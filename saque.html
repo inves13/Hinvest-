@@ -99,8 +99,8 @@
     <div class="saldos">
       <div class="saldo">
         <img src="10004.png" alt="">
-        <p id="saldo-conta">R$ 0.00</p>
-        <span>Saldo da conta</span>
+        <p id="saldo-carteira">R$ 0.00</p>
+        <span>Saldo da Carteira</span>
       </div>
       <div class="saldo">
         <img src="10004.png" alt="">
@@ -170,11 +170,11 @@
 
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
-        const saldoConta = parseFloat(data.saldoConta ?? data.saldo ?? 20).toFixed(2);
+        const saldoConta = parseFloat(data.saldodacarteira ?? data.saldo ?? 20).toFixed(2);
         const renda = parseFloat(data.renda || 0).toFixed(2);
         const recebimento = parseFloat(data.recebimento || 0).toFixed(2);
 
-        document.getElementById("saldo-conta").textContent = "R$ " + saldoConta;
+        document.getElementById("saldo-carteira").textContent = "R$ " + saldoConta;
         document.getElementById("renda-acumulada").textContent = "R$ " + renda;
         document.getElementById("valor-recebimento").textContent = "R$ " + recebimento;
 
