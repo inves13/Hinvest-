@@ -111,7 +111,7 @@
     function atualizarSaldo() {
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
-        const saldo = parseFloat(data.saldoConta || 0);
+        const saldo = parseFloat(data.saldodacarteira || 0);
         document.getElementById("saldo").textContent = saldo.toFixed(2);
         carregarPlanos(saldo);
       });
@@ -120,7 +120,7 @@
     function comprarPlano(nome, valor, retornoDiario) {
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
-        const saldoAtual = parseFloat(data.saldoConta || 0);
+        const saldoAtual = parseFloat(data.saldodacarteira || 0);
 
         if (saldoAtual < valor) {
           alert("Saldo insuficiente!");
@@ -196,7 +196,7 @@
     function coletarRendimento(nome, retornoDiario, index) {
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
-        const saldoAtual = parseFloat(data.saldoConta || 0);
+        const saldoAtual = parseFloat(data.saldodacarteira || 0);
 
         const novoSaldo = saldoAtual + retornoDiario;
         const investimentos = data.investimentos || [];
@@ -205,7 +205,7 @@
         investimentos[index].ultimoRetorno = new Date().getTime(); // Atualiza o horário do último retorno
 
         userRef.update({
-          saldoConta: novoSaldo,
+          saldodacarteira: novoSaldo,
           saldo: novoSaldo,
           investimentos: investimentos
         }).then(() => {
