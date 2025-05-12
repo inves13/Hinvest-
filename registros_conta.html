@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H+Investir - Cadastro e Login</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+            authDomain: "hinvest-f4354.firebaseapp.com",
+            projectId: "hinvest-f4354",
+            storageBucket: "hinvest-f4354.appspot.com",
+            messagingSenderId: "SENDER_ID_AQUI",
+            appId: "APP_ID_AQUI",
+            databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4caf50;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 5px;
+            background: #333;
+            color: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4caf50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #388e3c;
+        }
+
+        .voltar {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .voltar:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Tela de Login -->
+        <div id="loginForm">
+            <h2>Entrar</h2>
+            <label for="telefoneLogin">Telefone</label>
+            <input type="tel" id="telefoneLogin" name="telefoneLogin" required>
+
+            <label for="senhaLogin">Senha</label>
+            <input type="password" id="senhaLogin" name="senhaLogin" required>
+
+            <button type="button" onclick="login()">Entrar</button>
+            <p>Não tem uma conta? <a href="javascript:void(0);" onclick="showRegister()">Cadastre-se aqui</a></p>
+        </div>
+
+        <!-- Tela de Cadastro -->
+        <div id="registerForm" class="hidden">
+            <h2>Crie sua Conta</h2>
+            <form action="processar_registro.php" method="POST">
+                <label for="nome">Nome Completo</label>
+                <input type="text" id="nome" name="nome" required>
+
+                <label for="telefone">Número de Telefone</label>
+                <input type="tel" id="telefone" name="telefone" required>
+
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" required>
+
+                <label for="confirmar_senha">Confirmar Senha</label>
+                <input type="password" id="confirmar_senha" name="confirmar_senha" required>
+
+                <button type="button" onclick="register()">Registrar</button>
+            </form>
+
+            <a href="javascript:void(0);" onclick="showLogin()" class="voltar">Já tem uma conta? Faça login aqui</a>
+        </div>
+    </div>
+
+    <script>
+        // Alternar entre telas de login e cadastro
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+        }
+
+        // Função de Cadastro
+        function register() {
+            const nome = document.getElementById('nome').value;
+            const telefone = document.getElementById('telefone').value;
+            const senha = document.getElementById('senha').value;
+            const confirmarSenha = document.getElementById('confirmar_senha').value;
+
+            if (senha !== confirmarSenha) {
+                alert('As senhas não coincidem!');
+                return;
+            }
+
+            auth.createUserWithEmailAndPassword(telefone + '@example.com', senha)
+                .then(() => {
+                    alert('Cadastro realizado com sucesso!');
+                    localStorage.setItem("telefoneLogado", telefone);
+                    window.location.href = 'pagina_inicial.html'; // Redireciona para a página principal
+                })
+                .catch((error) => {
+                    alert('Erro no cadastro: ' + error.message);
+                });
+        }
+
+        // Função de Login
+        function login() {
+            const telefone = document.getElementById('telefoneLogin').value;
+            const senha = document.getElementById('senhaLogin').value;
+
+            auth.signInWithEmailAndPassword(telefone + '@example.com', senha)
+                .then(() => {
+                    localStorage.setItem("telefoneLogado", telefone);
+                    window.location.href = 'pagina_inicial.html'; // Redireciona para a página principal
+                })
+                .catch((error) => {
+                    alert('Erro no login: ' + error.message);
+                });
+        }
+
+        // Verifica se já está logado
+        function verificarLogin() {
+            const telefone = localStorage.getItem("telefoneLogado");
+            if (telefone) {
+                window.location.href = 'pagina_inicial.html'; // Redireciona automaticamente se estiver logado
+            }
+        }
+
+        window.onload = () => {
+            verificarLogin();
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Depósito Online</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #fff;
+    }
+
+    .deposit-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #1c1c1c;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .support-btn {
+      display: flex;
+      align-items: center;
+      padding: 8px 15px;
+      background-color: #25d366;
+      color: white;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .support-btn:hover {
+      background-color: #128c7e;
+    }
+
+    .support-btn img {
+      margin-right: 8px;
+    }
+
+    .payment-method label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      background-color: #333;
+      color: #fff;
+    }
+
+    .deposit-options {
+      margin-top: 20px;
+    }
+
+    .amount-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .amount-button {
+      padding: 15px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .amount-button:hover {
+      background-color: #0056b3;
+    }
+
+    .amount-button.selected {
+      background-color: #28a745;
+    }
+
+    .selected-amount {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    #deposit-now {
+      margin-top: 20px;
+      padding: 15px 0;
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    #deposit-now:hover {
+      background-color: #0056b3;
+    }
+
+    .pix-key {
+      margin-top: 20px;
+      display: none;
+      text-align: center;
+    }
+
+    .pix-key p {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .copy-btn {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background-color: #218838;
+    }
+
+    .action-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      display: none;
+    }
+
+    .cancel-btn, .continue-btn {
+      padding: 10px 20px;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .cancel-btn {
+      background-color: #dc3545;
+    }
+
+    .cancel-btn:hover {
+      background-color: #c82333;
+    }
+
+    .continue-btn {
+      background-color: #28a745;
+    }
+
+    .continue-btn:hover {
+      background-color: #218838;
+    }
+
+    .alert-message {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="deposit-container">
+  <div class="header">
+    <h2>Depósito Online</h2>
+    <a class="support-btn" href="https://wa.me/5575998282201?text=J%C3%A1%20recarreguei%20na%20plataforma%20da%20H%20investe" target="_blank">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/WhatsApp.svg" width="20" height="20" alt="WhatsApp">
+      Suporte
+    </a>
+  </div>
+
+  <div class="payment-method">
+    <label for="pix">Método de Depósito</label>
+    <select id="pix" name="pix">
+      <option value="pix">PIX</option>
+      <option value="bank">Transferência Bancária</option>
+    </select>
+  </div>
+
+  <div class="deposit-options">
+    <p>Escolha o valor do depósito:</p>
+    <div class="amount-buttons">
+      <button class="amount-button" data-value="60">R$ 60</button>
+      <button class="amount-button" data-value="160">R$ 160</button>
+      <button class="amount-button" data-value="300">R$ 300</button>
+      <button class="amount-button" data-value="450">R$ 450</button>
+      <button class="amount-button" data-value="500">R$ 500</button>
+      <button class="amount-button" data-value="650">R$ 650</button>
+      <button class="amount-button" data-value="700">R$ 700</button>
+      <button class="amount-button" data-value="850">R$ 850</button>
+      <button class="amount-button" data-value="900">R$ 900</button>
+      <button class="amount-button" data-value="1050">R$ 1050</button>
+    </div>
+    <div class="selected-amount">
+      <p>Valor Selecionado: <span id="selected-amount">R$ 0</span></p>
+    </div>
+  </div>
+
+  <button id="deposit-now" onclick="deposit()">Depositar agora</button>
+
+  <div class="pix-key" id="pix-key">
+    <p>Chave Pix: <span id="pix-key-value"></span></p>
+    <button class="copy-btn" onclick="copyPixKey()">Copiar chave</button>
+  </div>
+
+  <div class="action-buttons" id="action-buttons">
+    <button class="cancel-btn" onclick="cancelDeposit()">Cancelar</button>
+    <button class="continue-btn" onclick="confirmDeposit()">Confirmar Depósito</button>
+  </div>
+
+  <!-- Alerta de mensagem para depósito não processado -->
+  <div class="alert-message" id="alert-message">
+    O depósito foi feito, mas não caiu na plataforma. Entre em contato com o suporte para resolver a situação.
+  </div>
+</div>
+
+<script>
+  const amountButtons = document.querySelectorAll('.amount-button');
+  const selectedAmountDisplay = document.getElementById('selected-amount');
+  let selectedValue = null;
+
+  const pixKeys = {
+    "60": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/ad80dcdd-5a43-4723-a23c-ea33b6f800d45204000053039865802BR5907RK LTDA6009Sao Paulo62070503***6304DDFC",
+    "160": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/4be0ab00-efee-4a4e-9477-cfeea9c26bdf5204000053039865802BR5907RK LTDA6009Sao Paulo62070503***63044A9E",
+    "300": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/2d0f2264-fead-49fa-bfe9-cae25b821f3c5204000053039865802BR5907RK LTDA6009Sao Paulo62070503***63044211",
+    "450": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/0ea38309-8c2f-42bb-8f9d-beea07a3dac35204000053039865802BR5907RK LTDA6009Sao Paulo62070503***6304427A",
+    "500": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/d759e788-4a07-4f6a-bd73-923b57d941745204000053039865802BR5907RK LTDA6009Sao Paulo62070503***6304A4FE",
+    "650": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/72ccf1d8-4f6e-4d3a-90df-bb72db0345a65204000053039865802BR5907RK LTDA6009Sao Paulo62070503***6304F7F1",
+    "700": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/aad130a1-f4ab-4d8d-9333-32b26e2e3b265204000053039865802BR5907RK LTDA6009Sao Paulo62070503***63046A6B",
+    "850": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/62b6fe99-1220-4c3c-bd4f-b599bb2f6b0b5204000053039865802BR5907RK LTDA6009Sao Paulo62070503***63046F6F",
+    "900": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/92a0b3fe-502e-4234-8546-bdd7d8ac10545204000053039865802BR5907RK LTDA6009Sao Paulo62070503***630493B3",
+    "1050": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/7422e61b-90f7-4a2f-b0a5-49d1debdcbbe5204000053039865802BR5907RK LTDA6009Sao Paulo62070503***63040F77",
+  };
+
+  amountButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      selectedValue = button.getAttribute('data-value');
+      selectedAmountDisplay.textContent = `R$ ${selectedValue}`;
+      amountButtons.forEach(btn => btn.classList.remove('selected'));
+      button.classList.add('selected');
+    });
+  });
+
+  function deposit() {
+    if (!selectedValue) {
+      alert('Por favor, selecione um valor de depósito.');
+      return;
+    }
+
+    document.getElementById('pix-key').style.display = 'block';
+    document.getElementById('pix-key-value').textContent = pixKeys[selectedValue];
+    document.getElementById('action-buttons').style.display = 'flex';
+  }
+
+  function copyPixKey() {
+    const pixKey = document.getElementById('pix-key-value').textContent;
+    navigator.clipboard.writeText(pixKey)
+      .then(() => alert('Chave Pix copiada com sucesso!'))
+      .catch(() => alert('Erro ao copiar chave Pix.'));
+  }
+
+  function cancelDeposit() {
+    document.getElementById('pix-key').style.display = 'none';
+    document.getElementById('action-buttons').style.display = 'none';
+    selectedValue = null;
+    selectedAmountDisplay.textContent = 'R$ 0';
+  }
+
+  function confirmDeposit() {
+    // Adicionar lógica de verificação de depósito aqui
+    // Por exemplo, se o depósito não cair, exibe a mensagem de alerta
+
+    document.getElementById('alert-message').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>

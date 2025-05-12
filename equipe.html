@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>H Invest - Minha Equipe</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .box {
+      background: #1e1e1e;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    .label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .linha {
+      background: #222;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    button {
+      padding: 8px 12px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    h3 {
+      margin-top: 20px;
+    }
+    #membros-lista {
+      background: #222;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .membro {
+      background: #333;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="box">
+  <div class="label">Código de Convite</div>
+  <div class="linha">
+    <span id="codigo-link">Carregando...</span>
+    <button onclick="copiarTexto('codigo-link')">Copiar</button>
+  </div>
+  <div class="linha">
+    <strong>Compartilhar</strong>
+    <button onclick="compartilharWhatsApp()">WhatsApp</button>
+  </div>
+
+  <div class="label">Minha Equipe</div>
+
+  <h3>LV1</h3>
+  <div class="linha"><span>26% Taxa de comissão</span></div>
+  <div class="linha"><span id="lv1-qtd">0 Quantidade efetiva</span></div>
+  <div class="linha"><span id="lv1-bonus">R$ 0,00 Bônus</span></div>
+
+  <h3>LV2</h3>
+  <div class="linha"><span>1% Taxa de comissão</span></div>
+  <div class="linha"><span id="lv2-qtd">0 Quantidade efetiva</span></div>
+  <div class="linha"><span id="lv2-bonus">R$ 0,00 Bônus</span></div>
+
+  <h3>LV3</h3>
+  <div class="linha"><span>1% Taxa de comissão</span></div>
+  <div class="linha"><span id="lv3-qtd">0 Quantidade efetiva</span></div>
+  <div class="linha"><span id="lv3-bonus">R$ 0,00 Bônus</span></div>
+
+  <div class="linha"><strong>Número de equipe</strong><span id="total-users">0</span></div>
+  <div class="linha">
+    <strong>Bônus total</strong><span id="total-bonus">R$ 0,00</span>
+    <button id="btn-resgatar" onclick="resgatarBônus()">Resgatar</button>
+  </div>
+
+  <button onclick="mostrarMembros()">Ver Membros da Equipe</button>
+  <div id="membros-lista"></div>
+
+  <ul id="invited-users"></ul>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+  authDomain: "hinvest-f4354.firebaseapp.com",
+  databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+  projectId: "hinvest-f4354",
+  storageBucket: "hinvest-f4354.appspot.com",
+  messagingSenderId: "646397677016",
+  appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const telefoneLogado = localStorage.getItem("telefoneLogado");
+if (!telefoneLogado) {
+  window.location.href = "index.html";
+}
+
+let meuCodigo = "";
+let membrosLv1 = [], membrosLv2 = [], membrosLv3 = [];
+let bonusTotal = 0; // Variável para armazenar o bônus total
+let saldoConta = 60.00; // Exemplo de saldo inicial da conta, você pode pegar isso do Firebase também
+let bonusResgatado = false; // Status de resgate
+
+db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
+  const user = snapshot.val();
+  if (user) {
+    if (!user.codigo) {
+      const codigoUnico = gerarCodigoUnico();
+      db.ref("usuarios/" + telefoneLogado).update({ codigo: codigoUnico });
+      meuCodigo = codigoUnico;
+    } else {
+      meuCodigo = user.codigo;
+    }
+
+    if (user.bonusResgatado) {
+      bonusResgatado = true;
+      document.getElementById("btn-resgatar").disabled = true;
+      document.getElementById("btn-resgatar").innerText = "Bônus Resgatado";
+    }
+
+    const codigoLink = meuCodigo + " - " + "https://inves13.github.io/hivest-codigo-1/?codigo=" + encodeURIComponent(meuCodigo);
+    document.getElementById("codigo-link").innerText = codigoLink;
+    carregarEquipe(meuCodigo);
+  }
+});
+
+function gerarCodigoUnico() {
+  return Math.random().toString(36).substr(2, 8).toUpperCase();
+}
+
+function carregarEquipe(codigo) {
+  db.ref("usuarios").once("value").then(snapshot => {
+    let lv1 = 0, lv2 = 0, lv3 = 0;
+    let bonus1 = 0, bonus2 = 0, bonus3 = 0;
+    membrosLv1 = []; membrosLv2 = []; membrosLv3 = [];
+
+    const usuarios = snapshot.val();
+
+    for (let t1 in usuarios) {
+      const u1 = usuarios[t1];
+      if (u1.codigoIndicacao === codigo) {
+        lv1++; bonus1 += 20 * 0.26; membrosLv1.push(u1);
+        for (let t2 in usuarios) {
+          const u2 = usuarios[t2];
+          if (u2.codigoIndicacao === u1.codigo) {
+            lv2++; bonus2 += 20 * 0.01; membrosLv2.push(u2);
+            for (let t3 in usuarios) {
+              const u3 = usuarios[t3];
+              if (u3.codigoIndicacao === u2.codigo) {
+                lv3++; bonus3 += 20 * 0.01; membrosLv3.push(u3);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    bonusTotal = bonus1 + bonus2 + bonus3;
+
+    document.getElementById("lv1-qtd").innerText = lv1 + " Quantidade efetiva";
+    document.getElementById("lv1-bonus").innerText = "R$ " + bonus1.toFixed(2).replace(".", ",");
+    document.getElementById("lv2-qtd").innerText = lv2 + " Quantidade efetiva";
+    document.getElementById("lv2-bonus").innerText = "R$ " + bonus2.toFixed(2).replace(".", ",");
+    document.getElementById("lv3-qtd").innerText = lv3 + " Quantidade efetiva";
+    document.getElementById("lv3-bonus").innerText = "R$ " + bonus3.toFixed(2).replace(".", ",");
+
+    document.getElementById("total-users").innerText = lv1 + lv2 + lv3;
+    document.getElementById("total-bonus").innerText = "R$ " + bonusTotal.toFixed(2).replace(".", ",");
+
+    if (bonusResgatado) {
+      document.getElementById("btn-resgatar").disabled = true;
+      document.getElementById("btn-resgatar").innerText = "Bônus Resgatado";
+    }
+  });
+}
+
+function mostrarMembros() {
+  let listaMembros = "<h3>Lv1 Membros</h3>";
+  listaMembros += membrosLv1.map(membro => `
+    <div class="membro">
+      <strong>Nome:</strong> ${membro.nome} <br>
+      <strong>Telefone:</strong> ${mascararTelefone(membro.telefone)} <br>
+      <strong>Código:</strong> ${membro.codigo} <br><br>
+    </div>
+  `).join("");
+
+  listaMembros += "<h3>Lv2 Membros</h3>";
+  listaMembros += membrosLv2.map(membro => `
+    <div class="membro">
+      <strong>Nome:</strong> ${membro.nome} <br>
+      <strong>Telefone:</strong> ${mascararTelefone(membro.telefone)} <br>
+      <strong>Código:</strong> ${membro.codigo} <br><br>
+    </div>
+  `).join("");
+
+  listaMembros += "<h3>Lv3 Membros</h3>";
+  listaMembros += membrosLv3.map(membro => `
+    <div class="membro">
+      <strong>Nome:</strong> ${membro.nome} <br>
+      <strong>Telefone:</strong> ${mascararTelefone(membro.telefone)} <br>
+      <strong>Código:</strong> ${membro.codigo} <br><br>
+    </div>
+  `).join("");
+
+  document.getElementById("membros-lista").innerHTML = listaMembros;
+}
+
+function mascararTelefone(telefone) {
+  return telefone.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+}
+
+function copiarTexto(id) {
+  const texto = document.getElementById(id).innerText;
+  const areaTexto = document.createElement("textarea");
+  areaTexto.value = texto;
+  document.body.appendChild(areaTexto);
+  areaTexto.select();
+  document.execCommand("copy");
+  document.body.removeChild(areaTexto);
+}
+
+function compartilharWhatsApp() {
+  const mensagem = "Confira meu código de convite: " + meuCodigo;
+  window.open("https://wa.me/?text=" + encodeURIComponent(mensagem), "_blank");
+}
+
+function resgatarBônus() {
+  if (bonusTotal >= saldoConta) {
+    db.ref("usuarios/" + telefoneLogado).update({
+      bonusResgatado: true,
+    });
+
+    alert("Bônus resgatado com sucesso!");
+    location.reload(); // Recarrega a página para refletir o estado atualizado
+  } else {
+    alert("Você precisa de um bônus maior ou igual ao saldo da sua conta para resgatar.");
+  }
+}
+</script>
+</body>
+</html>
