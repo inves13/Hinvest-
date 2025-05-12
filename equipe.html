@@ -98,8 +98,6 @@
 
   <button onclick="mostrarMembros()">Ver Membros da Equipe</button>
   <div id="membros-lista"></div>
-
-  <ul id="invited-users"></ul>
 </div>
 
 <script>
@@ -122,20 +120,14 @@ if (!telefoneLogado) {
 
 let meuCodigo = "";
 let membrosLv1 = [], membrosLv2 = [], membrosLv3 = [];
-let bonusTotal = 0; // Variável para armazenar o bônus total
-let saldoConta = 60.00; // Exemplo de saldo inicial da conta, você pode pegar isso do Firebase também
-let bonusResgatado = false; // Status de resgate
+let bonusTotal = 0;
+let bonusResgatado = false;
 
 db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
   const user = snapshot.val();
   if (user) {
-    if (!user.codigo) {
-      const codigoUnico = gerarCodigoUnico();
-      db.ref("usuarios/" + telefoneLogado).update({ codigo: codigoUnico });
-      meuCodigo = codigoUnico;
-    } else {
-      meuCodigo = user.codigo;
-    }
+    meuCodigo = user.codigo || gerarCodigoUnico();
+    db.ref("usuarios/" + telefoneLogado).update({ codigo: meuCodigo });
 
     if (user.bonusResgatado) {
       bonusResgatado = true;
@@ -191,75 +183,73 @@ function carregarEquipe(codigo) {
 
     document.getElementById("total-users").innerText = lv1 + lv2 + lv3;
     document.getElementById("total-bonus").innerText = "R$ " + bonusTotal.toFixed(2).replace(".", ",");
+  });
+}
 
-    if (bonusResgatado) {
-      document.getElementById("btn-resgatar").disabled = true;
-      document.getElementById("btn-resgatar").innerText = "Bônus Resgatado";
-    }
+function resgatarBônus() {
+  if (bonusResgatado || bonusTotal <= 0) return;
+
+  db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
+    const user = snapshot.val();
+    const saldoAtual = user.saldo || 0;
+    const novoSaldo = saldoAtual + bonusTotal;
+
+    db.ref("usuarios/" + telefoneLogado).update({
+      saldo: novoSaldo,
+      bonusResgatado: true
+    });
+
+    document.getElementById("btn-resgatar").disabled = true;
+    document.getElementById("btn-resgatar").innerText = "Bônus Resgatado";
+    alert("Bônus de R$ " + bonusTotal.toFixed(2).replace(".", ",") + " resgatado com sucesso!");
   });
 }
 
 function mostrarMembros() {
-  let listaMembros = "<h3>Lv1 Membros</h3>";
-  listaMembros += membrosLv1.map(membro => `
+  let lista = "<h3>Lv1 Membros</h3>";
+  lista += membrosLv1.map(m => `
     <div class="membro">
-      <strong>Nome:</strong> ${membro.nome} <br>
-      <strong>Telefone:</strong> ${mascararTelefone(membro.telefone)} <br>
-      <strong>Código:</strong> ${membro.codigo} <br><br>
+      <strong>Nome:</strong> ${m.nome}<br>
+      <strong>Telefone:</strong> ${mascararTelefone(m.telefone)}<br>
+      <strong>Código:</strong> ${m.codigo}
     </div>
   `).join("");
 
-  listaMembros += "<h3>Lv2 Membros</h3>";
-  listaMembros += membrosLv2.map(membro => `
+  lista += "<h3>Lv2 Membros</h3>";
+  lista += membrosLv2.map(m => `
     <div class="membro">
-      <strong>Nome:</strong> ${membro.nome} <br>
-      <strong>Telefone:</strong> ${mascararTelefone(membro.telefone)} <br>
-      <strong>Código:</strong> ${membro.codigo} <br><br>
+      <strong>Nome:</strong> ${m.nome}<br>
+      <strong>Telefone:</strong> ${mascararTelefone(m.telefone)}<br>
+      <strong>Código:</strong> ${m.codigo}
     </div>
   `).join("");
 
-  listaMembros += "<h3>Lv3 Membros</h3>";
-  listaMembros += membrosLv3.map(membro => `
+  lista += "<h3>Lv3 Membros</h3>";
+  lista += membrosLv3.map(m => `
     <div class="membro">
-      <strong>Nome:</strong> ${membro.nome} <br>
-      <strong>Telefone:</strong> ${mascararTelefone(membro.telefone)} <br>
-      <strong>Código:</strong> ${membro.codigo} <br><br>
+      <strong>Nome:</strong> ${m.nome}<br>
+      <strong>Telefone:</strong> ${mascararTelefone(m.telefone)}<br>
+      <strong>Código:</strong> ${m.codigo}
     </div>
   `).join("");
 
-  document.getElementById("membros-lista").innerHTML = listaMembros;
+  document.getElementById("membros-lista").innerHTML = lista;
 }
 
 function mascararTelefone(telefone) {
-  return telefone.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  return telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
 }
 
 function copiarTexto(id) {
   const texto = document.getElementById(id).innerText;
-  const areaTexto = document.createElement("textarea");
-  areaTexto.value = texto;
-  document.body.appendChild(areaTexto);
-  areaTexto.select();
-  document.execCommand("copy");
-  document.body.removeChild(areaTexto);
+  navigator.clipboard.writeText(texto);
+  alert("Copiado: " + texto);
 }
 
 function compartilharWhatsApp() {
-  const mensagem = "Confira meu código de convite: " + meuCodigo;
+  const link = document.getElementById("codigo-link").innerText;
+  const mensagem = "Junte-se à minha equipe na H Invest e ganhe bônus!\n\n" + link;
   window.open("https://wa.me/?text=" + encodeURIComponent(mensagem), "_blank");
-}
-
-function resgatarBônus() {
-  if (bonusTotal >= saldoConta) {
-    db.ref("usuarios/" + telefoneLogado).update({
-      bonusResgatado: true,
-    });
-
-    alert("Bônus resgatado com sucesso!");
-    location.reload(); // Recarrega a página para refletir o estado atualizado
-  } else {
-    alert("Você precisa de um bônus maior ou igual ao saldo da sua conta para resgatar.");
-  }
 }
 </script>
 </body>
