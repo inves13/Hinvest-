@@ -135,7 +135,8 @@ db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
       document.getElementById("btn-resgatar").innerText = "Bônus Resgatado";
     }
 
-    const codigoLink = meuCodigo + " - " + "https://inves13.github.io/hivest-codigo-1/?codigo=" + encodeURIComponent(meuCodigo);
+    // Modificação para gerar o link único de convite
+    const codigoLink = meuCodigo + " - " + "https://inves13.github.io/Hinvest-/H.html?codigo=" + encodeURIComponent(meuCodigo);
     document.getElementById("codigo-link").innerText = codigoLink;
     carregarEquipe(meuCodigo);
   }
@@ -192,64 +193,51 @@ function resgatarBônus() {
   db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
     const user = snapshot.val();
     const saldoAtual = user.saldo || 0;
-    const novoSaldo = saldoAtual + bonusTotal;
+
+    if (bonusTotal + saldoAtual >= 2000) {
+      alert("Você não pode resgatar mais de R$ 2000,00");
+      return;
+    }
 
     db.ref("usuarios/" + telefoneLogado).update({
-      saldo: novoSaldo,
+      saldo: saldoAtual + bonusTotal,
       bonusResgatado: true
+    }).then(() => {
+      bonusResgatado = true;
+      document.getElementById("btn-resgatar").disabled = true;
+      document.getElementById("btn-resgatar").innerText = "Bônus Resgatado";
+      alert("Bônus resgatado com sucesso!");
     });
+  });
+}
 
-    document.getElementById("btn-resgatar").disabled = true;
-    document.getElementById("btn-resgatar").innerText = "Bônus Resgatado";
-    alert("Bônus de R$ " + bonusTotal.toFixed(2).replace(".", ",") + " resgatado com sucesso!");
+function compartilharWhatsApp() {
+  const url = "https://wa.me/?text=" + encodeURIComponent("Junte-se à minha equipe! Código de Convite: " + meuCodigo);
+  window.open(url, "_blank");
+}
+
+function copiarTexto(elementId) {
+  const texto = document.getElementById(elementId).innerText;
+  navigator.clipboard.writeText(texto).then(() => {
+    alert("Código copiado para a área de transferência!");
   });
 }
 
 function mostrarMembros() {
-  let lista = "<h3>Lv1 Membros</h3>";
-  lista += membrosLv1.map(m => `
-    <div class="membro">
-      <strong>Nome:</strong> ${m.nome}<br>
-      <strong>Telefone:</strong> ${mascararTelefone(m.telefone)}<br>
-      <strong>Código:</strong> ${m.codigo}
-    </div>
-  `).join("");
+  const listaMembros = [...membrosLv1, ...membrosLv2, ...membrosLv3];
+  const listaMembrosDiv = document.getElementById("membros-lista");
+  listaMembrosDiv.innerHTML = ""; // Limpar lista
 
-  lista += "<h3>Lv2 Membros</h3>";
-  lista += membrosLv2.map(m => `
-    <div class="membro">
-      <strong>Nome:</strong> ${m.nome}<br>
-      <strong>Telefone:</strong> ${mascararTelefone(m.telefone)}<br>
-      <strong>Código:</strong> ${m.codigo}
-    </div>
-  `).join("");
-
-  lista += "<h3>Lv3 Membros</h3>";
-  lista += membrosLv3.map(m => `
-    <div class="membro">
-      <strong>Nome:</strong> ${m.nome}<br>
-      <strong>Telefone:</strong> ${mascararTelefone(m.telefone)}<br>
-      <strong>Código:</strong> ${m.codigo}
-    </div>
-  `).join("");
-
-  document.getElementById("membros-lista").innerHTML = lista;
-}
-
-function mascararTelefone(telefone) {
-  return telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
-}
-
-function copiarTexto(id) {
-  const texto = document.getElementById(id).innerText;
-  navigator.clipboard.writeText(texto);
-  alert("Copiado: " + texto);
-}
-
-function compartilharWhatsApp() {
-  const link = document.getElementById("codigo-link").innerText;
-  const mensagem = "Junte-se à minha equipe na H Invest e ganhe bônus!\n\n" + link;
-  window.open("https://wa.me/?text=" + encodeURIComponent(mensagem), "_blank");
+  listaMembros.forEach(membro => {
+    const membroDiv = document.createElement("div");
+    membroDiv.classList.add("membro");
+    membroDiv.innerHTML = `
+      <div><strong>${membro.nome}</strong></div>
+      <div>Telefone: ${membro.telefone}</div>
+      <div>Código: ${membro.codigo}</div>
+    `;
+    listaMembrosDiv.appendChild(membroDiv);
+  });
 }
 </script>
 </body>
