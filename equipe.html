@@ -123,29 +123,34 @@ let membrosLv1 = [], membrosLv2 = [], membrosLv3 = [];
 let bonusTotal = 0;
 let bonusResgatado = false;
 
+// Recuperando dados do usuário logado
 db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
   const user = snapshot.val();
   if (user) {
     meuCodigo = user.codigo || gerarCodigoUnico();
     db.ref("usuarios/" + telefoneLogado).update({ codigo: meuCodigo });
 
+    // Se já resgatou bônus, não pode mais resgatar
     if (user.bonusResgatado) {
       bonusResgatado = true;
       document.getElementById("btn-resgatar").disabled = true;
       document.getElementById("btn-resgatar").innerText = "Bônus Resgatado";
     }
 
-    // Modificação para gerar o link único de convite no formato desejado
+    // Exibindo o link único de convite com o código
     const codigoLink = "https://inves13.github.io/Hinvest-/?codigo=" + encodeURIComponent(meuCodigo);
     document.getElementById("codigo-link").innerText = codigoLink;
+
     carregarEquipe(meuCodigo);
   }
 });
 
+// Função para gerar um código único para cada usuário
 function gerarCodigoUnico() {
   return Math.random().toString(36).substr(2, 8).toUpperCase();
 }
 
+// Carregando membros da equipe
 function carregarEquipe(codigo) {
   db.ref("usuarios").once("value").then(snapshot => {
     let lv1 = 0, lv2 = 0, lv3 = 0;
@@ -181,62 +186,45 @@ function carregarEquipe(codigo) {
     document.getElementById("lv2-bonus").innerText = "R$ " + bonus2.toFixed(2).replace(".", ",");
     document.getElementById("lv3-qtd").innerText = lv3 + " Quantidade efetiva";
     document.getElementById("lv3-bonus").innerText = "R$ " + bonus3.toFixed(2).replace(".", ",");
-
     document.getElementById("total-users").innerText = lv1 + lv2 + lv3;
     document.getElementById("total-bonus").innerText = "R$ " + bonusTotal.toFixed(2).replace(".", ",");
   });
 }
 
+// Função para resgatar bônus
 function resgatarBônus() {
-  if (bonusResgatado || bonusTotal <= 0) return;
-
-  db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
-    const user = snapshot.val();
-    const saldoAtual = user.saldo || 0;
-
-    if (bonusTotal + saldoAtual >= 2000) {
-      alert("Você não pode resgatar mais de R$ 2000,00");
-      return;
-    }
-
+  if (!bonusResgatado) {
     db.ref("usuarios/" + telefoneLogado).update({
-      saldo: saldoAtual + bonusTotal,
       bonusResgatado: true
-    }).then(() => {
-      bonusResgatado = true;
-      document.getElementById("btn-resgatar").disabled = true;
-      document.getElementById("btn-resgatar").innerText = "Bônus Resgatado";
-      alert("Bônus resgatado com sucesso!");
     });
-  });
+    alert("Bônus resgatado com sucesso!");
+    location.reload();
+  }
 }
 
+// Copiar o link para a área de transferência
+function copiarTexto(id) {
+  const texto = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(texto);
+}
+
+// Compartilhar via WhatsApp
 function compartilharWhatsApp() {
-  const url = "https://wa.me/?text=" + encodeURIComponent("Junte-se à minha equipe! Código de Convite: " + meuCodigo);
+  const codigoLink = document.getElementById("codigo-link").innerText;
+  const mensagem = "Convite para o H Invest: " + codigoLink;
+  const url = "https://wa.me/?text=" + encodeURIComponent(mensagem);
   window.open(url, "_blank");
 }
 
-function copiarTexto(elementId) {
-  const texto = document.getElementById(elementId).innerText;
-  navigator.clipboard.writeText(texto).then(() => {
-    alert("Código copiado para a área de transferência!");
-  });
-}
-
+// Mostrar membros da equipe
 function mostrarMembros() {
-  const listaMembros = [...membrosLv1, ...membrosLv2, ...membrosLv3];
-  const listaMembrosDiv = document.getElementById("membros-lista");
-  listaMembrosDiv.innerHTML = ""; // Limpar lista
-
-  listaMembros.forEach(membro => {
-    const membroDiv = document.createElement("div");
-    membroDiv.classList.add("membro");
-    membroDiv.innerHTML = `
-      <div><strong>${membro.nome}</strong></div>
-      <div>Telefone: ${membro.telefone}</div>
-      <div>Código: ${membro.codigo}</div>
-    `;
-    listaMembrosDiv.appendChild(membroDiv);
+  const listaMembros = document.getElementById("membros-lista");
+  listaMembros.innerHTML = "";
+  membrosLv1.forEach(membro => {
+    const div = document.createElement("div");
+    div.classList.add("membro");
+    div.innerText = "Nome: " + membro.nome + " - Código: " + membro.codigo;
+    listaMembros.appendChild(div);
   });
 }
 </script>
