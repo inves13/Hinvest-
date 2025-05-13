@@ -135,8 +135,8 @@ db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
       document.getElementById("btn-resgatar").innerText = "Bônus Resgatado";
     }
 
-    // Modificação para gerar o link único de convite
-    const codigoLink = meuCodigo + " - " + "https://inves13.github.io/Hinvest-/H.html?codigo=" + encodeURIComponent(meuCodigo);
+    // Modificação para gerar o link único de convite no formato desejado
+    const codigoLink = "https://inves13.github.io/Hinvest-/?codigo=" + encodeURIComponent(meuCodigo);
     document.getElementById("codigo-link").innerText = codigoLink;
     carregarEquipe(meuCodigo);
   }
