@@ -8,93 +8,58 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
-    body {
-      background-color: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
+    /* Ajuste no layout dos campos */
+    section.carteira, section.conta, section.saque {
+      margin: 20px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 20px;
-      background-color: #222;
-      border-bottom: 1px solid #444;
-    }
-
-    h2 {
-      margin: 0;
-    }
-
-    a {
-      text-decoration: none;
-      color: #007bff;
-    }
-
-    .carteira, .conta, .saque {
-      padding: 20px;
-      margin: 10px;
-      background-color: #333;
-      border-radius: 5px;
-    }
-
-    .saldos {
+    section.carteira .saldos {
       display: flex;
       justify-content: space-between;
     }
 
-    .saldo {
-      text-align: center;
-    }
-
-    .saldo img {
-      width: 50px;
-    }
-
-    label, input, select, button {
+    section.conta label, section.saque label {
       display: block;
-      margin: 10px 0;
+      margin: 5px 0;
+    }
+
+    section.conta input, section.saque input, section.conta select {
       width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 4px;
+      border: 1px solid #ddd;
     }
 
-    input, select {
+    section.conta button, section.saque button {
       padding: 10px;
-      background-color: #555;
-      color: #fff;
-      border: 1px solid #444;
-      border-radius: 5px;
-    }
-
-    button {
-      padding: 10px;
-      background-color: #007bff;
-      color: #fff;
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
+      border-radius: 5px;
     }
 
-    button:disabled {
+    section.conta button:disabled {
       background-color: #ccc;
     }
 
-    .valor-recebido {
-      font-weight: bold;
+    section.saque p {
+      margin-top: 10px;
     }
-
   </style>
 </head>
 <body>
 
-  <!-- BARRA SUPERIOR -->
   <header>
     <h2>Carteira</h2>
-    <!-- Link para ver o extrato -->
     <a href="extrato.html">Ver Extrato</a>
   </header>
 
-  <!-- SALDOS -->
   <section class="carteira">
     <h2>Minha carteira</h2>
     <div class="saldos">
@@ -116,25 +81,21 @@
     </div>
   </section>
 
-  <!-- CONTA BANCÁRIA -->
   <section class="conta">
     <h2>Conta Bancária</h2>
     <label>Nome do Titular:</label>
     <input type="text" id="nomeTitular" placeholder="Nome completo" />
-
     <label>Tipo de chave PIX:</label>
     <select id="tipoChave">
       <option value="email">Email</option>
       <option value="telefone">Telefone</option>
       <option value="cpf">CPF</option>
     </select>
-
     <label>Chave PIX:</label>
     <input type="text" id="chavePix" placeholder="Sua chave PIX" />
     <button id="salvarConta">Salvar Conta</button>
   </section>
 
-  <!-- SAQUE -->
   <section class="saque">
     <h2>Saque</h2>
     <label>Valor para saque (mínimo R$20):</label>
@@ -161,7 +122,6 @@
     const userId = localStorage.getItem("telefoneLogado");
     const userRef = db.ref("usuarios/" + userId);
 
-    // Mostrar saldos
     document.addEventListener("DOMContentLoaded", () => {
       if (!userId) {
         alert("Usuário não logado.");
@@ -171,27 +131,23 @@
 
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
-        
-        // Verifique se existe saldo no banco de dados, se não, use os valores fixos
-        const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00).toFixed(2);  // Se não houver, usa R$ 71,00
-        const renda = parseFloat(data.renda ?? 1.00).toFixed(2);  // Usa R$ 1,00 como renda
-        const recebimento = parseFloat(data.recebimento || 0).toFixed(2);  // Renda acumulada
+        const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00).toFixed(2);
+        const renda = parseFloat(data.renda ?? 1.00).toFixed(2);
+        const recebimento = parseFloat(data.recebimento || 0).toFixed(2);
 
         document.getElementById("saldo-carteira").textContent = "R$ " + saldoCarteira;
         document.getElementById("renda-acumulada").textContent = "R$ " + renda;
         document.getElementById("valor-recebimento").textContent = "R$ " + recebimento;
 
-        // Se os dados bancários já estiverem salvos, não exibe o formulário
         if (data.contaBancaria) {
           document.getElementById("nomeTitular").value = data.contaBancaria.nomeTitular;
           document.getElementById("tipoChave").value = data.contaBancaria.tipoChave;
           document.getElementById("chavePix").value = data.contaBancaria.chavePix;
-          document.getElementById("salvarConta").disabled = true; // Desativa o botão de salvar
+          document.getElementById("salvarConta").disabled = true;
         }
       });
     });
 
-    // Salvar conta bancária
     document.getElementById("salvarConta").addEventListener("click", () => {
       const nome = document.getElementById("nomeTitular").value;
       const tipo = document.getElementById("tipoChave").value;
@@ -211,10 +167,9 @@
       });
 
       alert("Conta bancária salva com sucesso!");
-      document.getElementById("salvarConta").disabled = true; // Desativa o botão após salvar
+      document.getElementById("salvarConta").disabled = true;
     });
 
-    // Função para calcular o valor líquido após a taxa de 12%
     function calcularValorRecebido() {
       const valor = parseFloat(document.getElementById("valorSaque").value);
       if (!isNaN(valor) && valor >= 20) {
@@ -225,7 +180,6 @@
       }
     }
 
-    // Fazer saque
     document.getElementById("confirmarSaque").addEventListener("click", async () => {
       const valor = parseFloat(document.getElementById("valorSaque").value);
       if (isNaN(valor) || valor < 20) {
@@ -235,27 +189,32 @@
 
       const snapshot = await userRef.once("value");
       const data = snapshot.val();
+      const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00);
 
-      if (data.saldoCarteira < valor) {
-        alert("Saldo insuficiente.");
+      if (valor > saldoCarteira) {
+        alert("Você não tem saldo suficiente para realizar o saque.");
         return;
       }
 
       const taxa = valor * 0.12;
-      const valorRecebido = valor - taxa;
+      const valorLiquido = valor - taxa;
 
-      // Atualizar saldo após o saque
+      // Atualizando saldo no banco de dados
       userRef.update({
-        saldoCarteira: data.saldoCarteira - valor,
-        recebimento: valorRecebido
+        saldoCarteira: saldoCarteira - valor,
+        extrato: (data.extrato || []).concat({
+          valor: valor,
+          taxa: taxa,
+          valorRecebido: valorLiquido,
+          data: new Date().toISOString()
+        })
       });
 
-      alert("Saque realizado com sucesso! Você recebeu: R$ " + valorRecebido.toFixed(2));
+      alert("Saque realizado com sucesso! Você receberá R$ " + valorLiquido.toFixed(2));
       document.getElementById("valorSaque").value = "";
       document.getElementById("valorTaxa").textContent = "R$ 0.00";
       document.getElementById("valorLiquido").textContent = "R$ 0.00";
     });
   </script>
-
 </body>
 </html>
