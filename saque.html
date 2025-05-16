@@ -202,19 +202,26 @@
       // Atualizando saldo no banco de dados
       userRef.update({
         saldoCarteira: saldoCarteira - valor,
-        extrato: (data.extrato || []).concat({
-          valor: valor,
-          taxa: taxa,
-          valorRecebido: valorLiquido,
-          data: new Date().toISOString()
-        })
+        recebimento: (parseFloat(data.recebimento || 0) + valorLiquido).toFixed(2)
       });
 
-      alert("Saque realizado com sucesso! Você receberá R$ " + valorLiquido.toFixed(2));
+      // Registrando o saque no extrato
+      const extratoRef = db.ref("extratos/" + userId);
+      const novaRetirada = {
+        data: new Date().toISOString(),
+        valor: valor,
+        valorLiquido: valorLiquido,
+        taxa: taxa
+      };
+
+      extratoRef.push(novaRetirada);
+
+      document.getElementById("status").textContent = "Saque de R$ " + valor + " realizado com sucesso!";
       document.getElementById("valorSaque").value = "";
       document.getElementById("valorTaxa").textContent = "R$ 0.00";
       document.getElementById("valorLiquido").textContent = "R$ 0.00";
     });
   </script>
+
 </body>
 </html>
