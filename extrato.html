@@ -65,25 +65,46 @@
 
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
-        const extrato = data.extrato || [];
         const extratoContainer = document.getElementById("extrato");
 
-        if (extrato.length === 0) {
+        // Verifica se o campo "extrato" está presente nos dados do usuário
+        const extrato = data.extrato;
+
+        if (!extrato) {
           extratoContainer.innerHTML = "<p>Sem saques registrados.</p>";
         } else {
           extrato.forEach(item => {
             const div = document.createElement("div");
             div.classList.add("extrato-item");
-            const statusClass = item.status === "pendente" ? "aguardando" : "aprovado";
+
+            // Verifica o status do saque
+            const statusClass = item.status === "Aprovado" ? "aprovado" : "aguardando";
             div.innerHTML = `
-              <p><strong>Data:</strong> ${new Date(item.data).toLocaleString()}</p>
-              <p><strong>Valor:</strong> R$ ${item.valor.toFixed(2)}</p>
-              <p><strong>Taxa:</strong> R$ ${item.taxa.toFixed(2)}</p>
-              <p><strong>Valor Recebido:</strong> R$ ${item.valorRecebido.toFixed(2)}</p>
-              <p class="${statusClass}"><strong>Status:</strong> ${item.status}</p>
+              <p><strong>Valor:</strong> R$ ${parseFloat(item.valor).toFixed(2)}</p>
+              <p><strong>Status:</strong> <span class="${statusClass}">${item.status}</span></p>
+              <p><strong>Data:</strong> ${item.data}</p>
             `;
             extratoContainer.appendChild(div);
           });
+        }
+
+        // Verifica se o campo "recebimento" está presente nos dados do usuário
+        const recebimento = data.recebimento;
+
+        if (recebimento) {
+          // Exibe o valor de "recebimento" com data e status
+          const div = document.createElement("div");
+          div.classList.add("extrato-item");
+
+          // Formata a data do saque
+          const dataSaque = new Date().toLocaleDateString('pt-BR');  // Data de hoje
+          
+          div.innerHTML = `
+            <p><strong>Recebimento:</strong> R$ ${parseFloat(recebimento).toFixed(2)}</p>
+            <p><strong>Data:</strong> ${dataSaque}</p>
+            <p><strong>Status:</strong> <span class="aguardando">Aguardando Aprovação</span></p>
+          `;
+          extratoContainer.appendChild(div);
         }
       });
     });
