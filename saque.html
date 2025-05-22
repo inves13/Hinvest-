@@ -202,7 +202,7 @@
       // Atualizando saldo no banco de dados
       userRef.update({
         saldoCarteira: saldoCarteira - valor,
-        recebimento: (parseFloat(data.recebimento || 0) + valorLiquido).toFixed(2)
+        recebimento: valorLiquido.toFixed(2)  // Zera o valor de recebimento e coloca o valor do saque
       });
 
       // Registrando o saque no extrato
