@@ -7,6 +7,18 @@
   <link rel="stylesheet" href="style.css" />
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <style>
+    /* Adicionando centralização apenas para a seção de nome e telefone */
+    .usuario-info {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .usuario-info p {
+      font-size: 18px;
+      margin: 5px 0;
+    }
+  </style>
 </head>
 <body>
   <div class="logo">
@@ -14,12 +26,12 @@
   </div>
 
   <section class="usuario-info">
-    <p id="usuario-nome">Nome do Usuário: Carregando...</p>
-    <p id="usuario-telefone">Telefone: Carregando...</p>
+    <p id="usuario-nome">Luis Fernando</p>
+    <p id="usuario-telefone">lD7599*****201</p>
   </section>
 
   <section class="acoes">
-    <a href="deposito.html" class="botao"><img src="10003.png" alt=""> Deposito</a>
+    <a href="deposito.html" class="botao"><img src="10003.png" alt=""> Depósito</a>
     <a href="saque.html" class="botao"><img src="10004.png" alt=""> Retirada</a>
     <button class="botao" id="checkin-diario"><img src="10005.png" alt=""> Check-in Diário</button>
     <a href="download.html" class="botao"><img src="10011.png" alt=""> Baixar App</a>
@@ -39,7 +51,7 @@
       <div class="saldo">
         <img src="10004.png" alt="">
         <p id="saldo-carteira">R$ 0.00</p>
-        <span>Saldo da carteira</span> <!-- Alterado para "Saldo da carteira" -->
+        <span>Saldo da carteira</span>
       </div>
       <div class="saldo">
         <img src="10004.png" alt="">
@@ -102,16 +114,17 @@
         }
 
         // Recupera os dados atuais
-        const nome = data.nome || "Não cadastrado";
-        const saldoCarteira = parseFloat(data.saldoCarteira ?? 10).toFixed(2);  // Usando saldoCarteira
+        const nome = data.nome || "Luis Fernando";  // Usando o nome correto
+        const telefone = userId || "75998282201";  // Formatando o telefone corretamente
+        const saldoCarteira = parseFloat(data.saldoCarteira ?? 10).toFixed(2);  
         const renda = parseFloat(data.renda || 0).toFixed(2);
         const recebimento = parseFloat(data.recebimento || 0).toFixed(2);
         const ultimoCheckin = data.ultimoCheckin || "";
 
         // Atualiza as informações na página
-        document.getElementById("usuario-nome").textContent = "Nome do Usuário: " + nome;
-        document.getElementById("usuario-telefone").textContent = "Telefone: " + userId;
-        document.getElementById("saldo-carteira").textContent = "R$ " + saldoCarteira;  // Atualizado
+        document.getElementById("usuario-nome").textContent = nome;
+        document.getElementById("usuario-telefone").textContent = "lD" + telefone.slice(0, 4) + "*****" + telefone.slice(-4);  // Formata o telefone
+        document.getElementById("saldo-carteira").textContent = "R$ " + saldoCarteira;
         document.getElementById("renda-acumulada").textContent = "R$ " + renda;
         document.getElementById("valor-recebimento").textContent = "R$ " + recebimento;
 
@@ -137,22 +150,18 @@
 
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
-        const saldoAtual = parseFloat(data.saldoCarteira || 0);  // Usando saldoCarteira
-        const rendaAcumulada = parseFloat(data.renda || 0);
+        const saldoAtual = parseFloat(data.saldoCarteira || 0); 
 
         // Incrementa R$1.00 no saldo
         const novoSaldo = saldoAtual + 1;
-        const novaRendaAcumulada = rendaAcumulada + 1;
 
-        const hoje = new Date().toISOString().slice(0, 10); // Formato YYYY-MM-DD
+        const hoje = new Date().toISOString().slice(0, 10); 
 
         userRef.update({
           saldoCarteira: novoSaldo,
-          renda: novaRendaAcumulada,
-          ultimoCheckin: hoje  // Registra o dia do último check-in
+          ultimoCheckin: hoje  
         }).then(() => {
-          document.getElementById("saldo-carteira").textContent = "R$ " + novoSaldo.toFixed(2);  // Atualizado
-          document.getElementById("renda-acumulada").textContent = "R$ " + novaRendaAcumulada.toFixed(2);
+          document.getElementById("saldo-carteira").textContent = "R$ " + novoSaldo.toFixed(2);  
           alert("Check-in diário realizado com sucesso! +R$1.00");
 
           // Desabilita o botão de check-in até o próximo dia
@@ -174,14 +183,14 @@
 
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
-        const saldoAtual = parseFloat(data.saldoCarteira || 0);  // Usando saldoCarteira
+        const saldoAtual = parseFloat(data.saldoCarteira || 0);  
 
         const novoSaldo = saldoAtual + valorRecarga;
 
         userRef.update({
           saldoCarteira: novoSaldo
         }).then(() => {
-          document.getElementById("saldo-carteira").textContent = "R$ " + novoSaldo.toFixed(2);  // Atualizado
+          document.getElementById("saldo-carteira").textContent = "R$ " + novoSaldo.toFixed(2);  
           alert("Recarga aplicada com sucesso!");
         });
       });
