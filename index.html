@@ -1,4 +1,3 @@
-<!-- CÓDIGO COMPLETO ATUALIZADO -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -30,6 +29,11 @@
       color: white;
       cursor: pointer;
       font-weight: bold;
+      transition: 0.3s;
+    }
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
     }
     .form-box {
       background: #1c1c1c;
@@ -45,10 +49,11 @@
     #codigo-gerado {
       text-align: center;
       margin-top: 15px;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       color: #00ff99;
       white-space: pre-wrap;
+      cursor: pointer;
     }
     .link {
       text-align: center;
@@ -56,6 +61,12 @@
       color: #00ff99;
       cursor: pointer;
       text-decoration: underline;
+    }
+    .msg {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+      color: yellow;
     }
   </style>
 
@@ -77,7 +88,7 @@
       <button type="submit">Cadastrar</button>
     </form>
 
-    <div id="codigo-gerado"></div>
+    <div id="codigo-gerado" onclick="copiarCodigo(this)"></div>
 
     <h3>Entrar</h3>
     <form id="login-form">
@@ -87,133 +98,161 @@
     </form>
 
     <div class="link" onclick="recuperarSenha()">Esqueci minha senha</div>
+    <div class="msg" id="msg"></div>
   </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-      authDomain: "hinvest-f4354.firebaseapp.com",
-      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-      projectId: "hinvest-f4354",
-      storageBucket: "hinvest-f4354.appspot.com",
-      messagingSenderId: "646397677016",
-      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.appspot.com",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const codigoIndicado = urlParams.get("codigo");
-    if (codigoIndicado) {
-      document.getElementById("cadastro-codigo").value = codigoIndicado;
+  const urlParams = new URLSearchParams(window.location.search);
+  const codigoIndicado = urlParams.get("codigo");
+  if (codigoIndicado) {
+    document.getElementById("cadastro-codigo").value = codigoIndicado;
+  }
+
+  function gerarCodigoAlfanumerico(tamanho = 8) {
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let codigo = '';
+    for (let i = 0; i < tamanho; i++) {
+      codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
     }
+    return codigo;
+  }
 
-    function gerarCodigoAlfanumerico(tamanho = 8) {
-      const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let codigo = '';
-      for (let i = 0; i < tamanho; i++) {
-        codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-      }
-      return codigo;
-    }
-
-    document.getElementById("cadastro-form").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const nome = document.getElementById("cadastro-nome").value.trim();
-      const telefone = document.getElementById("cadastro-telefone").value.trim();
-      const email = document.getElementById("cadastro-email").value.trim();
-      const senha = document.getElementById("cadastro-senha").value.trim();
-      const codigoIndicacao = document.getElementById("cadastro-codigo").value.trim() || null;
-
-      if (!nome || !telefone || !email || !senha) {
-        alert("Preencha todos os campos obrigatórios.");
-        return;
-      }
-
-      if (!/^\d{10,11}$/.test(telefone)) {
-        alert("Telefone inválido. Use DDD + número, ex: 11912345678");
-        return;
-      }
-
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        alert("E-mail inválido. Digite um e-mail real.");
-        return;
-      }
-
-      if (!/^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{6,}$/.test(senha)) {
-        alert("A senha deve conter no mínimo 6 caracteres, com letras e números.");
-        return;
-      }
-
-      db.ref("usuarios/" + telefone).once("value").then(snapshot => {
-        if (snapshot.exists()) {
-          alert("Já existe uma conta com esse telefone.");
-        } else {
-          const meuCodigo = gerarCodigoAlfanumerico(8);
-
-          db.ref("usuarios/" + telefone).set({
-            nome,
-            telefone,
-            email,
-            senha,
-            saldo: 20,
-            renda: 0,
-            recebimento: 0,
-            ultimoCheckin: "",
-            codigoIndicacao,
-            codigo: meuCodigo,
-            timestamp: Date.now()
-          }).then(() => {
-            document.getElementById("codigo-gerado").innerText =
-              "Cadastro realizado!\nSeu código de indicação: " + meuCodigo +
-              "\nLink: https://inves13.github.io/hivest-codigo-1/?codigo=" + meuCodigo;
-
-            localStorage.setItem("telefoneLogado", telefone);
-
-            if (codigoIndicacao) {
-              db.ref("indicacoes/" + codigoIndicacao + "/" + telefone).set({
-                nome, telefone, timestamp: Date.now()
-              });
-            }
-
-            setTimeout(() => {
-              window.location.href = "H.html";
-            }, 4000);
-          });
-        }
-      });
+  function copiarCodigo(el) {
+    navigator.clipboard.writeText(el.innerText).then(() => {
+      alert("Código copiado!");
     });
+  }
 
-    document.getElementById("login-form").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const telefone = document.getElementById("login-telefone").value.trim();
-      const senha = document.getElementById("login-senha").value.trim();
+  const msg = document.getElementById("msg");
 
-      db.ref("usuarios/" + telefone).once("value").then(snapshot => {
-        const user = snapshot.val();
-        if (user && user.senha === senha) {
+  document.getElementById("cadastro-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const botao = this.querySelector("button");
+    botao.disabled = true;
+    botao.innerText = "Cadastrando...";
+
+    const nome = document.getElementById("cadastro-nome").value.trim();
+    const telefone = document.getElementById("cadastro-telefone").value.trim();
+    const email = document.getElementById("cadastro-email").value.trim();
+    const senha = document.getElementById("cadastro-senha").value.trim();
+    const codigoIndicacao = document.getElementById("cadastro-codigo").value.trim() || null;
+
+    if (!/^\d{10,11}$/.test(telefone)) {
+      alert("Telefone inválido. Use DDD + número.");
+      botao.disabled = false;
+      botao.innerText = "Cadastrar";
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("E-mail inválido.");
+      botao.disabled = false;
+      botao.innerText = "Cadastrar";
+      return;
+    }
+
+    if (!/^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{6,}$/.test(senha)) {
+      alert("Senha deve conter letras e números, no mínimo 6 caracteres.");
+      botao.disabled = false;
+      botao.innerText = "Cadastrar";
+      return;
+    }
+
+    db.ref("usuarios/" + telefone).once("value").then(snapshot => {
+      if (snapshot.exists()) {
+        alert("Já existe uma conta com esse telefone.");
+        botao.disabled = false;
+        botao.innerText = "Cadastrar";
+      } else {
+        const meuCodigo = gerarCodigoAlfanumerico();
+
+        db.ref("usuarios/" + telefone).set({
+          nome,
+          telefone,
+          email,
+          senha,
+          saldo: 20,
+          renda: 0,
+          recebimento: 0,
+          ultimoCheckin: "",
+          codigoIndicacao,
+          codigo: meuCodigo,
+          timestamp: Date.now()
+        }).then(() => {
+          const link = "https://inves13.github.io/hivest-codigo-1/?codigo=" + meuCodigo;
+          const codigoEl = document.getElementById("codigo-gerado");
+          codigoEl.innerText = `Cadastro realizado!\nCódigo: ${meuCodigo}\nLink: ${link}`;
+
           localStorage.setItem("telefoneLogado", telefone);
-          window.location.href = "H.html";
-        } else {
-          alert("Telefone ou senha incorretos!");
-        }
-      });
-    });
 
-    function recuperarSenha() {
-      const email = prompt("Digite seu e-mail cadastrado:");
-      if (email) {
-        db.ref("usuarios").orderByChild("email").equalTo(email).once("value").then(snapshot => {
-          if (snapshot.exists()) {
-            const user = snapshot.val();
-            const telefone = Object.keys(user)[0];
-            alert("Sua senha cadastrada é: " + user[telefone].senha);
-          } else {
-            alert("E-mail não encontrado.");
+          if (codigoIndicacao) {
+            db.ref("indicacoes/" + codigoIndicacao + "/" + telefone).set({
+              nome, telefone, timestamp: Date.now()
+            });
           }
+
+          msg.innerText = "Redirecionando...";
+          setTimeout(() => {
+            window.location.href = "H.html";
+          }, 3000);
         });
       }
+    });
+  });
+
+  document.getElementById("login-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const botao = this.querySelector("button");
+    botao.disabled = true;
+    botao.innerText = "Entrando...";
+
+    const telefone = document.getElementById("login-telefone").value.trim();
+    const senha = document.getElementById("login-senha").value.trim();
+
+    db.ref("usuarios/" + telefone).once("value").then(snapshot => {
+      const user = snapshot.val();
+      if (user && user.senha === senha) {
+        localStorage.setItem("telefoneLogado", telefone);
+        msg.innerText = "Login bem-sucedido!";
+        setTimeout(() => {
+          window.location.href = "H.html";
+        }, 2000);
+      } else {
+        alert("Telefone ou senha incorretos!");
+        botao.disabled = false;
+        botao.innerText = "Entrar";
+      }
+    });
+  });
+
+  function recuperarSenha() {
+    const email = prompt("Digite seu e-mail cadastrado:");
+    if (email) {
+      db.ref("usuarios").orderByChild("email").equalTo(email).once("value").then(snapshot => {
+        if (snapshot.exists()) {
+          snapshot.forEach(userSnap => {
+            alert(`Senha cadastrada: ${userSnap.val().senha}`);
+          });
+        } else {
+          alert("E-mail não encontrado.");
+        }
+      });
     }
-  </script>
+  }
+
+  window.onbeforeunload = () => "Tem certeza que quer sair?";
+</script>
 </body>
 </html>
