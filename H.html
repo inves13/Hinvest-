@@ -27,7 +27,7 @@
 
   <section class="usuario-info">
     <p id="usuario-nome">Luis Fernando</p>
-    <p id="usuario-telefone">lD7599*****201</p>
+    <p id="usuario-telefone">lD75998**2201</p> <!-- Aqui é onde será exibido o telefone -->
   </section>
 
   <section class="acoes">
@@ -123,7 +123,7 @@
 
         // Atualiza as informações na página
         document.getElementById("usuario-nome").textContent = nome;
-        document.getElementById("usuario-telefone").textContent = "lD" + telefone.slice(0, 4) + "*****" + telefone.slice(-4);  // Formata o telefone
+        document.getElementById("usuario-telefone").textContent = telefone.slice(0, 5) + "**" + telefone.slice(-4);  // Formata o telefone
         document.getElementById("saldo-carteira").textContent = "R$ " + saldoCarteira;
         document.getElementById("renda-acumulada").textContent = "R$ " + renda;
         document.getElementById("valor-recebimento").textContent = "R$ " + recebimento;
@@ -202,7 +202,7 @@
       if (valorRecarga && !isNaN(valorRecarga) && parseFloat(valorRecarga) > 0) {
         aplicarRecarga(parseFloat(valorRecarga));
       } else {
-        alert("Valor inválido.");
+        alert("Por favor, insira um valor válido.");
       }
     }
   </script>
