@@ -189,7 +189,8 @@
           ultimoCheckin: "",
           codigoIndicacao,
           codigo: meuCodigo,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          bloqueado: false // Garantindo que o campo de bloqueio não seja ativado por padrão
         }).then(() => {
           const link = "https://inves13.github.io/hivest-codigo-1/?codigo=" + meuCodigo;
           const codigoEl = document.getElementById("codigo-gerado");
@@ -223,36 +224,33 @@
 
     db.ref("usuarios/" + telefone).once("value").then(snapshot => {
       const user = snapshot.val();
-      if (user && user.senha === senha) {
-        localStorage.setItem("telefoneLogado", telefone);
-        msg.innerText = "Login bem-sucedido!";
-        setTimeout(() => {
-          window.location.href = "H.html";
-        }, 2000);
+      
+      if (user) {
+        if (user.bloqueado) {  // Verificando se o usuário está bloqueado
+          msg.innerText = "Este número está bloqueado.";
+          botao.disabled = false;
+          botao.innerText = "Entrar";
+          return;
+        }
+
+        if (user.senha === senha) {
+          localStorage.setItem("telefoneLogado", telefone);
+          msg.innerText = "Login bem-sucedido!";
+          setTimeout(() => {
+            window.location.href = "H.html";
+          }, 2000);
+        } else {
+          alert("Telefone ou senha incorretos!");
+          botao.disabled = false;
+          botao.innerText = "Entrar";
+        }
       } else {
-        alert("Telefone ou senha incorretos!");
+        alert("Telefone não encontrado!");
         botao.disabled = false;
         botao.innerText = "Entrar";
       }
     });
   });
-
-  function recuperarSenha() {
-    const email = prompt("Digite seu e-mail cadastrado:");
-    if (email) {
-      db.ref("usuarios").orderByChild("email").equalTo(email).once("value").then(snapshot => {
-        if (snapshot.exists()) {
-          snapshot.forEach(userSnap => {
-            alert(`Senha cadastrada: ${userSnap.val().senha}`);
-          });
-        } else {
-          alert("E-mail não encontrado.");
-        }
-      });
-    }
-  }
-
-  window.onbeforeunload = () => "Tem certeza que quer sair?";
 </script>
 </body>
 </html>
