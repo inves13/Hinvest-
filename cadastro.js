@@ -1,97 +1,51 @@
-import { getDatabase, ref, set, get, update } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
-import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+// Importando os módulos necessários do Firebase
+import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
-const db = getDatabase();
+// Obtendo a instância do Firebase
 const auth = getAuth();
+const db = getDatabase();
 
-document.getElementById("botao-cadastro").addEventListener("click", function() {
-  let nome = document.getElementById("nome").value;
-  let telefone = document.getElementById("telefone").value;
-  let senha = document.getElementById("senha").value;
-  let confirmarSenha = document.getElementById("confirmarSenha").value;
-  let codigoConvite = document.getElementById("codigoConvite").value; // Recebe o código de indicação
+// Adicionando o evento de login
+document.getElementById("botao-login").addEventListener("click", function() {
+    let telefone = document.getElementById("telefone").value;
+    let senha = document.getElementById("senha").value;
+    
+    // Definindo a persistência da autenticação como LOCAL
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => {
+            // Tentando fazer login no Firebase Authentication com o telefone (como email)
+            return signInWithEmailAndPassword(auth, telefone + "@example.com", senha);
+        })
+        .then((userCredential) => {
+            // Login bem-sucedido
+            const user = userCredential.user;
 
-  // Verificação dos campos obrigatórios
-  if (nome === "" || telefone === "" || senha === "" || confirmarSenha === "") {
-    alert("Preencha todos os campos!");
-    return;
-  }
+            // Verificar se o usuário está bloqueado no Realtime Database
+            const userRef = ref(db, 'usuarios/' + user.uid);
+            get(userRef).then((snapshot) => {
+                const userData = snapshot.val();
 
-  // Verificando se a senha e a confirmação da senha são iguais
-  if (senha !== confirmarSenha) {
-    alert("As senhas não coincidem!");
-    return;
-  }
+                // Verificando se o campo 'bloqueado' está como true
+                if (userData && userData.bloqueado === true) {
+                    alert("Sua conta foi bloqueada. Entre em contato com o suporte.");
+                    auth.signOut(); // Faz logout imediatamente
+                    window.location.href = "login.html"; // Redireciona para a página de login
+                } else {
+                    // Armazenando o telefone do usuário localmente
+                    localStorage.setItem("telefoneUsuario", telefone);
 
-  // Criando o usuário no Firebase Auth (usando o telefone como email temporário)
-  createUserWithEmailAndPassword(auth, telefone + "@example.com", senha)
-    .then((userCredential) => {
-      const user = userCredential.user;
-
-      // Pegar o último código gerado
-      const codigoRef = ref(db, 'ultimo_codigo');
-      get(codigoRef).then((snapshot) => {
-        let novoCodigo = 1;
-        if (snapshot.exists()) {
-          novoCodigo = snapshot.val() + 1; // Incrementa o último código
-        }
-
-        // Salva os dados do usuário com o código gerado
-        set(ref(db, "usuarios/" + user.uid), {
-          nome: nome,
-          telefone: telefone,
-          senha: senha,
-          saldo: 0,
-          codigoIndicacao: novoCodigo, // Atribui o código de indicação gerado
-          codigoConvite: codigoConvite || null, // Associa o código de convite (caso exista)
-          nivel: 1 // Atribui nível inicial ao usuário
-        }).then(() => {
-          // Atualiza o último código no banco de dados
-          update(ref(db), { ultimo_codigo: novoCodigo });
-
-          // Se o usuário usou um código de convite, atualizar a equipe da pessoa que convidou
-          if (codigoConvite) {
-            const conviteRef = ref(db, 'usuarios');
-            get(conviteRef).then((snapshot) => {
-              snapshot.forEach(childSnapshot => {
-                const dados = childSnapshot.val();
-                if (dados.codigoIndicacao == codigoConvite) {  // Encontrou o usuário que fez a indicação
-                  const uidConvite = childSnapshot.key;
-                  
-                  // Atualiza o número de membros da equipe
-                  const equipeRef = ref(db, 'usuarios/' + uidConvite + '/equipe');
-                  get(equipeRef).then((equipeSnapshot) => {
-                    let numeroMembros = equipeSnapshot.exists() ? equipeSnapshot.val() : 0;
-                    numeroMembros++;
-
-                    // Atualiza o número de membros da equipe
-                    update(ref(db, 'usuarios/' + uidConvite), { equipe: numeroMembros });
-
-                    // Se a comissão por indicação for baseada no número de membros, atualize a comissão aqui
-                    const comissaoRef = ref(db, 'usuarios/' + uidConvite + '/comissao');
-                    get(comissaoRef).then((comissaoSnapshot) => {
-                      let comissao = comissaoSnapshot.exists() ? comissaoSnapshot.val() : 0;
-                      comissao += 10;  // Exemplo de bônus por indicação (R$ 10,00 por novo membro)
-
-                      // Atualiza a comissão do usuário que convidou
-                      update(ref(db, 'usuarios/' + uidConvite), { comissao: comissao });
-                    });
-                  });
+                    // Redirecionando para a página principal
+                    window.location.href = "index.html"; // Redireciona para a página principal
                 }
-              });
             });
-          }
+        })
+        .catch((error) => {
+            // Caso ocorra erro no login
+            const errorCode = error.code;
+            const errorMessage = error.message;
 
-          alert("Cadastro realizado com sucesso!");
-          window.location.href = "login.html"; // Redireciona para a página de login
-        }).catch((error) => {
-          console.error("Erro ao salvar dados no Firebase:", error);
-          alert("Erro ao salvar dados no Firebase. Tente novamente.");
+            console.error("Erro no login:", errorCode, errorMessage);
+            alert("Erro ao fazer login. Verifique seus dados.");
         });
-      });
-    })
-    .catch((error) => {
-      console.error("Erro ao cadastrar usuário:", error);
-      alert("Erro ao criar conta. Tente novamente.");
-    });
 });
