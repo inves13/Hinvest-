@@ -1,44 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Extrato</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Extrato de Retirada</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
-    .extrato-container {
-      padding: 20px;
-      margin-top: 20px;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
     }
-    .extrato-item {
+    h2 {
+      margin-bottom: 20px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      margin-bottom: 10px;
       padding: 10px;
-      border-bottom: 1px solid #ddd;
+      border-radius: 5px;
     }
-    .aguardando {
-      background-color: orange;
+    .voltar {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #4CAF50;
       color: white;
-      padding: 5px;
-    }
-    .aprovado {
-      background-color: green;
-      color: white;
-      padding: 5px;
+      text-decoration: none;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h2>Extrato de Saques</h2>
-    <a href="saque.html">Voltar</a>
-  </header>
+  <h2>Extrato de Retirada</h2>
+  <ul id="extrato-lista">
+    <li>Carregando extrato...</li>
+  </ul>
 
-  <section class="extrato-container" id="extrato">
-    <h3>Histórico de Saques</h3>
-    <!-- Extrato será carregado aqui -->
-  </section>
+  <a class="voltar" href="carteira.html">Voltar para a Carteira</a>
 
   <script>
     const firebaseConfig = {
@@ -56,59 +62,36 @@
     const userId = localStorage.getItem("telefoneLogado");
     const userRef = db.ref("usuarios/" + userId);
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
       if (!userId) {
         alert("Usuário não logado.");
         window.location.href = "index.html";
         return;
       }
 
-      userRef.once("value").then(snapshot => {
-        const data = snapshot.val() || {};
-        const extratoContainer = document.getElementById("extrato");
+      const extratoLista = document.getElementById("extrato-lista");
+      extratoLista.innerHTML = '<li>Carregando extrato...</li>';
 
-        // Verifica se o campo "extrato" está presente nos dados do usuário
-        const extrato = data.extrato;
+      const snapshot = await userRef.child("extratoRetirada").once("value");
+      const extrato = snapshot.val();
 
-        if (!extrato) {
-          extratoContainer.innerHTML = "<p>Sem saques registrados.</p>";
-        } else {
-          extrato.forEach(item => {
-            const div = document.createElement("div");
-            div.classList.add("extrato-item");
+      extratoLista.innerHTML = '';
 
-            // Verifica o status do saque
-            const statusClass = item.status === "Aprovado" ? "aprovado" : "aguardando";
-            div.innerHTML = `
-              <p><strong>Valor:</strong> R$ ${parseFloat(item.valor).toFixed(2)}</p>
-              <p><strong>Status:</strong> <span class="${statusClass}">${item.status}</span></p>
-              <p><strong>Data:</strong> ${item.data}</p>
-            `;
-            extratoContainer.appendChild(div);
-          });
-        }
-
-        // Verifica se o campo "recebimento" está presente nos dados do usuário
-        const recebimento = data.recebimento;
-
-        if (recebimento) {
-          // Exibe o valor de "recebimento" com data e status
-          const div = document.createElement("div");
-          div.classList.add("extrato-item");
-
-          // Formata a data do saque
-          const dataSaque = new Date().toLocaleDateString('pt-BR');  // Data de hoje
-          
-          div.innerHTML = `
-            <p><strong>Recebimento:</strong> R$ ${parseFloat(recebimento).toFixed(2)}</p>
-            <p><strong>Data:</strong> ${dataSaque}</p>
-            <p><strong>Status:</strong> <span class="aguardando">Aguardando Aprovação</span></p>
+      if (extrato) {
+        Object.keys(extrato).forEach(key => {
+          const item = extrato[key];
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <strong>Valor:</strong> R$ ${item.valor.toFixed(2)}<br>
+            <strong>Líquido:</strong> R$ ${item.valorLiquido.toFixed(2)}<br>
+            <strong>Data:</strong> ${item.data}
           `;
-          extratoContainer.appendChild(div);
-        }
-      });
+          extratoLista.appendChild(li);
+        });
+      } else {
+        extratoLista.innerHTML = '<li>Sem registros de retirada.</li>';
+      }
     });
   </script>
-
 </body>
 </html>
