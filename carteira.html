@@ -8,24 +8,20 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
-    /* Ajuste no layout dos campos */
-    section.carteira, section.conta, section.saque {
+    section.carteira, section.conta, section.saque, section.terco {
       margin: 20px;
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-
     section.carteira .saldos {
       display: flex;
       justify-content: space-between;
     }
-
     section.conta label, section.saque label {
       display: block;
       margin: 5px 0;
     }
-
     section.conta input, section.saque input, section.conta select {
       width: 100%;
       padding: 8px;
@@ -33,7 +29,6 @@
       border-radius: 4px;
       border: 1px solid #ddd;
     }
-
     section.conta button, section.saque button {
       padding: 10px;
       width: 100%;
@@ -43,13 +38,16 @@
       cursor: pointer;
       border-radius: 5px;
     }
-
     section.conta button:disabled {
       background-color: #ccc;
     }
-
     section.saque p {
       margin-top: 10px;
+    }
+    section.terco {
+      background-color: #f9f9f9;
+      font-style: italic;
+      text-align: center;
     }
   </style>
 </head>
@@ -65,18 +63,18 @@
     <div class="saldos">
       <div class="saldo">
         <img src="10004.png" alt="">
-        <p id="saldo-carteira">R$ 71.00</p>
+        <p id="saldo-carteira">R$ 0.00</p>
         <span>Saldo da carteira</span>
       </div>
       <div class="saldo">
         <img src="10004.png" alt="">
-        <p id="renda-acumulada">R$ 1.00</p>
-        <span>Renda acumulada</span>
+        <p id="valor-recebimento">R$ 0.00</p>
+        <span>valor de recebimento </span>
       </div>
       <div class="saldo">
         <img src="10004.png" alt="">
-        <p id="valor-recebimento">R$ 0.00</p>
-        <span>Valor de recebimento</span>
+        <p id="valor-retirada">R$ 0.00</p>
+        <span>Valor de retirada</span>
       </div>
     </div>
   </section>
@@ -106,6 +104,11 @@
     <p id="status"></p>
   </section>
 
+  <section class="terco">
+    <p>"O Senhor é meu pastor, nada me faltará."</p>
+    <p>Salmo 23:1</p>
+  </section>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
@@ -133,11 +136,11 @@
         const data = snapshot.val() || {};
         const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00).toFixed(2);
         const renda = parseFloat(data.renda ?? 1.00).toFixed(2);
-        const recebimento = parseFloat(data.recebimento || 0).toFixed(2);
+        const retirada = parseFloat(data.retirada || 0).toFixed(2);
 
         document.getElementById("saldo-carteira").textContent = "R$ " + saldoCarteira;
-        document.getElementById("renda-acumulada").textContent = "R$ " + renda;
-        document.getElementById("valor-recebimento").textContent = "R$ " + recebimento;
+        document.getElementById("valor-recebimento").textContent = "R$ " + renda;
+        document.getElementById("valor-retirada").textContent = "R$ " + retirada;
 
         if (data.contaBancaria) {
           document.getElementById("nomeTitular").value = data.contaBancaria.nomeTitular;
@@ -177,13 +180,16 @@
         const valorLiquido = valor - taxa;
         document.getElementById("valorTaxa").textContent = "R$ " + taxa.toFixed(2);
         document.getElementById("valorLiquido").textContent = "R$ " + valorLiquido.toFixed(2);
+      } else {
+        document.getElementById("valorTaxa").textContent = "R$ 0.00";
+        document.getElementById("valorLiquido").textContent = "R$ 0.00";
       }
     }
 
     document.getElementById("confirmarSaque").addEventListener("click", async () => {
       const valor = parseFloat(document.getElementById("valorSaque").value);
       if (isNaN(valor) || valor < 20) {
-        alert("O valor mínimo para saque é R$20.");
+        alert("O valor mínimo para retirada é R$20.");
         return;
       }
 
@@ -192,36 +198,27 @@
       const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00);
 
       if (valor > saldoCarteira) {
-        alert("Você não tem saldo suficiente para realizar o saque.");
+        alert("Você não tem saldo suficiente para realizar este saque.");
         return;
       }
 
       const taxa = valor * 0.12;
       const valorLiquido = valor - taxa;
 
-      // Atualizando saldo no banco de dados
-      userRef.update({
+      await userRef.update({
         saldoCarteira: saldoCarteira - valor,
-        recebimento: valorLiquido.toFixed(2)  // Zera o valor de recebimento e coloca o valor do saque
+        recebimento: (data.recebimento ?? 0) + valorLiquido,
+        retirada: (data.retirada ?? 0) + valor
       });
 
-      // Registrando o saque no extrato
-      const extratoRef = db.ref("extratos/" + userId);
-      const novaRetirada = {
-        data: new Date().toISOString(),
-        valor: valor,
-        valorLiquido: valorLiquido,
-        taxa: taxa
-      };
+      alert(`Saque confirmado. Você receberá R$ ${valorLiquido.toFixed(2)} após a taxa.`);
 
-      extratoRef.push(novaRetirada);
-
-      document.getElementById("status").textContent = "Saque de R$ " + valor + " realizado com sucesso!";
       document.getElementById("valorSaque").value = "";
-      document.getElementById("valorTaxa").textContent = "R$ 0.00";
-      document.getElementById("valorLiquido").textContent = "R$ 0.00";
+      calcularValorRecebido();
+
+      document.getElementById("saldo-carteira").textContent = "R$ " + (saldoCarteira - valor).toFixed(2);
+      document.getElementById("valor-retirada").textContent = "R$ " + ((data.retirada ?? 0) + valor).toFixed(2);
     });
   </script>
-
 </body>
 </html>
