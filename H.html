@@ -32,7 +32,7 @@
 
   <section class="acoes">
     <a href="deposito.html" class="botao"><img src="10003.png" alt=""> Depósito</a>
-    <a href="saque.html" class="botao"><img src="10004.png" alt=""> Retirada</a>
+    <a href="carteira.html" class="botao"><img src="10004.png" alt=""> Retirada</a>
     <button class="botao" id="checkin-diario"><img src="10005.png" alt=""> Check-in Diário</button>
     <a href="download.html" class="botao"><img src="10011.png" alt=""> Baixar App</a>
     <a href="ajuda.html" class="botao"><img src="10011.png" alt=""> Ajuda</a>
@@ -45,27 +45,26 @@
     </marquee>
   </div>
 
-  <section class="carteira">
-    <h2>Minha carteira</h2>
-    <div class="saldos">
-      <div class="saldo">
-        <img src="10004.png" alt="">
-        <p id="saldo-carteira">R$ 0.00</p>
-        <span>Saldo da carteira</span>
-      </div>
-      <div class="saldo">
-        <img src="10004.png" alt="">
-        <p id="renda-acumulada">R$ 0.00</p>
-        <span>Renda acumulada</span>
-      </div>
-      <div class="saldo">
-        <img src="10004.png" alt="">
-        <p id="valor-recebimento">R$ 0.00</p>
-        <span>Valor de recebimento</span>
-      </div>
+<section class="carteira">
+  <h2>Minha carteira</h2>
+  <div class="saldos">
+    <div class="saldo">
+      <img src="10004.png" alt="">
+      <p id="saldo-carteira">R$ 0.00</p>
+      <span>Saldo da carteira</span>
     </div>
-  </section>
-
+    <div class="saldo">
+      <img src="10004.png" alt="">
+      <p id="valor-recebimento">R$ 0.00</p>
+      <span>valor de  recebimento </span>
+    </div>
+    <div class="saldo">
+      <img src="10004.png" alt="">
+      <p id="valor-retirada">R$ 0.00</p>
+      <span>Valor de retirada</span>
+    </div>
+  </div>
+</section>
   <button id="btn-recarga" onclick="enviarRecarga()">Aplicar Recarga</button>
 
   <!-- Menu inferior -->
@@ -118,15 +117,15 @@
         const telefone = userId || "75998282201";  // Formatando o telefone corretamente
         const saldoCarteira = parseFloat(data.saldoCarteira ?? 10).toFixed(2);  
         const renda = parseFloat(data.renda || 0).toFixed(2);
-        const recebimento = parseFloat(data.recebimento || 0).toFixed(2);
+        const retirada = parseFloat(data.retirada || 0).toFixed(2);
         const ultimoCheckin = data.ultimoCheckin || "";
 
         // Atualiza as informações na página
         document.getElementById("usuario-nome").textContent = nome;
         document.getElementById("usuario-telefone").textContent = telefone.slice(0, 5) + "**" + telefone.slice(-4);  // Formata o telefone
         document.getElementById("saldo-carteira").textContent = "R$ " + saldoCarteira;
-        document.getElementById("renda-acumulada").textContent = "R$ " + renda;
-        document.getElementById("valor-recebimento").textContent = "R$ " + recebimento;
+        document.getElementById("valor-recebimento").textContent = "R$ " + renda;
+        document.getElementById("valor-retirada").textContent = "R$ " + retirada;
 
         // Verifica se o usuário já fez o check-in hoje
         const hoje = new Date().toISOString().slice(0, 10); // Formato YYYY-MM-DD
