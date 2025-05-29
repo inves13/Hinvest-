@@ -83,7 +83,7 @@
     <div class="linha"><strong>LV 2</strong> <span id="lv2-qtd">0</span></div>
     <div class="linha"><strong>LV 3</strong> <span id="lv3-qtd">0</span></div>
     <div class="linha"><strong>Total de Membros</strong> <span id="total-users">0</span></div>
-    <div class="linha"><strong>Bônus Total</strong> <span id="total-bonus">R$ 0,00</span></div>
+    <div class="linha"><strong>Bônus Acumulado</strong> <span id="total-bonus">R$ 0,00</span></div>
     <button id="btn-resgatar" onclick="resgatarBonus()">Resgatar Bônus</button>
   </div>
 
@@ -113,7 +113,6 @@
   }
 
   let meuCodigo = "";
-  let bonusTotal = 0;
   let membros = [];
 
   db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
@@ -136,21 +135,27 @@
   function carregarEquipe() {
     db.ref("usuarios").once("value").then(snapshot => {
       const usuarios = snapshot.val();
-      let lv1 = 0, lv2 = 0, lv3 = 0, bonus = 0;
+      let lv1 = 0, lv2 = 0, lv3 = 0;
+      let bonus = 0;
       membros = [];
 
       for (let tel in usuarios) {
         const u = usuarios[tel];
         if (u.codigoIndicacao === meuCodigo) {
-          lv1++; bonus += 20 * 0.26; membros.push(u.telefone);
+          lv1++; bonus += 5;
+          membros.push(u.telefone);
+
           for (let tel2 in usuarios) {
             const u2 = usuarios[tel2];
             if (u2.codigoIndicacao === u.codigo) {
-              lv2++; bonus += 20 * 0.01; membros.push(u2.telefone);
+              lv2++; bonus += 3;
+              membros.push(u2.telefone);
+
               for (let tel3 in usuarios) {
                 const u3 = usuarios[tel3];
                 if (u3.codigoIndicacao === u2.codigo) {
-                  lv3++; bonus += 20 * 0.01; membros.push(u3.telefone);
+                  lv3++; bonus += 1;
+                  membros.push(u3.telefone);
                 }
               }
             }
@@ -158,12 +163,14 @@
         }
       }
 
-      bonusTotal = bonus;
-
       document.getElementById("lv1-qtd").innerText = lv1;
       document.getElementById("lv2-qtd").innerText = lv2;
       document.getElementById("lv3-qtd").innerText = lv3;
       document.getElementById("total-users").innerText = lv1 + lv2 + lv3;
+
+      // Atualiza saldoBonus no banco
+      db.ref("usuarios/" + telefoneLogado).update({ saldoBonus: bonus });
+
       document.getElementById("total-bonus").innerText = "R$ " + bonus.toFixed(2).replace(".", ",");
     });
   }
@@ -203,29 +210,23 @@
   }
 
   function resgatarBonus() {
-    if (bonusTotal < 30) {
-      alert("O valor mínimo para resgatar o bônus é R$30,00.");
-      return;
-    }
-
     db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
       const user = snapshot.val();
-      let saldo = user.saldoCarteira || 0;
-      saldo += bonusTotal;
+      const saldoAtual = user.saldoCarteira || 0;
+      const bonusAtual = user.saldoBonus || 0;
+
+      if (bonusAtual < 30) {
+        alert("O valor mínimo para resgatar é R$30,00.");
+        return;
+      }
+
+      const novoSaldo = saldoAtual + bonusAtual;
 
       db.ref("usuarios/" + telefoneLogado).update({
-        saldoCarteira: saldo,
-        bonusResgatado: true
+        saldoCarteira: novoSaldo,
+        saldoBonus: 0
       }).then(() => {
-        alert("Bônus resgatado para carteira com sucesso!");
-        // Zerar o bônus após o resgate
-        db.ref("usuarios/" + telefoneLogado).update({
-          bonusResgatado: false,
-          saldoBonus: 0
-        });
-
-        // Atualizar a interface
-        bonusTotal = 0;
+        alert("Bônus resgatado com sucesso!");
         carregarEquipe();
       });
     });
