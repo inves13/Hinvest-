@@ -8,7 +8,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
-    /* Adicionando centralização apenas para a seção de nome e telefone */
     .usuario-info {
       text-align: center;
       margin-top: 20px;
@@ -17,6 +16,85 @@
     .usuario-info p {
       font-size: 18px;
       margin: 5px 0;
+    }
+
+    .carteira {
+      padding: 15px;
+      background-color: #f9f9f9;
+      margin: 20px;
+      border-radius: 10px;
+    }
+
+    .saldos {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+
+    .saldo {
+      text-align: center;
+      margin: 10px;
+    }
+
+    .saldo p {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .botao {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: #008000;
+      color: white;
+      padding: 10px;
+      margin: 10px;
+      text-decoration: none;
+      border-radius: 8px;
+      justify-content: center;
+    }
+
+    #btn-recarga {
+      margin: 20px auto;
+      display: block;
+      padding: 10px 20px;
+      background-color: #008000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .notificacao {
+      background-color: yellow;
+      padding: 10px;
+      font-weight: bold;
+    }
+
+    .menu-inferior {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #eee;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+    }
+
+    .menu-inferior a {
+      text-align: center;
+      color: #000;
+      text-decoration: none;
+    }
+
+    .menu-inferior img {
+      width: 30px;
+      height: 30px;
+    }
+
+    .ativo {
+      font-weight: bold;
     }
   </style>
 </head>
@@ -27,7 +105,7 @@
 
   <section class="usuario-info">
     <p id="usuario-nome">Luis Fernando</p>
-    <p id="usuario-telefone">lD75998**2201</p> <!-- Aqui é onde será exibido o telefone -->
+    <p id="usuario-telefone">ID75998**2201</p>
   </section>
 
   <section class="acoes">
@@ -41,42 +119,41 @@
   <div class="notificacao">
     <span class="icone-sino">🔔</span>
     <marquee behavior="scroll" direction="left">
-    atenção a plataforma Hinveste a área de depósito quando tiver pronto vocês vão ver a mensagem
+      Atenção: a plataforma HInvest atualizará a área de depósito em breve. Fique atento!
     </marquee>
   </div>
 
-<section class="carteira">
-  <h2>Minha carteira</h2>
-  <div class="saldos">
-    <div class="saldo">
-      <img src="10004.png" alt="">
-      <p id="saldo-carteira">R$ 0.00</p>
-      <span>Saldo da carteira</span>
+  <section class="carteira">
+    <h2>Minha carteira</h2>
+    <div class="saldos">
+      <div class="saldo">
+        <img src="10004.png" alt="">
+        <p id="saldo-carteira">R$ 0.00</p>
+        <span>Saldo da carteira</span>
+      </div>
+      <div class="saldo">
+        <img src="10004.png" alt="">
+        <p id="valor-recebimento">R$ 0.00</p>
+        <span>Valor de recebimento</span>
+      </div>
+      <div class="saldo">
+        <img src="10004.png" alt="">
+        <p id="valor-retirada">R$ 0.00</p>
+        <span>Valor de retirada</span>
+      </div>
     </div>
-    <div class="saldo">
-      <img src="10004.png" alt="">
-      <p id="valor-recebimento">R$ 0.00</p>
-      <span>valor de  recebimento </span>
-    </div>
-    <div class="saldo">
-      <img src="10004.png" alt="">
-      <p id="valor-retirada">R$ 0.00</p>
-      <span>Valor de retirada</span>
-    </div>
-  </div>
-</section>
+  </section>
+
   <button id="btn-recarga" onclick="enviarRecarga()">Aplicar Recarga</button>
 
-  <!-- Menu inferior -->
   <nav class="menu-inferior">
     <a href="H.html" class="ativo"><img src="30001.png" alt=""> Início</a>
-    <a href="investimento.html"><img src="10016.png" alt=""> investimento </a>
-    <a href="equipe.html"><img src="10017.png" alt=""> equipe </a>
-    <a href="perfil.html"><img src="ft4_1.png" alt=""> perfil </a>
+    <a href="investimento.html"><img src="10016.png" alt=""> Investimento</a>
+    <a href="equipe.html"><img src="10017.png" alt=""> Equipe</a>
+    <a href="perfil.html"><img src="ft4_1.png" alt=""> Perfil</a>
   </nav>
 
   <script>
-    // Configuração do Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
       authDomain: "hinvest-f4354.firebaseapp.com",
@@ -87,12 +164,10 @@
       appId: "1:646397677016:web:f05ca27a38439568bff6ad"
     };
 
-    // Inicializa o Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Função para atualizar os dados do usuário
-    document.addEventListener("DOMContentLoaded", async () => {
+    document.addEventListener("DOMContentLoaded", () => {
       const userId = localStorage.getItem("telefoneLogado");
 
       if (!userId) {
@@ -103,43 +178,35 @@
 
       const userRef = db.ref("usuarios/" + userId);
 
-      // Recupera os dados do Firebase
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
 
-        // Garante saldo inicial de R$21 se não existir
         if (data.saldoCarteira === undefined) {
-          userRef.update({ saldoCarteira: 10 });  // Inicializa com saldo de R$10
+          userRef.update({ saldoCarteira: 10 });
         }
 
-        // Recupera os dados atuais
-        const nome = data.nome || "Luis Fernando";  // Usando o nome correto
-        const telefone = userId || "75998282201";  // Formatando o telefone corretamente
-        const saldoCarteira = parseFloat(data.saldoCarteira ?? 10).toFixed(2);  
+        const nome = data.nome || "Usuário";
+        const telefone = userId;
+        const saldoCarteira = parseFloat(data.saldoCarteira ?? 10).toFixed(2);
         const renda = parseFloat(data.renda || 0).toFixed(2);
         const retirada = parseFloat(data.retirada || 0).toFixed(2);
         const ultimoCheckin = data.ultimoCheckin || "";
 
-        // Atualiza as informações na página
         document.getElementById("usuario-nome").textContent = nome;
-        document.getElementById("usuario-telefone").textContent = telefone.slice(0, 5) + "**" + telefone.slice(-4);  // Formata o telefone
+        document.getElementById("usuario-telefone").textContent = telefone.slice(0, 5) + "**" + telefone.slice(-4);
         document.getElementById("saldo-carteira").textContent = "R$ " + saldoCarteira;
         document.getElementById("valor-recebimento").textContent = "R$ " + renda;
         document.getElementById("valor-retirada").textContent = "R$ " + retirada;
 
-        // Verifica se o usuário já fez o check-in hoje
-        const hoje = new Date().toISOString().slice(0, 10); // Formato YYYY-MM-DD
-
+        const hoje = new Date().toISOString().slice(0, 10);
         if (ultimoCheckin === hoje) {
-          document.getElementById("checkin-diario").disabled = true; // Desabilita o botão se já fez check-in
+          document.getElementById("checkin-diario").disabled = true;
         }
       });
     });
 
-    // Função para realizar o check-in diário
-    document.getElementById("checkin-diario").addEventListener("click", function() {
+    document.getElementById("checkin-diario").addEventListener("click", () => {
       const userId = localStorage.getItem("telefoneLogado");
-
       if (!userId) {
         alert("Usuário não logado.");
         return;
@@ -149,30 +216,23 @@
 
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
-        const saldoAtual = parseFloat(data.saldoCarteira || 0); 
-
-        // Incrementa R$1.00 no saldo
+        const saldoAtual = parseFloat(data.saldoCarteira || 0);
         const novoSaldo = saldoAtual + 1;
-
-        const hoje = new Date().toISOString().slice(0, 10); 
+        const hoje = new Date().toISOString().slice(0, 10);
 
         userRef.update({
           saldoCarteira: novoSaldo,
-          ultimoCheckin: hoje  
+          ultimoCheckin: hoje
         }).then(() => {
-          document.getElementById("saldo-carteira").textContent = "R$ " + novoSaldo.toFixed(2);  
+          document.getElementById("saldo-carteira").textContent = "R$ " + novoSaldo.toFixed(2);
           alert("Check-in diário realizado com sucesso! +R$1.00");
-
-          // Desabilita o botão de check-in até o próximo dia
           document.getElementById("checkin-diario").disabled = true;
         });
       });
     });
 
-    // Função para aplicar a recarga na carteira
     function aplicarRecarga(valorRecarga) {
       const userId = localStorage.getItem("telefoneLogado");
-
       if (!userId) {
         alert("Usuário não logado.");
         return;
@@ -182,20 +242,18 @@
 
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
-        const saldoAtual = parseFloat(data.saldoCarteira || 0);  
-
+        const saldoAtual = parseFloat(data.saldoCarteira || 0);
         const novoSaldo = saldoAtual + valorRecarga;
 
         userRef.update({
           saldoCarteira: novoSaldo
         }).then(() => {
-          document.getElementById("saldo-carteira").textContent = "R$ " + novoSaldo.toFixed(2);  
+          document.getElementById("saldo-carteira").textContent = "R$ " + novoSaldo.toFixed(2);
           alert("Recarga aplicada com sucesso!");
         });
       });
     }
 
-    // Função para enviar recarga
     function enviarRecarga() {
       const valorRecarga = prompt("Digite o valor da recarga em R$:");
       if (valorRecarga && !isNaN(valorRecarga) && parseFloat(valorRecarga) > 0) {
@@ -206,4 +264,4 @@
     }
   </script>
 </body>
-        </html>
+</html>
