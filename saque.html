@@ -1,224 +1,199 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Carteira e Saque</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carteira - HInvest</title>
   <style>
-    section.carteira, section.conta, section.saque, section.terco {
-      margin: 20px;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #000; /* Fundo preto */
+      color: #fff; /* Texto branco */
     }
-    section.carteira .saldos {
-      display: flex;
-      justify-content: space-between;
+    h2 {
+      color: #0f0; /* Verde para destacar os títulos */
     }
-    section.conta label, section.saque label {
+    .info {
+      margin-bottom: 10px;
+    }
+    label {
       display: block;
-      margin: 5px 0;
+      margin-top: 10px;
     }
-    section.conta input, section.saque input, section.conta select {
+    input, select, button {
       width: 100%;
-      padding: 8px;
-      margin: 5px 0;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-    }
-    section.conta button, section.saque button {
       padding: 10px;
-      width: 100%;
-      background-color: #4CAF50;
+      margin-top: 5px;
+    }
+    button {
+      background: #28a745;
       color: white;
       border: none;
       cursor: pointer;
-      border-radius: 5px;
     }
-    section.conta button:disabled {
-      background-color: #ccc;
+    button:disabled {
+      background: #ccc;
     }
-    section.saque p {
-      margin-top: 10px;
-    }
-    section.terco {
-      background-color: #f9f9f9;
-      font-style: italic;
-      text-align: center;
+    .btn-extrato {
+      margin-top: 20px;
+      background: #007bff;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h2>Carteira</h2>
-    <a href="extrato.html">Ver Extrato</a>
-  </header>
+<h2>Saldo da Carteira</h2>
+<div class="info">Saldo: <span id="saldo-carteira">R$ 0.00</span></div>
+<div class="info">Valor Recebido: <span id="valor-recebimento">R$ 0.00</span></div>
+<div class="info">Valor Retirado: <span id="valor-retirada">R$ 0.00</span></div>
 
-  <section class="carteira">
-    <h2>Minha carteira</h2>
-    <div class="saldos">
-      <div class="saldo">
-        <img src="10004.png" alt="">
-        <p id="saldo-carteira">R$ 0.00</p>
-        <span>Saldo da carteira</span>
-      </div>
-      <div class="saldo">
-        <img src="10004.png" alt="">
-        <p id="valor-recebimento">R$ 0.00</p>
-        <span>valor de recebimento </span>
-      </div>
-      <div class="saldo">
-        <img src="10004.png" alt="">
-        <p id="valor-retirada">R$ 0.00</p>
-        <span>Valor de retirada</span>
-      </div>
-    </div>
-  </section>
+<button class="btn-extrato" onclick="window.location.href='extrato.html'">Ver Extrato Completo</button>
 
-  <section class="conta">
-    <h2>Conta Bancária</h2>
-    <label>Nome do Titular:</label>
-    <input type="text" id="nomeTitular" placeholder="Nome completo" />
-    <label>Tipo de chave PIX:</label>
-    <select id="tipoChave">
-      <option value="email">Email</option>
-      <option value="telefone">Telefone</option>
-      <option value="cpf">CPF</option>
-    </select>
-    <label>Chave PIX:</label>
-    <input type="text" id="chavePix" placeholder="Sua chave PIX" />
-    <button id="salvarConta">Salvar Conta</button>
-  </section>
+<h2>Conta Bancária</h2>
+<label>Nome do Titular</label>
+<input type="text" id="nomeTitular">
+<label>Tipo de Chave</label>
+<select id="tipoChave">
+  <option value="CPF">CPF</option>
+  <option value="Email">Email</option>
+  <option value="Telefone">Telefone</option>
+</select>
+<label>Chave Pix</label>
+<input type="text" id="chavePix">
+<button id="salvarConta">Salvar Conta</button>
 
-  <section class="saque">
-    <h2>Saque</h2>
-    <label>Valor para saque (mínimo R$20):</label>
-    <input type="number" id="valorSaque" placeholder="Ex: 100" oninput="calcularValorRecebido()" />
-    <p><strong>Valor da taxa (12%): <span id="valorTaxa">R$ 0.00</span></strong></p>
-    <p><strong>Valor a ser recebido: <span id="valorLiquido">R$ 0.00</span></strong></p>
-    <button id="confirmarSaque">Sacar</button>
-    <p id="status"></p>
-  </section>
+<h2>Sacar</h2>
+<label>Valor do Saque</label>
+<input type="number" id="valorSaque" placeholder="Digite o valor" oninput="calcularValorRecebido()">
+<div class="info">Taxa: <span id="valorTaxa">R$ 0.00</span></div>
+<div class="info">Valor Líquido: <span id="valorLiquido">R$ 0.00</span></div>
+<button id="confirmarSaque">Confirmar Saque</button>
 
-  <section class="terco">
-    <p>"O Senhor é meu pastor, nada me faltará."</p>
-    <p>Salmo 23:1</p>
-  </section>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-      authDomain: "hinvest-f4354.firebaseapp.com",
-      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-      projectId: "hinvest-f4354",
-      storageBucket: "hinvest-f4354.appspot.com",
-      messagingSenderId: "646397677016",
-      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-    };
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.appspot.com",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const userId = localStorage.getItem("telefoneLogado");
-    const userRef = db.ref("usuarios/" + userId);
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const userId = localStorage.getItem("telefoneLogado");
+  const userRef = db.ref("usuarios/" + userId);
 
-    document.addEventListener("DOMContentLoaded", () => {
-      if (!userId) {
-        alert("Usuário não logado.");
-        window.location.href = "index.html";
-        return;
-      }
-
-      userRef.once("value").then(snapshot => {
-        const data = snapshot.val() || {};
-        const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00).toFixed(2);
-        const renda = parseFloat(data.renda ?? 1.00).toFixed(2);
-        const retirada = parseFloat(data.retirada || 0).toFixed(2);
-
-        document.getElementById("saldo-carteira").textContent = "R$ " + saldoCarteira;
-        document.getElementById("valor-recebimento").textContent = "R$ " + renda;
-        document.getElementById("valor-retirada").textContent = "R$ " + retirada;
-
-        if (data.contaBancaria) {
-          document.getElementById("nomeTitular").value = data.contaBancaria.nomeTitular;
-          document.getElementById("tipoChave").value = data.contaBancaria.tipoChave;
-          document.getElementById("chavePix").value = data.contaBancaria.chavePix;
-          document.getElementById("salvarConta").disabled = true;
-        }
-      });
-    });
-
-    document.getElementById("salvarConta").addEventListener("click", () => {
-      const nome = document.getElementById("nomeTitular").value;
-      const tipo = document.getElementById("tipoChave").value;
-      const chave = document.getElementById("chavePix").value;
-
-      if (!nome || !chave) {
-        alert("Preencha todos os campos da conta.");
-        return;
-      }
-
-      userRef.update({
-        contaBancaria: {
-          nomeTitular: nome,
-          tipoChave: tipo,
-          chavePix: chave
-        }
-      });
-
-      alert("Conta bancária salva com sucesso!");
-      document.getElementById("salvarConta").disabled = true;
-    });
-
-    function calcularValorRecebido() {
-      const valor = parseFloat(document.getElementById("valorSaque").value);
-      if (!isNaN(valor) && valor >= 20) {
-        const taxa = valor * 0.12;
-        const valorLiquido = valor - taxa;
-        document.getElementById("valorTaxa").textContent = "R$ " + taxa.toFixed(2);
-        document.getElementById("valorLiquido").textContent = "R$ " + valorLiquido.toFixed(2);
-      } else {
-        document.getElementById("valorTaxa").textContent = "R$ 0.00";
-        document.getElementById("valorLiquido").textContent = "R$ 0.00";
-      }
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!userId) {
+      alert("Usuário não logado.");
+      window.location.href = "index.html";
+      return;
     }
 
-    document.getElementById("confirmarSaque").addEventListener("click", async () => {
-      const valor = parseFloat(document.getElementById("valorSaque").value);
-      if (isNaN(valor) || valor < 20) {
-        alert("O valor mínimo para retirada é R$20.");
-        return;
+    userRef.once("value").then(snapshot => {
+      const data = snapshot.val() || {};
+      const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00).toFixed(2);
+      const renda = parseFloat(data.renda ?? 1.00).toFixed(2);
+      const retirada = parseFloat(data.retirada || 0).toFixed(2);
+
+      document.getElementById("saldo-carteira").textContent = "R$ " + saldoCarteira;
+      document.getElementById("valor-recebimento").textContent = "R$ " + renda;
+      document.getElementById("valor-retirada").textContent = "R$ " + retirada;
+
+      if (data.contaBancaria) {
+        document.getElementById("nomeTitular").value = data.contaBancaria.nomeTitular;
+        document.getElementById("tipoChave").value = data.contaBancaria.tipoChave;
+        document.getElementById("chavePix").value = data.contaBancaria.chavePix;
+        document.getElementById("salvarConta").disabled = true;
       }
+    });
+  });
 
-      const snapshot = await userRef.once("value");
-      const data = snapshot.val();
-      const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00);
+  document.getElementById("salvarConta").addEventListener("click", () => {
+    const nome = document.getElementById("nomeTitular").value;
+    const tipo = document.getElementById("tipoChave").value;
+    const chave = document.getElementById("chavePix").value;
 
-      if (valor > saldoCarteira) {
-        alert("Você não tem saldo suficiente para realizar este saque.");
-        return;
+    if (!nome || !chave) {
+      alert("Preencha todos os campos da conta.");
+      return;
+    }
+
+    userRef.update({
+      contaBancaria: {
+        nomeTitular: nome,
+        tipoChave: tipo,
+        chavePix: chave
       }
+    });
 
+    alert("Conta bancária salva com sucesso!");
+    document.getElementById("salvarConta").disabled = true;
+  });
+
+  function calcularValorRecebido() {
+    const valor = parseFloat(document.getElementById("valorSaque").value);
+    if (!isNaN(valor) && valor >= 20) {
       const taxa = valor * 0.12;
       const valorLiquido = valor - taxa;
+      document.getElementById("valorTaxa").textContent = "R$ " + taxa.toFixed(2);
+      document.getElementById("valorLiquido").textContent = "R$ " + valorLiquido.toFixed(2);
+    } else {
+      document.getElementById("valorTaxa").textContent = "R$ 0.00";
+      document.getElementById("valorLiquido").textContent = "R$ 0.00";
+    }
+  }
 
-      await userRef.update({
-        saldoCarteira: saldoCarteira - valor,
-        recebimento: (data.recebimento ?? 0) + valorLiquido,
-        retirada: (data.retirada ?? 0) + valor
-      });
+  document.getElementById("confirmarSaque").addEventListener("click", async () => {
+    const valor = parseFloat(document.getElementById("valorSaque").value);
+    if (isNaN(valor) || valor < 20) {
+      alert("O valor mínimo para retirada é R$20.");
+      return;
+    }
 
-      alert(`Saque confirmado. Você receberá R$ ${valorLiquido.toFixed(2)} após a taxa.`);
+    const snapshot = await userRef.once("value");
+    const data = snapshot.val();
+    const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00);
 
-      document.getElementById("valorSaque").value = "";
-      calcularValorRecebido();
+    if (valor > saldoCarteira) {
+      alert("Você não tem saldo suficiente para realizar este saque.");
+      return;
+    }
 
-      document.getElementById("saldo-carteira").textContent = "R$ " + (saldoCarteira - valor).toFixed(2);
-      document.getElementById("valor-retirada").textContent = "R$ " + ((data.retirada ?? 0) + valor).toFixed(2);
+    const taxa = valor * 0.12;
+    const valorLiquido = valor - taxa;
+
+    await userRef.update({
+      saldoCarteira: saldoCarteira - valor,
+      recebimento: (data.recebimento ?? 0) + valorLiquido,
+      retirada: (data.retirada ?? 0) + valor
     });
-  </script>
+
+    let extrato = JSON.parse(localStorage.getItem("extrato")) || [];
+    const dataHora = new Date().toLocaleString();
+    extrato.push({
+      valor: valor.toFixed(2),
+      taxa: taxa.toFixed(2),
+      liquido: valorLiquido.toFixed(2),
+      data: dataHora
+    });
+    localStorage.setItem("extrato", JSON.stringify(extrato));
+
+    alert(`Saque confirmado. Você receberá R$ ${valorLiquido.toFixed(2)} após a taxa.`);
+
+    document.getElementById("valorSaque").value = "";
+    calcularValorRecebido();
+
+    document.getElementById("saldo-carteira").textContent = "R$ " + (saldoCarteira - valor).toFixed(2);
+    document.getElementById("valor-retirada").textContent = "R$ " + ((data.retirada ?? 0) + valor).toFixed(2);
+  });
+</script>
+
 </body>
 </html>
