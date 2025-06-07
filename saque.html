@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Carteira - HInvest</title>
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
       padding: 20px;
-      background: #000; /* Fundo preto */
-      color: #fff; /* Texto branco */
     }
     h2 {
-      color: #0f0; /* Verde para destacar os títulos */
+      color: #0f0;
     }
     .info {
       margin-bottom: 10px;
@@ -25,6 +25,7 @@
       width: 100%;
       padding: 10px;
       margin-top: 5px;
+      font-size: 16px;
     }
     button {
       background: #28a745;
@@ -33,20 +34,50 @@
       cursor: pointer;
     }
     button:disabled {
-      background: #ccc;
+      background: #666;
     }
     .btn-extrato {
-      margin-top: 20px;
       background: #007bff;
+      margin-top: 20px;
+    }
+    .aviso {
+      background: #111;
+      border: 1px solid #333;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      color: #ff0;
+    }
+    .titulo-destaque {
+      color: #00ffcc;
+      font-size: 20px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
 
+<h2>Carteira - HInvest</h2>
+
+<div class="aviso">
+  <div class="titulo-destaque">⏰ Tempo de pagamento:</div>
+  Pagamos de 1 minuto até 2 horas. Horário de pagamento é de 8h às 22h. Horário de Brasília.
+</div>
+
+<div class="aviso">
+  <div class="titulo-destaque">⚠️ Aviso importante:</div>
+  A plataforma exige <strong>recarga mínima de R$ 60</strong> para liberar os saques.
+</div>
+
+<div class="aviso">
+  <div class="titulo-destaque">💵 Sobre saques:</div>
+  Não adianta pedir saque se ainda não tiver feito uma recarga mínima de R$ 60. Recargas de teste não serão consideradas.
+</div>
+
 <h2>Saldo da Carteira</h2>
-<div class="info">Saldo: <span id="saldo-carteira">R$ 0.00</span></div>
-<div class="info">Valor Recebido: <span id="valor-recebimento">R$ 0.00</span></div>
-<div class="info">Valor Retirado: <span id="valor-retirada">R$ 0.00</span></div>
+<div class="info">Saldo: <span id="saldo-carteira">R$ 0,00</span></div>
+<div class="info">Valor Recebido: <span id="valor-recebimento">R$ 0,00</span></div>
+<div class="info">Valor Retirado: <span id="valor-retirada">R$ 0,00</span></div>
 
 <button class="btn-extrato" onclick="window.location.href='extrato.html'">Ver Extrato Completo</button>
 
@@ -66,13 +97,12 @@
 <h2>Sacar</h2>
 <label>Valor do Saque</label>
 <input type="number" id="valorSaque" placeholder="Digite o valor" oninput="calcularValorRecebido()">
-<div class="info">Taxa: <span id="valorTaxa">R$ 0.00</span></div>
-<div class="info">Valor Líquido: <span id="valorLiquido">R$ 0.00</span></div>
+<div class="info">Taxa (12%): <span id="valorTaxa">R$ 0,00</span></div>
+<div class="info">Valor Líquido: <span id="valorLiquido">R$ 0,00</span></div>
 <button id="confirmarSaque">Confirmar Saque</button>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
@@ -83,11 +113,27 @@
     messagingSenderId: "646397677016",
     appId: "1:646397677016:web:f05ca27a38439568bff6ad"
   };
-
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
   const userId = localStorage.getItem("telefoneLogado");
   const userRef = db.ref("usuarios/" + userId);
+
+  function atualizarTela(data) {
+    const saldo = parseFloat(data.saldoCarteira || 0).toFixed(2);
+    const receb = parseFloat(data.recebimento || 0).toFixed(2);
+    const retirada = parseFloat(data.retirada || 0).toFixed(2);
+
+    document.getElementById("saldo-carteira").textContent = "R$ " + saldo.replace(".", ",");
+    document.getElementById("valor-recebimento").textContent = "R$ " + receb.replace(".", ",");
+    document.getElementById("valor-retirada").textContent = "R$ " + retirada.replace(".", ",");
+
+    if (data.contaBancaria) {
+      document.getElementById("nomeTitular").value = data.contaBancaria.nomeTitular || "";
+      document.getElementById("tipoChave").value = data.contaBancaria.tipoChave || "CPF";
+      document.getElementById("chavePix").value = data.contaBancaria.chavePix || "";
+      document.getElementById("salvarConta").disabled = true;
+    }
+  }
 
   document.addEventListener("DOMContentLoaded", () => {
     if (!userId) {
@@ -95,30 +141,16 @@
       window.location.href = "index.html";
       return;
     }
-
     userRef.once("value").then(snapshot => {
       const data = snapshot.val() || {};
-      const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00).toFixed(2);
-      const renda = parseFloat(data.renda ?? 1.00).toFixed(2);
-      const retirada = parseFloat(data.retirada || 0).toFixed(2);
-
-      document.getElementById("saldo-carteira").textContent = "R$ " + saldoCarteira;
-      document.getElementById("valor-recebimento").textContent = "R$ " + renda;
-      document.getElementById("valor-retirada").textContent = "R$ " + retirada;
-
-      if (data.contaBancaria) {
-        document.getElementById("nomeTitular").value = data.contaBancaria.nomeTitular;
-        document.getElementById("tipoChave").value = data.contaBancaria.tipoChave;
-        document.getElementById("chavePix").value = data.contaBancaria.chavePix;
-        document.getElementById("salvarConta").disabled = true;
-      }
+      atualizarTela(data);
     });
   });
 
   document.getElementById("salvarConta").addEventListener("click", () => {
-    const nome = document.getElementById("nomeTitular").value;
+    const nome = document.getElementById("nomeTitular").value.trim();
     const tipo = document.getElementById("tipoChave").value;
-    const chave = document.getElementById("chavePix").value;
+    const chave = document.getElementById("chavePix").value.trim();
 
     if (!nome || !chave) {
       alert("Preencha todos os campos da conta.");
@@ -141,57 +173,59 @@
     const valor = parseFloat(document.getElementById("valorSaque").value);
     if (!isNaN(valor) && valor >= 20) {
       const taxa = valor * 0.12;
-      const valorLiquido = valor - taxa;
-      document.getElementById("valorTaxa").textContent = "R$ " + taxa.toFixed(2);
-      document.getElementById("valorLiquido").textContent = "R$ " + valorLiquido.toFixed(2);
+      const liquido = valor - taxa;
+      document.getElementById("valorTaxa").textContent = "R$ " + taxa.toFixed(2).replace(".", ",");
+      document.getElementById("valorLiquido").textContent = "R$ " + liquido.toFixed(2).replace(".", ",");
     } else {
-      document.getElementById("valorTaxa").textContent = "R$ 0.00";
-      document.getElementById("valorLiquido").textContent = "R$ 0.00";
+      document.getElementById("valorTaxa").textContent = "R$ 0,00";
+      document.getElementById("valorLiquido").textContent = "R$ 0,00";
     }
   }
 
   document.getElementById("confirmarSaque").addEventListener("click", async () => {
     const valor = parseFloat(document.getElementById("valorSaque").value);
     if (isNaN(valor) || valor < 20) {
-      alert("O valor mínimo para retirada é R$20.");
+      alert("O valor mínimo para saque é R$ 20,00.");
       return;
     }
 
     const snapshot = await userRef.once("value");
     const data = snapshot.val();
-    const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00);
+    const saldoAtual = parseFloat(data.saldoCarteira || 0);
 
-    if (valor > saldoCarteira) {
-      alert("Você não tem saldo suficiente para realizar este saque.");
+    if (valor > saldoAtual) {
+      alert("Saldo insuficiente.");
       return;
     }
 
     const taxa = valor * 0.12;
-    const valorLiquido = valor - taxa;
+    const liquido = valor - taxa;
+    const novoSaldo = saldoAtual - valor;
+    const novoReceb = parseFloat(data.recebimento || 0) + liquido;
+    const novaRetirada = parseFloat(data.retirada || 0) + valor;
 
     await userRef.update({
-      saldoCarteira: saldoCarteira - valor,
-      recebimento: (data.recebimento ?? 0) + valorLiquido,
-      retirada: (data.retirada ?? 0) + valor
+      saldoCarteira: novoSaldo,
+      recebimento: novoReceb,
+      retirada: novaRetirada
     });
 
-    let extrato = JSON.parse(localStorage.getItem("extrato")) || [];
-    const dataHora = new Date().toLocaleString();
-    extrato.push({
+    // Adiciona extrato no Firebase
+    const emailCodificado = btoa(userId); // usa telefone como "email" codificado
+    const dataAtual = new Date().toLocaleString("pt-BR");
+
+    db.ref("extratos/" + emailCodificado).push({
+      data: dataAtual,
       valor: valor.toFixed(2),
       taxa: taxa.toFixed(2),
-      liquido: valorLiquido.toFixed(2),
-      data: dataHora
+      liquido: liquido.toFixed(2)
     });
-    localStorage.setItem("extrato", JSON.stringify(extrato));
 
-    alert(`Saque confirmado. Você receberá R$ ${valorLiquido.toFixed(2)} após a taxa.`);
+    alert(`Saque confirmado! Você receberá R$ ${liquido.toFixed(2).replace(".", ",")}.`);
 
     document.getElementById("valorSaque").value = "";
     calcularValorRecebido();
-
-    document.getElementById("saldo-carteira").textContent = "R$ " + (saldoCarteira - valor).toFixed(2);
-    document.getElementById("valor-retirada").textContent = "R$ " + ((data.retirada ?? 0) + valor).toFixed(2);
+    atualizarTela({ saldoCarteira: novoSaldo, recebimento: novoReceb, retirada: novaRetirada });
   });
 </script>
 
