@@ -3,119 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Extrato</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <title>Extrato - HInvest</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #000000;
-      color: #ffffff;
-      margin: 0;
-      padding: 0;
-    }
-
-    header {
-      background-color: #1a1a1a;
-      color: white;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .extrato {
+      background: #000;
+      color: #fff;
       padding: 20px;
     }
-
-    .transacao {
-      background-color: #1e1e1e;
-      margin-bottom: 10px;
-      padding: 15px;
-      border-radius: 5px;
-      border: 1px solid #ffffff;
-      box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+    table {
+      width: 100%;
+      border-collapse: collapse;
     }
-
-    .transacao p {
-      margin: 5px 0;
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
     }
-
-    .botao-voltar {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #1a1a1a;
-      color: white;
-      border: 1px solid white;
-      border-radius: 5px;
-      text-decoration: none;
-      transition: background-color 0.3s ease;
+    th {
+      background-color: #333;
     }
-
-    .botao-voltar:hover {
-      background-color: #333333;
+    tr:nth-child(even) {
+      background-color: #222;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h2>Extrato de Saques</h2>
-  </header>
+<h2>Extrato de Saques</h2>
 
-  <section class="extrato">
-    <h3>Transações Realizadas</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Valor Bruto</th>
+      <th>Taxa</th>
+      <th>Valor Líquido</th>
+    </tr>
+  </thead>
+  <tbody id="extrato-table">
+    <!-- Extrato será carregado aqui -->
+  </tbody>
+</table>
 
-    <div id="extrato-container">
-      <!-- Transações serão inseridas aqui dinamicamente -->
-    </div>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.appspot.com",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
 
-    <a href="saque.html" class="botao-voltar">Voltar para a Carteira</a>
-  </section>
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const userId = localStorage.getItem('telefoneLogado');
 
-  <script>
-    // Configuração Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-      authDomain: "hinvest-f4354.firebaseapp.com",
-      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-      projectId: "hinvest-f4354",
-      storageBucket: "hinvest-f4354.firebasestorage.app",
-      messagingSenderId: "646397677016",
-      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-    };
+  if (!userId) {
+    alert("Usuário não logado.");
+    window.location.href = "index.html";
+  }
 
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
+  db.ref("saques").orderByChild("dataSolicitacao").on("value", snapshot => {
+    const saques = snapshot.val();
+    const tableBody = document.getElementById("extrato-table");
+    tableBody.innerHTML = "";  // Limpa a tabela antes de adicionar novas transações
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const extratoContainer = document.getElementById("extrato-container");
+    if (saques) {
+      Object.values(saques).forEach(saque => {
+        if (saque.status === "aprovado" && saque.userId === userId) {
+          const valorBruto = saque.valor;
+          const taxa = saque.taxa;
+          const valorLiquido = saque.valorLiquido;
+          const data = new Date(saque.dataSolicitacao).toLocaleString();
 
-      const extrato = JSON.parse(localStorage.getItem("extrato")) || [];
-
-      extratoContainer.innerHTML = "";
-
-      if (extrato.length === 0) {
-        const div = document.createElement("div");
-        div.className = "transacao";
-        div.textContent = "Nenhuma retirada realizada ainda.";
-        extratoContainer.appendChild(div);
-      } else {
-        extrato.reverse().forEach(item => {
-          const div = document.createElement("div");
-          div.className = "transacao";
-          div.innerHTML = `
-            <p><strong>Data:</strong> ${item.data}</p>
-            <p><strong>Valor Bruto:</strong> R$ ${item.valor}</p>
-            <p><strong>Taxa:</strong> R$ ${item.taxa}</p>
-            <p><strong>Valor Líquido:</strong> R$ ${item.liquido}</p>
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${data}</td>
+            <td>R$ ${valorBruto.toFixed(2).replace(".", ",")}</td>
+            <td>R$ ${taxa.toFixed(2).replace(".", ",")}</td>
+            <td>R$ ${valorLiquido.toFixed(2).replace(".", ",")}</td>
           `;
-          extratoContainer.appendChild(div);
-        });
-      }
-    });
-  </script>
+          tableBody.appendChild(row);
+        }
+      });
+    } else {
+      tableBody.innerHTML = '<tr><td colspan="4">Nenhuma transação encontrada.</td></tr>';
+    }
+  });
+</script>
 
 </body>
 </html>
