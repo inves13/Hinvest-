@@ -142,19 +142,19 @@
       for (let tel in usuarios) {
         const u = usuarios[tel];
         if (u.codigoIndicacao === meuCodigo) {
-          lv1++; bonus += (u.valorInvestido * 0.35); // 35% de bonus para LV1
+          lv1++; bonus += 5;
           membros.push(u.telefone);
 
           for (let tel2 in usuarios) {
             const u2 = usuarios[tel2];
             if (u2.codigoIndicacao === u.codigo) {
-              lv2++; bonus += (u2.valorInvestido * 0.02); // 2% de bonus para LV2
+              lv2++; bonus += 3;
               membros.push(u2.telefone);
 
               for (let tel3 in usuarios) {
                 const u3 = usuarios[tel3];
                 if (u3.codigoIndicacao === u2.codigo) {
-                  lv3++; bonus += (u3.valorInvestido * 0.01); // 1% de bonus para LV3
+                  lv3++; bonus += 1;
                   membros.push(u3.telefone);
                 }
               }
