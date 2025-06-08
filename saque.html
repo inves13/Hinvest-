@@ -99,7 +99,7 @@
 <input type="number" id="valorSaque" placeholder="Digite o valor" oninput="calcularValorRecebido()">
 <div class="info">Taxa (12%): <span id="valorTaxa">R$ 0,00</span></div>
 <div class="info">Valor Líquido: <span id="valorLiquido">R$ 0,00</span></div>
-<button id="confirmarSaque">Confirmar Saque</button>
+<button id="confirmarSaque" disabled>Confirmar Saque</button>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -113,10 +113,12 @@
     messagingSenderId: "646397677016",
     appId: "1:646397677016:web:f05ca27a38439568bff6ad"
   };
+
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
-  const userId = localStorage.getItem("telefoneLogado");
+  const userId = localStorage.getItem('telefoneLogado');
   const userRef = db.ref("usuarios/" + userId);
+  const saquesRef = db.ref("saques");
 
   function atualizarTela(data) {
     const saldo = parseFloat(data.saldoCarteira || 0).toFixed(2);
@@ -132,6 +134,13 @@
       document.getElementById("tipoChave").value = data.contaBancaria.tipoChave || "CPF";
       document.getElementById("chavePix").value = data.contaBancaria.chavePix || "";
       document.getElementById("salvarConta").disabled = true;
+    }
+
+    const temPlanoAtivo = data.investimentos && data.investimentos.some(investimento => investimento.status === 'comprado');
+    if (temPlanoAtivo) {
+      document.getElementById("confirmarSaque").disabled = false;
+    } else {
+      document.getElementById("confirmarSaque").disabled = true;
     }
   }
 
@@ -182,52 +191,52 @@
     }
   }
 
-  document.getElementById("confirmarSaque").addEventListener("click", async () => {
+  document.getElementById("confirmarSaque").addEventListener("click", () => {
     const valor = parseFloat(document.getElementById("valorSaque").value);
-    if (isNaN(valor) || valor < 20) {
-      alert("O valor mínimo para saque é R$ 20,00.");
+    if (valor < 20) {
+      alert("O valor mínimo para saque é R$ 20.");
       return;
     }
 
-    const snapshot = await userRef.once("value");
-    const data = snapshot.val();
-    const saldoAtual = parseFloat(data.saldoCarteira || 0);
+    userRef.once("value").then(snapshot => {
+      const data = snapshot.val();
+      const saldo = parseFloat(data.saldoCarteira || 0);
 
-    if (valor > saldoAtual) {
-      alert("Saldo insuficiente.");
-      return;
-    }
+      if (saldo < valor) {
+        alert("Saldo insuficiente.");
+        return;
+      }
 
-    const taxa = valor * 0.12;
-    const liquido = valor - taxa;
-    const novoSaldo = saldoAtual - valor;
-    const novoReceb = parseFloat(data.recebimento || 0) + liquido;
-    const novaRetirada = parseFloat(data.retirada || 0) + valor;
+      const taxa = valor * 0.12;
+      const valorLiquido = valor - taxa;
 
-    await userRef.update({
-      saldoCarteira: novoSaldo,
-      recebimento: novoReceb,
-      retirada: novaRetirada
+      // Atualiza o saldo com o valor líquido
+      const novoSaldo = saldo - valor;
+      userRef.update({
+        saldoCarteira: novoSaldo,
+        recebimento: valorLiquido,
+        retirada: valor
+      });
+
+      // Adiciona o saque ao extrato
+      saquesRef.push({
+        userId: userId,
+        valor: valor,
+        taxa: taxa,
+        valorLiquido: valorLiquido,
+        dataSolicitacao: new Date().toISOString(),
+        status: "aprovado"
+      });
+
+      alert("Saque realizado com sucesso. Valor líquido de R$ " + valorLiquido.toFixed(2).replace(".", ",") + " foi transferido.");
+
+      atualizarTela({
+        saldoCarteira: novoSaldo,
+        recebimento: valorLiquido,
+        retirada: valor
+      });
     });
-
-    // Adiciona extrato no Firebase
-    const emailCodificado = btoa(userId); // usa telefone como "email" codificado
-    const dataAtual = new Date().toLocaleString("pt-BR");
-
-    db.ref("extratos/" + emailCodificado).push({
-      data: dataAtual,
-      valor: valor.toFixed(2),
-      taxa: taxa.toFixed(2),
-      liquido: liquido.toFixed(2)
-    });
-
-    alert(`Saque confirmado! Você receberá R$ ${liquido.toFixed(2).replace(".", ",")}.`);
-
-    document.getElementById("valorSaque").value = "";
-    calcularValorRecebido();
-    atualizarTela({ saldoCarteira: novoSaldo, recebimento: novoReceb, retirada: novaRetirada });
   });
 </script>
-
 </body>
 </html>
