@@ -154,24 +154,22 @@
     usuarioRef.once('value', (snapshot) => {
       const dados = snapshot.val();
       if (dados) {
-        // Preencher nome completo e sobrenome corretamente
         const nomeCompleto = dados.nome.split(" ");
         const nome = nomeCompleto[0];
         const sobrenome = nomeCompleto.slice(1).join(" ");
         
-        document.getElementById("nomeCompleto").textContent = nome; // Exibe nome completo no título do perfil
+        document.getElementById("nomeCompleto").textContent = nome;
         document.getElementById("nome_completo").value = nome || "Nome não disponível"; 
-        document.getElementById("sobrenome").value = sobrenome || '';  // Preencher sobrenome
+        document.getElementById("sobrenome").value = sobrenome || '';  
         
-        document.getElementById("email_usuario").value = dados.email || '';  // Preencher e-mail automaticamente
+        document.getElementById("email_usuario").value = dados.email || '';  
         document.getElementById("cep").value = dados.cep || '';
         document.getElementById("cidade").value = dados.cidade || '';
         document.getElementById("bairro").value = dados.bairro || '';
         document.getElementById("endereco").value = dados.endereco || '';
         document.getElementById("rua").value = dados.rua || '';
-        document.getElementById("data_nascimento").value = dados.data_nascimento || ''; // Preencher data de nascimento
+        document.getElementById("data_nascimento").value = dados.data_nascimento || '';
 
-        // Se houver foto salva
         if (dados.foto) {
           document.getElementById("fotoPerfil").src = dados.foto;
         }
@@ -185,7 +183,7 @@
       const reader = new FileReader();
       reader.onloadend = function() {
         document.getElementById("fotoPerfil").src = reader.result;
-        salvarDados(); // Salvar a foto no Firebase
+        salvarDados(); 
       };
       reader.readAsDataURL(foto);
     }
