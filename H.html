@@ -9,6 +9,11 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
     /* Estilos */
+    body {
+      background-color: #000; /* Altera a cor de fundo para preto */
+      color: #fff; /* Altera a cor do texto para branco */
+    }
+
     .usuario-info {
       text-align: center;
       margin-top: 20px;
@@ -16,10 +21,11 @@
     .usuario-info p {
       font-size: 18px;
       margin: 5px 0;
+      color: #fff; /* Altera a cor do texto */
     }
     .carteira {
       padding: 20px 15px;
-      background-color: #f9f9f9;
+      background-color: #333; /* Fundo escuro para a carteira */
       margin: 20px;
       border-radius: 10px;
       max-width: 600px;
@@ -31,7 +37,7 @@
       margin-bottom: 30px;
       font-weight: 700;
       font-size: 28px;
-      color: #006400;
+      color: #00b140;
     }
     .saldos {
       display: flex;
@@ -41,7 +47,7 @@
     }
     .saldo {
       flex: 1 1 150px;
-      background: white;
+      background: #444; /* Fundo mais escuro para os saldos */
       border-radius: 12px;
       padding: 20px 15px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
@@ -57,20 +63,20 @@
       font-size: 24px;
       font-weight: 700;
       margin: 10px 0 5px;
-      color: #008000;
+      color: #00b140;
       user-select: none;
     }
     .saldo span {
       display: block;
       font-size: 16px;
-      color: #444;
+      color: #ccc; /* Altera a cor do texto para cinza claro */
       font-weight: 600;
     }
     .botao {
       display: flex;
       align-items: center;
       gap: 10px;
-      background-color: #008000;
+      background-color: #00b140;
       color: white;
       padding: 10px;
       margin: 10px auto;
@@ -105,7 +111,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: #eee;
+      background: #444; /* Fundo escuro para o menu inferior */
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
@@ -114,7 +120,7 @@
     }
     .menu-inferior a {
       text-align: center;
-      color: #000;
+      color: #fff; /* Texto branco no menu inferior */
       text-decoration: none;
       font-weight: 600;
       font-size: 14px;
@@ -127,7 +133,7 @@
     }
     .ativo {
       font-weight: 700;
-      color: #008000;
+      color: #00b140;
     }
     .logo img {
       max-width: 400px;
@@ -227,80 +233,16 @@
       const nome = data.nome || "Usuário";
       const telefone = userId;
       const saldoCarteira = parseFloat(data.saldoCarteira ?? 10).toFixed(2);
-      const valorRecebido = parseFloat(data.recebimento || 0).toFixed(2);
-      const retirada = parseFloat(data.retirada || 0).toFixed(2);
-      const ultimoCheckin = data.ultimoCheckin || "";
+      const valorRecebido = parseFloat(data.valorRecebido ?? 0).toFixed(2);
+      const valorRecebimento = parseFloat(data.valorRecebimento ?? 0).toFixed(2);
 
-      const usuarioNome = document.getElementById("usuario-nome");
-      const usuarioTelefone = document.getElementById("usuario-telefone");
-      const saldoCarteiraElement = document.getElementById("saldo-carteira");
-      const valorRecebidoElement = document.getElementById("valor-recebido");
-      const valorRetirada = document.getElementById("valor-recebimento");
-      const checkinDiarioBtn = document.getElementById("checkin-diario");
-
-      if (usuarioNome) usuarioNome.textContent = nome;
-      if (usuarioTelefone) usuarioTelefone.textContent = telefone.slice(0, 5) + "**" + telefone.slice(-4);
-      if (saldoCarteiraElement) saldoCarteiraElement.textContent = "R$ " + saldoCarteira;
-      if (valorRecebidoElement) valorRecebidoElement.textContent = "R$ " + valorRecebido;
-      if (valorRetirada) valorRetirada.textContent = "R$ " + retirada;
-
-      const hoje = new Date().toISOString().slice(0, 10);
-      if (ultimoCheckin === hoje) {
-        if (checkinDiarioBtn) {
-          checkinDiarioBtn.disabled = true;
-          checkinDiarioBtn.textContent = "Check-in Diário (Já coletado)";
-        }
-      }
-    });
-
-    document.getElementById("checkin-diario").addEventListener("click", () => {
-      realizarCheckin();
+      document.getElementById("usuario-nome").textContent = nome;
+      document.getElementById("usuario-telefone").textContent = telefone;
+      document.getElementById("saldo-carteira").textContent = `R$ ${saldoCarteira}`;
+      document.getElementById("valor-recebido").textContent = `R$ ${valorRecebido}`;
+      document.getElementById("valor-recebimento").textContent = `R$ ${valorRecebimento}`;
     });
   });
-
-  function realizarCheckin() {
-    const userId = localStorage.getItem("telefoneLogado");
-    if (!userId) {
-      alert("Usuário não logado.");
-      return;
-    }
-
-    const userRef = db.ref("usuarios/" + userId);
-
-    userRef.once("value").then(snapshot => {
-      const data = snapshot.val() || {};
-      const hoje = new Date().toISOString().slice(0, 10);
-
-      if (data.ultimoCheckin === hoje) {
-        alert("Você já coletou seu check-in diário hoje.");
-        const btn = document.getElementById("checkin-diario");
-        if (btn) {
-          btn.disabled = true;
-          btn.textContent = "Check-in Diário (Já coletado)";
-        }
-        return;
-      }
-
-      const saldoAtual = parseFloat(data.saldoCarteira || 0);
-      const novoSaldo = saldoAtual + 1;
-
-      userRef.update({
-        saldoCarteira: novoSaldo,
-        ultimoCheckin: hoje
-      }).then(() => {
-        document.getElementById("saldo-carteira").textContent = "R$ " + novoSaldo.toFixed(2);
-        const btn = document.getElementById("checkin-diario");
-        if (btn) {
-          btn.disabled = true;
-          btn.textContent = "Check-in Diário (Já coletado)";
-        }
-        alert("Check-in diário realizado! + R$1,00 creditado.");
-      }).catch(() => {
-        alert("Erro ao atualizar saldo.");
-      });
-    });
-  }
 </script>
-
 </body>
 </html>
