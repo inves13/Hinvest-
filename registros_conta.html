@@ -1,208 +1,259 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H+Investir - Cadastro e Login</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-            authDomain: "hinvest-f4354.firebaseapp.com",
-            projectId: "hinvest-f4354",
-            storageBucket: "hinvest-f4354.appspot.com",
-            messagingSenderId: "SENDER_ID_AQUI",
-            appId: "APP_ID_AQUI",
-            databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com"
-        };
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>H Invest - Cadastro/Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #111;
+      color: #fff;
+    }
+    input, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+    }
+    input {
+      background: #222;
+      color: #fff;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+    .form-box {
+      background: #1c1c1c;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    h2, h3 {
+      text-align: center;
+    }
+    #codigo-gerado {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #00ff99;
+      white-space: pre-wrap;
+      cursor: pointer;
+    }
+    .link {
+      text-align: center;
+      margin-top: 10px;
+      color: #00ff99;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .msg {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+      color: yellow;
+    }
+  </style>
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-    </script>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: #121212;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #4caf50;
-        }
-
-        label {
-            display: block;
-            margin-top: 10px;
-            font-size: 14px;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: none;
-            border-radius: 5px;
-            background: #333;
-            color: white;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #4caf50;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #388e3c;
-        }
-
-        .voltar {
-            display: block;
-            text-align: center;
-            margin-top: 15px;
-            color: white;
-            text-decoration: none;
-        }
-
-        .voltar:hover {
-            text-decoration: underline;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
+  <div class="form-box">
+    <img src="1004.png" alt="Imagem H Invest" style="display:block; margin: 0 auto 20px auto; max-width: 100%; border-radius: 12px;" />
+    <h2>H Invest</h2>
 
-    <div class="container">
-        <!-- Tela de Login -->
-        <div id="loginForm">
-            <h2>Entrar</h2>
-            <label for="telefoneLogin">Telefone</label>
-            <input type="tel" id="telefoneLogin" name="telefoneLogin" required>
+    <h3>Criar Conta</h3>
+    <form id="cadastro-form">
+      <input type="text" id="cadastro-nome" placeholder="Nome completo" required />
+      <input type="text" id="cadastro-telefone" placeholder="Telefone (somente números)" required />
+      <input type="email" id="cadastro-email" placeholder="E-mail" required />
+      <input type="password" id="cadastro-senha" placeholder="Senha" required />
+      <input type="text" id="cadastro-codigo" placeholder="Código de Indicação (Opcional)" />
+      <button type="submit">Cadastrar</button>
+    </form>
 
-            <label for="senhaLogin">Senha</label>
-            <input type="password" id="senhaLogin" name="senhaLogin" required>
+    <div id="codigo-gerado" onclick="copiarCodigo(this)"></div>
 
-            <button type="button" onclick="login()">Entrar</button>
-            <p>Não tem uma conta? <a href="javascript:void(0);" onclick="showRegister()">Cadastre-se aqui</a></p>
-        </div>
+    <h3>Entrar</h3>
+    <form id="login-form">
+      <input type="text" id="login-telefone" placeholder="Telefone" required />
+      <input type="password" id="login-senha" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+    </form>
 
-        <!-- Tela de Cadastro -->
-        <div id="registerForm" class="hidden">
-            <h2>Crie sua Conta</h2>
-            <form action="processar_registro.php" method="POST">
-                <label for="nome">Nome Completo</label>
-                <input type="text" id="nome" name="nome" required>
+    <div class="link" onclick="recuperarSenha()">Esqueci minha senha</div>
+    <div class="msg" id="msg"></div>
+  </div>
 
-                <label for="telefone">Número de Telefone</label>
-                <input type="tel" id="telefone" name="telefone" required>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.appspot.com",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-                <label for="senha">Senha</label>
-                <input type="password" id="senha" name="senha" required>
+  const urlParams = new URLSearchParams(window.location.search);
+  const codigoIndicado = urlParams.get("codigo");
+  if (codigoIndicado) {
+    document.getElementById("cadastro-codigo").value = codigoIndicado;
+  }
 
-                <label for="confirmar_senha">Confirmar Senha</label>
-                <input type="password" id="confirmar_senha" name="confirmar_senha" required>
+  // 👉 Redireciona direto para H.html se já estiver logado
+  if (localStorage.getItem("telefoneLogado")) {
+    window.location.href = "H.html";
+  }
 
-                <button type="button" onclick="register()">Registrar</button>
-            </form>
+  function gerarCodigoAlfanumerico(tamanho = 8) {
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let codigo = '';
+    for (let i = 0; i < tamanho; i++) {
+      codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+    }
+    return codigo;
+  }
 
-            <a href="javascript:void(0);" onclick="showLogin()" class="voltar">Já tem uma conta? Faça login aqui</a>
-        </div>
-    </div>
+  function copiarCodigo(el) {
+    navigator.clipboard.writeText(el.innerText).then(() => {
+      alert("Código copiado!");
+    });
+  }
 
-    <script>
-        // Alternar entre telas de login e cadastro
-        function showRegister() {
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('registerForm').classList.remove('hidden');
+  const msg = document.getElementById("msg");
+
+  document.getElementById("cadastro-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const botao = this.querySelector("button");
+    botao.disabled = true;
+    botao.innerText = "Cadastrando...";
+
+    const nome = document.getElementById("cadastro-nome").value.trim();
+    const telefone = document.getElementById("cadastro-telefone").value.trim();
+    const email = document.getElementById("cadastro-email").value.trim();
+    const senha = document.getElementById("cadastro-senha").value.trim();
+    const codigoIndicacao = document.getElementById("cadastro-codigo").value.trim() || null;
+
+    if (!/^\d{10,11}$/.test(telefone)) {
+      alert("Telefone inválido. Use DDD + número.");
+      botao.disabled = false;
+      botao.innerText = "Cadastrar";
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("E-mail inválido.");
+      botao.disabled = false;
+      botao.innerText = "Cadastrar";
+      return;
+    }
+
+    if (!/^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{6,}$/.test(senha)) {
+      alert("Senha deve conter letras e números, no mínimo 6 caracteres.");
+      botao.disabled = false;
+      botao.innerText = "Cadastrar";
+      return;
+    }
+
+    db.ref("usuarios/" + telefone).once("value").then(snapshot => {
+      if (snapshot.exists()) {
+        alert("Já existe uma conta com esse telefone.");
+        botao.disabled = false;
+        botao.innerText = "Cadastrar";
+      } else {
+        const meuCodigo = gerarCodigoAlfanumerico();
+
+        db.ref("usuarios/" + telefone).set({
+          nome,
+          telefone,
+          email,
+          senha,
+          saldo: 20,
+          renda: 0,
+          recebimento: 0,
+          ultimoCheckin: "",
+          codigoIndicacao,
+          codigo: meuCodigo,
+          timestamp: Date.now(),
+          bloqueado: false
+        }).then(() => {
+          const link = "https://inves13.github.io/hivest-codigo-1/?codigo=" + meuCodigo;
+          const codigoEl = document.getElementById("codigo-gerado");
+          codigoEl.innerText = `Cadastro realizado!\nCódigo: ${meuCodigo}\nLink: ${link}`;
+
+          localStorage.setItem("telefoneLogado", telefone); // Salva login
+
+          if (codigoIndicacao) {
+            db.ref("indicacoes/" + codigoIndicacao + "/" + telefone).set({
+              nome, telefone, timestamp: Date.now()
+            });
+          }
+
+          msg.innerText = "Redirecionando...";
+          setTimeout(() => {
+            window.location.href = "H.html";
+          }, 3000);
+        });
+      }
+    });
+  });
+
+  document.getElementById("login-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const botao = this.querySelector("button");
+    botao.disabled = true;
+    botao.innerText = "Entrando...";
+
+    const telefone = document.getElementById("login-telefone").value.trim();
+    const senha = document.getElementById("login-senha").value.trim();
+
+    db.ref("usuarios/" + telefone).once("value").then(snapshot => {
+      const user = snapshot.val();
+
+      if (user) {
+        if (user.senha === senha) {
+          localStorage.setItem("telefoneLogado", telefone); // Salva login
+          msg.innerText = "Login bem-sucedido!";
+          setTimeout(() => {
+            window.location.href = "H.html";
+          }, 2000);
+        } else {
+          alert("Telefone ou senha incorretos!");
+          botao.disabled = false;
+          botao.innerText = "Entrar";
         }
+      } else {
+        alert("Usuário não encontrado.");
+        botao.disabled = false;
+        botao.innerText = "Entrar";
+      }
+    });
+  });
 
-        function showLogin() {
-            document.getElementById('registerForm').classList.add('hidden');
-            document.getElementById('loginForm').classList.remove('hidden');
-        }
-
-        // Função de Cadastro
-        function register() {
-            const nome = document.getElementById('nome').value;
-            const telefone = document.getElementById('telefone').value;
-            const senha = document.getElementById('senha').value;
-            const confirmarSenha = document.getElementById('confirmar_senha').value;
-
-            if (senha !== confirmarSenha) {
-                alert('As senhas não coincidem!');
-                return;
-            }
-
-            auth.createUserWithEmailAndPassword(telefone + '@example.com', senha)
-                .then(() => {
-                    alert('Cadastro realizado com sucesso!');
-                    localStorage.setItem("telefoneLogado", telefone);
-                    window.location.href = 'pagina_inicial.html'; // Redireciona para a página principal
-                })
-                .catch((error) => {
-                    alert('Erro no cadastro: ' + error.message);
-                });
-        }
-
-        // Função de Login
-        function login() {
-            const telefone = document.getElementById('telefoneLogin').value;
-            const senha = document.getElementById('senhaLogin').value;
-
-            auth.signInWithEmailAndPassword(telefone + '@example.com', senha)
-                .then(() => {
-                    localStorage.setItem("telefoneLogado", telefone);
-                    window.location.href = 'pagina_inicial.html'; // Redireciona para a página principal
-                })
-                .catch((error) => {
-                    alert('Erro no login: ' + error.message);
-                });
-        }
-
-        // Verifica se já está logado
-        function verificarLogin() {
-            const telefone = localStorage.getItem("telefoneLogado");
-            if (telefone) {
-                window.location.href = 'pagina_inicial.html'; // Redireciona automaticamente se estiver logado
-            }
-        }
-
-        window.onload = () => {
-            verificarLogin();
-        };
-    </script>
+  function recuperarSenha() {
+    alert("Recuperação de senha ainda não implementada.");
+  }
+</script>
 
 </body>
 </html>
