@@ -154,15 +154,16 @@
     usuarioRef.once('value', (snapshot) => {
       const dados = snapshot.val();
       if (dados) {
-        const nomeCompleto = dados.nome.split(" ");
-        const nome = nomeCompleto[0];
-        const sobrenome = nomeCompleto.slice(1).join(" ");
+        // Preencher nome completo e sobrenome corretamente
+        const nomeCompleto = dados.nome_completo ? dados.nome_completo.split(" ") : [];
+        const nome = nomeCompleto[0] || "Nome não disponível";
+        const sobrenome = nomeCompleto.slice(1).join(" ") || '';
+
+        document.getElementById("nomeCompleto").textContent = nome; // Exibe nome completo no título do perfil
+        document.getElementById("nome_completo").value = nome;
+        document.getElementById("sobrenome").value = sobrenome;
         
-        document.getElementById("nomeCompleto").textContent = nome;
-        document.getElementById("nome_completo").value = nome || "Nome não disponível"; 
-        document.getElementById("sobrenome").value = sobrenome || '';  
-        
-        document.getElementById("email_usuario").value = dados.email || '';  
+        document.getElementById("email_usuario").value = dados.email || '';  // Preencher e-mail automaticamente
         document.getElementById("cep").value = dados.cep || '';
         document.getElementById("cidade").value = dados.cidade || '';
         document.getElementById("bairro").value = dados.bairro || '';
@@ -170,10 +171,16 @@
         document.getElementById("rua").value = dados.rua || '';
         document.getElementById("data_nascimento").value = dados.data_nascimento || '';
 
+        // Se houver foto salva
         if (dados.foto) {
           document.getElementById("fotoPerfil").src = dados.foto;
         }
+      } else {
+        alert("Nenhum dado encontrado para este usuário.");
       }
+    }).catch((error) => {
+      console.error("Erro ao carregar dados do usuário:", error);
+      alert("Erro ao carregar dados do usuário.");
     });
   }
 
@@ -183,13 +190,13 @@
       const reader = new FileReader();
       reader.onloadend = function() {
         document.getElementById("fotoPerfil").src = reader.result;
-        salvarDados(); 
+        salvarDados(true); // Salvar a foto no Firebase
       };
       reader.readAsDataURL(foto);
     }
   }
 
-  function salvarDados() {
+  function salvarDados(atualizarFotoFlag = false) {
     const telefone = document.getElementById("telefone_usuario").value;
     const nome_completo = document.getElementById("nome_completo").value;
     const sobrenome = document.getElementById("sobrenome").value;
@@ -200,10 +207,11 @@
     const bairro = document.getElementById("bairro").value;
     const endereco = document.getElementById("endereco").value;
     const rua = document.getElementById("rua").value;
-    const foto = document.getElementById("fotoPerfil").src;
+    const foto = atualizarFotoFlag ? document.getElementById("fotoPerfil").src : null;
 
     const usuarioRef = database.ref('usuarios/' + telefone);
-    usuarioRef.set({
+
+    const dadosParaSalvar = {
       nome_completo,
       sobrenome,
       email,
@@ -212,11 +220,21 @@
       cidade,
       bairro,
       endereco,
-      rua,
-      foto
-    });
+      rua
+    };
 
-    alert("Dados atualizados com sucesso!");
+    if (foto) {
+      dadosParaSalvar.foto = foto;
+    }
+
+    usuarioRef.update(dadosParaSalvar)
+      .then(() => {
+        alert("Dados atualizados com sucesso!");
+      })
+      .catch((error) => {
+        console.error("Erro ao salvar dados:", error);
+        alert("Erro ao salvar dados.");
+      });
   }
 
   // Carregar as informações do usuário ao carregar a página
