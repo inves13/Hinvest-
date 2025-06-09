@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hivest - Plataforma</title>
+  <title>Hinvest - Plataforma</title>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -11,16 +11,18 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
   <script>
+    // Configuração correta
     const firebaseConfig = {
       apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
       authDomain: "hinvest-f4354.firebaseapp.com",
+      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
       projectId: "hinvest-f4354",
       storageBucket: "hinvest-f4354.appspot.com",
-      messagingSenderId: "SENDER_ID_AQUI",
-      appId: "APP_ID_AQUI",
-      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com"
+      messagingSenderId: "646397677016",
+      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
     };
 
+    // Inicializa Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
   </script>
@@ -67,7 +69,7 @@
       flex-direction: column;
       gap: 10px;
     }
-    .form-perfil input, .form-perfil select {
+    .form-perfil input {
       padding: 10px;
       border-radius: 5px;
       border: 1px solid #333;
@@ -77,8 +79,6 @@
     .form-perfil label {
       font-weight: bold;
     }
-
-    /* Estilo dos Serviços */
     .servicos {
       margin-top: 30px;
       display: grid;
@@ -98,59 +98,53 @@
     }
   </style>
 </head>
-<body>
+
+<body onload="carregarUsuario()">
 
 <div class="container">
-  <!-- Perfil -->
   <div class="perfil">
     <img id="fotoPerfil" src="10017.png" alt="Foto de Perfil">
     <div class="perfil-info">
-      <h3 id="nomeCompleto">Hivest</h3>
+      <h3 id="nomeCompleto">Hinvest</h3>
       <p id="telefone">ID: Não disponível</p>
     </div>
-    <!-- Botão de Logout -->
     <div class="logout" onclick="logout()">Sair</div>
   </div>
 
-  <!-- Formulário de Perfil -->
   <div class="form-perfil">
     <label for="foto">Foto de Perfil</label>
-    <input type="file" id="foto" name="foto" onchange="atualizarFoto()">
+    <input type="file" id="foto" onchange="atualizarFoto()">
 
     <label for="nome_completo">Nome Completo</label>
-    <input type="text" id="nome_completo" name="nome_completo" placeholder="Nome Completo" onchange="salvarDados()">
-
-    <label for="sobrenome">Sobrenome</label>
-    <input type="text" id="sobrenome" name="sobrenome" placeholder="Sobrenome" onchange="salvarDados()">
+    <input type="text" id="nome_completo" onchange="salvarDados()">
 
     <label for="telefone_usuario">Número de Telefone</label>
-    <input type="text" id="telefone_usuario" name="telefone_usuario" placeholder="Número de Telefone" readonly>
+    <input type="text" id="telefone_usuario" readonly>
 
     <label for="email_usuario">E-mail</label>
-    <input type="email" id="email_usuario" name="email_usuario" placeholder="E-mail" readonly>
+    <input type="email" id="email_usuario" readonly>
 
     <label for="data_nascimento">Data de Nascimento</label>
-    <input type="date" id="data_nascimento" name="data_nascimento" onchange="salvarDados()">
+    <input type="date" id="data_nascimento" onchange="salvarDados()">
 
     <label for="cep">CEP</label>
-    <input type="text" id="cep" name="cep" placeholder="CEP" onchange="salvarDados()">
+    <input type="text" id="cep" onchange="salvarDados()">
 
     <label for="cidade">Cidade</label>
-    <input type="text" id="cidade" name="cidade" placeholder="Cidade" onchange="salvarDados()">
+    <input type="text" id="cidade" onchange="salvarDados()">
 
     <label for="bairro">Bairro</label>
-    <input type="text" id="bairro" name="bairro" placeholder="Bairro" onchange="salvarDados()">
+    <input type="text" id="bairro" onchange="salvarDados()">
 
     <label for="endereco">Endereço</label>
-    <input type="text" id="endereco" name="endereco" placeholder="Endereço" onchange="salvarDados()">
+    <input type="text" id="endereco" onchange="salvarDados()">
 
     <label for="rua">Rua</label>
-    <input type="text" id="rua" name="rua" placeholder="Rua" onchange="salvarDados()">
+    <input type="text" id="rua" onchange="salvarDados()">
 
     <button onclick="salvarDados()">Salvar Dados</button>
   </div>
 
-  <!-- Serviços -->
   <h3>Meus serviços</h3>
   <div class="servicos">
     <div onclick="irPara('sobre.html')">ℹ️ <br> Sobre nós</div>
@@ -160,7 +154,7 @@
     <div onclick="irPara('download.html')">⬇️ <br> Download</div>
     <div onclick="irPara('saque.html')">💳 <br> Conta PIX</div>
     <div onclick="irPara('senha.html')">🔒 <br> Senha</div>
-    <div onclick="irPara('presente.htm')">🎁 <br> Resgatar presentes</div>
+    <div onclick="irPara('presente.html')">🎁 <br> Resgatar presentes</div>
   </div>
 </div>
 
@@ -172,48 +166,35 @@
   function logout() {
     alert("Você foi deslogado!");
     localStorage.removeItem("telefoneLogado");
-    window.location.href = "index.html"; // Redireciona para a página de cadastro e login
+    window.location.href = "index.html";
   }
 
   function carregarUsuario() {
     const telefone = localStorage.getItem("telefoneLogado");
-    if (telefone) {
-      document.getElementById("telefone").textContent = "ID: " + telefone;
-      document.getElementById("telefone_usuario").value = telefone;  // Preenche o campo com o telefone
-    } else {
+    if (!telefone) {
       alert("Nenhum telefone logado. Faça login novamente.");
-      window.location.href = "index.html"; // Redireciona para a página de cadastro e login
+      window.location.href = "index.html";
+      return;
     }
 
-    // Carregar dados do usuário, como foto, nome, e-mail, etc., do Firebase
+    document.getElementById("telefone").textContent = "ID: " + telefone;
+    document.getElementById("telefone_usuario").value = telefone;
+
     const usuarioRef = database.ref('usuarios/' + telefone);
-    usuarioRef.once('value', (snapshot) => {
+    usuarioRef.once('value').then((snapshot) => {
       const dados = snapshot.val();
       if (dados) {
-        const nomeCompleto = dados.nome_completo || 'Nome não disponível';
-        const sobrenome = dados.sobrenome || '';
-
-        document.getElementById("nomeCompleto").textContent = nomeCompleto; // Exibe nome completo no título do perfil
-        document.getElementById("nome_completo").value = nomeCompleto; 
-        document.getElementById("sobrenome").value = sobrenome;
-        document.getElementById("email_usuario").value = dados.email || '';
-        document.getElementById("cep").value = dados.cep || '';
-        document.getElementById("cidade").value = dados.cidade || '';
-        document.getElementById("bairro").value = dados.bairro || '';
-        document.getElementById("endereco").value = dados.endereco || '';
-        document.getElementById("rua").value = dados.rua || '';
-        document.getElementById("data_nascimento").value = dados.data_nascimento || ''; 
-
-        // Se houver foto salva
-        if (dados.foto) {
-          document.getElementById("fotoPerfil").src = dados.foto;
-        }
-      } else {
-        alert("Dados do usuário não encontrados.");
+        document.getElementById("nomeCompleto").textContent = dados.nome_completo || "Nome não disponível";
+        document.getElementById("nome_completo").value = dados.nome_completo || "";
+        document.getElementById("email_usuario").value = dados.email || "";
+        document.getElementById("data_nascimento").value = dados.data_nascimento || "";
+        document.getElementById("cep").value = dados.cep || "";
+        document.getElementById("cidade").value = dados.cidade || "";
+        document.getElementById("bairro").value = dados.bairro || "";
+        document.getElementById("endereco").value = dados.endereco || "";
+        document.getElementById("rua").value = dados.rua || "";
+        if (dados.foto) document.getElementById("fotoPerfil").src = dados.foto;
       }
-    }).catch((error) => {
-      console.error("Erro ao carregar dados:", error);
-      alert("Erro ao carregar dados do usuário.");
     });
   }
 
@@ -222,8 +203,10 @@
     if (foto) {
       const reader = new FileReader();
       reader.onloadend = function() {
-        document.getElementById("fotoPerfil").src = reader.result;
-        salvarDados(); // Salvar a foto no Firebase
+        const fotoBase64 = reader.result;
+        document.getElementById("fotoPerfil").src = fotoBase64;
+        const telefone = document.getElementById("telefone_usuario").value;
+        database.ref('usuarios/' + telefone).update({ foto: fotoBase64 });
       };
       reader.readAsDataURL(foto);
     }
@@ -231,36 +214,19 @@
 
   function salvarDados() {
     const telefone = document.getElementById("telefone_usuario").value;
-    const nome_completo = document.getElementById("nome_completo").value;
-    const sobrenome = document.getElementById("sobrenome").value;
-    const email = document.getElementById("email_usuario").value;
-    const data_nascimento = document.getElementById("data_nascimento").value;
-    const cep = document.getElementById("cep").value;
-    const cidade = document.getElementById("cidade").value;
-    const bairro = document.getElementById("bairro").value;
-    const endereco = document.getElementById("endereco").value;
-    const rua = document.getElementById("rua").value;
-    const foto = document.getElementById("fotoPerfil").src;
-
-    const usuarioRef = database.ref('usuarios/' + telefone);
-    usuarioRef.set({
-      nome_completo,
-      sobrenome,
-      email,
-      data_nascimento,
-      cep,
-      cidade,
-      bairro,
-      endereco,
-      rua,
-      foto
-    });
-
+    const dadosAtualizados = {
+      nome_completo: document.getElementById("nome_completo").value,
+      data_nascimento: document.getElementById("data_nascimento").value,
+      cep: document.getElementById("cep").value,
+      cidade: document.getElementById("cidade").value,
+      bairro: document.getElementById("bairro").value,
+      endereco: document.getElementById("endereco").value,
+      rua: document.getElementById("rua").value
+    };
+    database.ref('usuarios/' + telefone).update(dadosAtualizados);
     alert("Dados atualizados com sucesso!");
   }
-
-  // Carregar as informações do usuário ao carregar a página
-  window.onload = carregarUsuario;
 </script>
+
 </body>
 </html>
