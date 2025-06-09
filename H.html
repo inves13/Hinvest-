@@ -13,35 +13,59 @@
       text-align: center;
       margin-top: 20px;
     }
-
     .usuario-info p {
       font-size: 18px;
       margin: 5px 0;
     }
-
     .carteira {
-      padding: 15px;
+      padding: 20px 15px;
       background-color: #f9f9f9;
       margin: 20px;
       border-radius: 10px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
-
+    .carteira h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      font-size: 28px;
+      color: #006400;
+    }
     .saldos {
       display: flex;
       justify-content: space-around;
       flex-wrap: wrap;
+      gap: 30px;
     }
-
     .saldo {
+      flex: 1 1 150px;
+      background: white;
+      border-radius: 12px;
+      padding: 20px 15px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
       text-align: center;
-      margin: 10px;
+      min-width: 150px;
+      max-width: 180px;
     }
-
+    .saldo img {
+      max-width: 60px;
+      margin-bottom: 15px;
+    }
     .saldo p {
-      font-size: 20px;
-      font-weight: bold;
+      font-size: 24px;
+      font-weight: 700;
+      margin: 10px 0 5px;
+      color: #008000;
+      user-select: none;
     }
-
+    .saldo span {
+      display: block;
+      font-size: 16px;
+      color: #444;
+      font-weight: 600;
+    }
     .botao {
       display: flex;
       align-items: center;
@@ -49,29 +73,33 @@
       background-color: #008000;
       color: white;
       padding: 10px;
-      margin: 10px;
+      margin: 10px auto;
       text-decoration: none;
       border-radius: 8px;
       justify-content: center;
-    }
-
-    #btn-recarga {
-      margin: 20px auto;
-      display: block;
-      padding: 10px 20px;
-      background-color: #008000;
-      color: white;
+      cursor: pointer;
       border: none;
-      border-radius: 8px;
       font-size: 16px;
+      max-width: 220px;
+      user-select: none;
     }
-
+    .botao img {
+      max-width: 24px;
+    }
+    .botao:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
     .notificacao {
       background-color: yellow;
       padding: 10px;
       font-weight: bold;
+      margin: 10px 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
-
     .menu-inferior {
       position: fixed;
       bottom: 0;
@@ -81,27 +109,38 @@
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+      user-select: none;
     }
-
     .menu-inferior a {
       text-align: center;
       color: #000;
       text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
     }
-
     .menu-inferior img {
       width: 30px;
       height: 30px;
+      display: block;
+      margin: 0 auto 4px;
     }
-
     .ativo {
-      font-weight: bold;
+      font-weight: 700;
+      color: #008000;
+    }
+    .logo img {
+      max-width: 400px;
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
     }
   </style>
 </head>
 <body>
   <div class="logo">
-    <img src="1006.png" style="width: 100%; max-width: 400px; height: auto;" />
+    <img src="1006.png" alt="Logo" />
   </div>
 
   <section class="usuario-info">
@@ -110,54 +149,47 @@
   </section>
 
   <section class="acoes">
-    <a href="deposito.html" class="botao"><img src="10003.png" alt=""> Depósito</a>
-    <a href="saque.html" class="botao"><img src="10004.png" alt=""> Retirada</a>
-    <button class="botao" id="checkin-diario"><img src="10005.png" alt=""> Check-in Diário</button>
-    <a href="download.html" class="botao"><img src="10011.png" alt=""> Baixar App</a>
-    <a href="ajuda.html" class="botao"><img src="10011.png" alt=""> Ajuda</a>
+    <a href="deposito.html" class="botao"><img src="10003.png" alt="Depósito"> Depósito</a>
+    <a href="saque.html" class="botao"><img src="10004.png" alt="Retirada"> Retirada</a>
+    <button class="botao" id="checkin-diario"><img src="10005.png" alt="Check-in Diário"> Check-in Diário</button>
+    <a href="download.html" class="botao"><img src="10011.png" alt="Baixar App"> Baixar App</a>
+    <a href="ajuda.html" class="botao"><img src="10011.png" alt="Ajuda"> Ajuda</a>
   </section>
 
   <div class="notificacao">
     <span class="icone-sino">🔔</span>
-    <marquee behavior="scroll" direction="left">
+    <marquee behavior="scroll" direction="left" scrollamount="5" style="user-select:none;">
       Atenção: a plataforma HInvest atualizará a área de depósito em breve. Fique atento!
     </marquee>
   </div>
 
-<!-- Carteira -->
-<section class="carteira">
-  <h2>Minha carteira</h2>
-  <div class="saldos">
-    <!-- Saldo da carteira -->
-    <div class="saldo">
-      <img src="1004.png" alt="Saldo da Carteira" /> <!-- Adicionando a imagem do saldo da carteira -->
-      <p id="saldo-carteira">R$ 100.00</p>
-      <span>Saldo da carteira</span>
+  <!-- Carteira -->
+  <section class="carteira">
+    <h2>Minha carteira</h2>
+    <div class="saldos">
+      <div class="saldo">
+        <img src="saldo_carteira.png" alt="Saldo da Carteira" />
+        <p id="saldo-carteira">R$ 100.00</p>
+        <span>Saldo da carteira</span>
+      </div>
+      <div class="saldo">
+        <img src="valor_recebido.png" alt="Valor Recebido" />
+        <p id="valor-recebido">R$ 100.00</p>
+        <span>Valor Recebido</span>
+      </div>
+      <div class="saldo">
+        <img src="valor_recebimento.png" alt="Valor de Recebimento" />
+        <p id="valor-recebimento">R$ 0.00</p>
+        <span>Valor de recebimento</span>
+      </div>
     </div>
-
-    <!-- Valor Recebido -->
-    <div class="saldo">
-      <img src="1004.png" alt="Valor Recebido" /> <!-- Adicionando a imagem do valor recebido -->
-      <p id="valor-recebido">R$ 100.00</p>
-      <span>Valor Recebido</span>
-    </div>
-
-    <!-- Valor de Recebimento -->
-    <div class="saldo">
-      <img src="1004.png" alt="Valor de Recebimento" /> <!-- Adicionando a imagem do valor de recebimento -->
-      <p id="valor-recebimento">R$ 0.00</p>
-      <span>Valor de recebimento</span>
-    </div>
-  </div>
-</section>
-
-  <button id="btn-recarga" onclick="aplicarRecarga(20)">Aplicar Recarga</button> <!-- Exemplo de valor de recarga -->
+  </section>
 
   <nav class="menu-inferior">
-    <a href="H.html" class="ativo"><img src="30001.png" alt=""> Início</a>
-    <a href="investimento.html"><img src="10016.png" alt=""> Investimento</a>
-    <a href="equipe.html"><img src="10017.png" alt=""> Equipe</a>
-    <a href="perfil.html"><img src="10017.png" alt=""> Perfil</a>
+    <a href="H.html" class="ativo"><img src="30001.png" alt="Início"> Início</a>
+    <a href="investimento.html"><img src="10016.png" alt="Investimento"> Investimento</a>
+    <a href="equipe.html"><img src="10017.png" alt="Equipe"> Equipe</a>
+    <a href="perfil.html"><img src="ft4_1.png" alt="Perfil"> Perfil</a>
   </nav>
 
 <script>
@@ -195,7 +227,7 @@
       const nome = data.nome || "Usuário";
       const telefone = userId;
       const saldoCarteira = parseFloat(data.saldoCarteira ?? 10).toFixed(2);
-      const valorRecebido = parseFloat(data.recebimento || 0).toFixed(2);  // Aqui atualiza o valor recebido com o 'recebimento' do Firebase
+      const valorRecebido = parseFloat(data.recebimento || 0).toFixed(2);
       const retirada = parseFloat(data.retirada || 0).toFixed(2);
       const ultimoCheckin = data.ultimoCheckin || "";
 
@@ -204,22 +236,29 @@
       const saldoCarteiraElement = document.getElementById("saldo-carteira");
       const valorRecebidoElement = document.getElementById("valor-recebido");
       const valorRetirada = document.getElementById("valor-recebimento");
+      const checkinDiarioBtn = document.getElementById("checkin-diario");
 
       if (usuarioNome) usuarioNome.textContent = nome;
       if (usuarioTelefone) usuarioTelefone.textContent = telefone.slice(0, 5) + "**" + telefone.slice(-4);
       if (saldoCarteiraElement) saldoCarteiraElement.textContent = "R$ " + saldoCarteira;
-      if (valorRecebidoElement) valorRecebidoElement.textContent = "R$ " + valorRecebido;  // Atualiza o valor recebido
+      if (valorRecebidoElement) valorRecebidoElement.textContent = "R$ " + valorRecebido;
       if (valorRetirada) valorRetirada.textContent = "R$ " + retirada;
 
       const hoje = new Date().toISOString().slice(0, 10);
       if (ultimoCheckin === hoje) {
-        const checkinDiario = document.getElementById("checkin-diario");
-        if (checkinDiario) checkinDiario.disabled = true;
+        if (checkinDiarioBtn) {
+          checkinDiarioBtn.disabled = true;
+          checkinDiarioBtn.textContent = "Check-in Diário (Já coletado)";
+        }
       }
+    });
+
+    document.getElementById("checkin-diario").addEventListener("click", () => {
+      realizarCheckin();
     });
   });
 
-  function aplicarRecarga(valorRecarga) {
+  function realizarCheckin() {
     const userId = localStorage.getItem("telefoneLogado");
     if (!userId) {
       alert("Usuário não logado.");
@@ -230,18 +269,38 @@
 
     userRef.once("value").then(snapshot => {
       const data = snapshot.val() || {};
+      const hoje = new Date().toISOString().slice(0, 10);
+
+      if (data.ultimoCheckin === hoje) {
+        alert("Você já coletou seu check-in diário hoje.");
+        const btn = document.getElementById("checkin-diario");
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = "Check-in Diário (Já coletado)";
+        }
+        return;
+      }
+
       const saldoAtual = parseFloat(data.saldoCarteira || 0);
-      const novoSaldo = saldoAtual + valorRecarga;
+      const novoSaldo = saldoAtual + 1;
 
       userRef.update({
-        saldoCarteira: novoSaldo
+        saldoCarteira: novoSaldo,
+        ultimoCheckin: hoje
       }).then(() => {
         document.getElementById("saldo-carteira").textContent = "R$ " + novoSaldo.toFixed(2);
-        document.getElementById("valor-recebido").textContent = "R$ " + novoSaldo.toFixed(2);  // Atualiza o valor recebido
-        alert("Recarga aplicada com sucesso!");
+        const btn = document.getElementById("checkin-diario");
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = "Check-in Diário (Já coletado)";
+        }
+        alert("Check-in diário realizado! + R$1,00 creditado.");
+      }).catch(() => {
+        alert("Erro ao atualizar saldo.");
       });
     });
   }
 </script>
+
 </body>
 </html>
