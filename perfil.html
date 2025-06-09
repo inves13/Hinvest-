@@ -154,13 +154,13 @@
     <div onclick="irPara('download.html')">⬇️ <br> Download</div>
     <div onclick="irPara('saque.html')">💳 <br> Conta PIX</div>
     <div onclick="irPara('senha.html')">🔒 <br> Senha</div>
-    <div onclick="irPara('presente.html')">🎁 <br> Resgatar presente</div>
+    <div onclick="irPara('presente.html')">🎁 <br> Resgatar presente</div> <!-- Aqui foi mantido o redirecionamento para presente.html -->
   </div>
 </div>
 
 <script>
   function irPara(pagina) {
-    window.location.href = pagina;
+    window.location.href = pagina; // Certifique-se de que o arquivo presente.html está no mesmo diretório ou ajuste o caminho
   }
 
   function logout() {
