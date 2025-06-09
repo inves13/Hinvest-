@@ -1,172 +1,220 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resgatar Presente</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: #121212;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-
-        .container {
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
-            width: 300px;
-        }
-
-        h2 {
-            margin-bottom: 15px;
-        }
-
-        button {
-            background-color: #6200ea;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #4500b5;
-        }
-
-        input {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            width: 100%;
-            font-size: 16px;
-        }
-
-        .resgate-form {
-            display: none;
-            margin-top: 20px;
-        }
-
-        .status {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        /* Estilo do menu que aparece para colocar o código */
-        .menu-container {
-            display: none;
-            background-color: #333;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-
-        .menu-container input {
-            width: calc(100% - 20px);
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Resgatar Presente</title>
+<style>
+  body {
+    background-color: #000; /* fundo preto */
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0; padding: 20px;
+    display: flex; justify-content: center; align-items: center; height: 100vh;
+  }
+  #btnAbrirModal {
+    font-size: 18px;
+    padding: 12px 24px;
+    background: #1e90ff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  #btnAbrirModal:hover {
+    background: #1c86ee;
+  }
+  #modalResgate {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+  }
+  #modalContent {
+    background: #222;
+    padding: 20px;
+    border-radius: 8px;
+    width: 320px;
+    box-shadow: 0 0 15px #1e90ff;
+  }
+  #modalContent h3 {
+    margin-top: 0;
+  }
+  #modalContent input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+  }
+  #modalContent button {
+    margin-top: 15px;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  #btnConfirmarResgate {
+    background-color: #1e90ff;
+    color: white;
+  }
+  #btnConfirmarResgate:hover {
+    background-color: #1c86ee;
+  }
+  #btnFecharModal {
+    background-color: #555;
+    color: white;
+    margin-left: 10px;
+  }
+  #btnFecharModal:hover {
+    background-color: #444;
+  }
+  #msgErro {
+    margin-top: 10px;
+    color: #ff4444;
+    display: none;
+  }
+  #msgSucesso {
+    margin-top: 10px;
+    color: #44ff44;
+    display: none;
+  }
+</style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Resgate seu presente</h2>
-        <button id="resgatarBtn">Resgatar Presente</button>
+<button id="btnAbrirModal">Resgatar Presente</button>
 
-        <!-- Menu para inserir o código -->
-        <div class="menu-container" id="menuContainer">
-            <h3>Digite o código para resgatar:</h3>
-            <input type="text" id="codigoResgate" placeholder="Código (2023 a 2030)">
-            <button onclick="validarCodigo()">Resgatar</button>
-        </div>
-        
-        <p id="status" class="status"></p>
+<div id="modalResgate">
+  <div id="modalContent">
+    <h3>Digite o código do presente</h3>
+    <input type="text" id="codigoPresente" placeholder="Código do presente" autocomplete="off" />
+    <div>
+      <button id="btnConfirmarResgate">Resgatar</button>
+      <button id="btnFecharModal">Cancelar</button>
     </div>
+    <p id="msgErro"></p>
+    <p id="msgSucesso"></p>
+  </div>
+</div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
-    <script>
-        // Configuração do Firebase (substitua pelas suas credenciais)
-        const firebaseConfig = {
-            apiKey: "sua-api-key",
-            authDomain: "seu-auth-domain",
-            databaseURL: "seu-database-url",
-            projectId: "seu-project-id",
-            storageBucket: "seu-storage-bucket",
-            messagingSenderId: "seu-sender-id",
-            appId: "seu-app-id"
-        };
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-        // Inicializa o Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+<script>
+  // Config Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.firebasestorage.app",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
 
-        // Função para abrir o menu e exibir o campo de código
-        document.getElementById("resgatarBtn").addEventListener("click", function() {
-            document.getElementById("menuContainer").style.display = "block";  // Exibe o menu para inserir o código
-            document.getElementById("status").innerText = "Digite o código para resgatar seu presente.";
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+
+  const btnAbrirModal = document.getElementById('btnAbrirModal');
+  const modal = document.getElementById('modalResgate');
+  const btnFecharModal = document.getElementById('btnFecharModal');
+  const btnConfirmarResgate = document.getElementById('btnConfirmarResgate');
+  const inputCodigo = document.getElementById('codigoPresente');
+  const msgErro = document.getElementById('msgErro');
+  const msgSucesso = document.getElementById('msgSucesso');
+
+  btnAbrirModal.addEventListener('click', () => {
+    modal.style.display = 'flex';
+    msgErro.style.display = 'none';
+    msgSucesso.style.display = 'none';
+    inputCodigo.value = '';
+    inputCodigo.focus();
+  });
+
+  btnFecharModal.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  btnConfirmarResgate.addEventListener('click', () => {
+    const codigo = inputCodigo.value.trim().toUpperCase();
+
+    msgErro.style.display = 'none';
+    msgSucesso.style.display = 'none';
+
+    if (!codigo) {
+      msgErro.textContent = 'Por favor, digite o código do presente.';
+      msgErro.style.display = 'block';
+      return;
+    }
+
+    // Função para formatar data no formato YYYY-MM-DD
+    function hoje() {
+      const d = new Date();
+      return d.toISOString().split('T')[0];
+    }
+
+    // Checar se código é válido
+    database.ref('codigosValidos/' + codigo).get().then(snapshot => {
+      if (!snapshot.exists()) {
+        msgErro.textContent = 'Código inválido.';
+        msgErro.style.display = 'block';
+        return;
+      }
+
+      // Checar se o usuário já resgatou o código hoje
+      // Considerando que não temos mais um usuário autenticado
+      database.ref(`resgates/${codigo}`).get().then(snapResgate => {
+        const dataResgate = snapResgate.exists() ? snapResgate.val().data : null;
+
+        if (dataResgate === hoje()) {
+          msgErro.textContent = 'Você já resgatou esse código hoje.';
+          msgErro.style.display = 'block';
+          return;
+        }
+
+        // Registrar resgate com data de hoje
+        database.ref(`resgates/${codigo}`).set({
+          data: hoje(),
+          timestamp: Date.now()
+        }).then(() => {
+          msgSucesso.textContent = 'Presente resgatado com sucesso!';
+          msgSucesso.style.display = 'block';
+          msgErro.style.display = 'none';
+
+          // Se quiser fechar o modal automaticamente, descomente:
+          // setTimeout(() => { modal.style.display = 'none'; }, 2000);
+
+          // Aqui você pode adicionar lógica para entregar o presente, atualizar saldo etc.
+        }).catch(err => {
+          msgErro.textContent = 'Erro ao registrar resgate: ' + err.message;
+          msgErro.style.display = 'block';
         });
 
-        // Função para validar o código de resgate
-        function validarCodigo() {
-            const codigo = document.getElementById("codigoResgate").value.trim();
-            if (!codigo) {
-                document.getElementById("status").innerText = "Por favor, insira um código válido.";
-                return;
-            }
+      }).catch(err => {
+        msgErro.textContent = 'Erro ao checar resgate: ' + err.message;
+        msgErro.style.display = 'block';
+      });
 
-            // Verificar se o código está dentro do intervalo permitido (2023 a 2030)
-            const codigoNumero = parseInt(codigo, 10);
-            if (codigoNumero < 2023 || codigoNumero > 2030) {
-                document.getElementById("status").innerText = "Código inválido. O código deve estar entre 2023 e 2030.";
-                return;
-            }
+    }).catch(err => {
+      msgErro.textContent = 'Erro ao checar código: ' + err.message;
+      msgErro.style.display = 'block';
+    });
 
-            const userId = "user123"; // Substitua isso pelo ID do usuário logado ou recupere dinamicamente
-            const userRef = database.ref('usuarios/' + userId);
+  });
 
-            // Verifica se o usuário possui um plano ativo
-            userRef.once('value', snapshot => {
-                const userData = snapshot.val();
-                if (!userData || !userData.planoAtivo) {
-                    document.getElementById("status").innerText = "Você precisa adquirir um plano para resgatar o presente.";
-                    return;
-                }
-
-                // Verifica se o usuário já resgatou o presente hoje
-                const hoje = new Date().toISOString().split('T')[0]; // Data de hoje no formato YYYY-MM-DD
-                if (userData.dataResgate === hoje) {
-                    document.getElementById("status").innerText = "Você já resgatou o presente hoje.";
-                    return;
-                }
-
-                // Adiciona R$ 0,50 ao saldo da conta do usuário
-                const saldoRef = userRef.child('saldodaConta');
-                saldoRef.transaction(currentSaldo => {
-                    return (currentSaldo || 0) + 0.50; // Adiciona 50 centavos ao saldo existente
-                });
-
-                // Atualiza a data de resgate para evitar resgates no mesmo dia
-                userRef.update({ dataResgate: hoje });
-
-                document.getElementById("status").innerText = `Presente resgatado com sucesso! Valor de R$ 0,50 adicionado ao saldo.`;
-            });
-        }
-    </script>
+  // Fechar modal clicando fora do conteúdo
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+</script>
 
 </body>
 </html>
