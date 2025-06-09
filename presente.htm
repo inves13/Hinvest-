@@ -107,7 +107,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
-  // Config Firebase
+  // Configuração Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
     authDomain: "hinvest-f4354.firebaseapp.com",
@@ -159,7 +159,7 @@
       return d.toISOString().split('T')[0];
     }
 
-    // Checar se código é válido
+    // Checar se o código é válido
     database.ref('codigosValidos/' + codigo).get().then(snapshot => {
       if (!snapshot.exists()) {
         msgErro.textContent = 'Código inválido.';
@@ -168,7 +168,6 @@
       }
 
       // Checar se o usuário já resgatou o código hoje
-      // Considerando que não temos mais um usuário autenticado
       database.ref(`resgates/${codigo}`).get().then(snapResgate => {
         const dataResgate = snapResgate.exists() ? snapResgate.val().data : null;
 
@@ -185,12 +184,6 @@
         }).then(() => {
           msgSucesso.textContent = 'Presente resgatado com sucesso!';
           msgSucesso.style.display = 'block';
-          msgErro.style.display = 'none';
-
-          // Se quiser fechar o modal automaticamente, descomente:
-          // setTimeout(() => { modal.style.display = 'none'; }, 2000);
-
-          // Aqui você pode adicionar lógica para entregar o presente, atualizar saldo etc.
         }).catch(err => {
           msgErro.textContent = 'Erro ao registrar resgate: ' + err.message;
           msgErro.style.display = 'block';
