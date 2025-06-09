@@ -19,7 +19,7 @@
     }
     .carteira {
       padding: 20px 15px;
-      background-color: #f9f9f9;
+      background-color: #000000;
       margin: 20px;
       border-radius: 10px;
       max-width: 600px;
@@ -41,7 +41,7 @@
     }
     .saldo {
       flex: 1 1 150px;
-      background: white;
+      background: black;
       border-radius: 12px;
       padding: 20px 15px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
@@ -105,7 +105,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: #eee;
+      background: #000000;
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
@@ -114,7 +114,7 @@
     }
     .menu-inferior a {
       text-align: center;
-      color: #000;
+      color: #fff;
       text-decoration: none;
       font-weight: 600;
       font-size: 14px;
@@ -235,72 +235,15 @@
       const usuarioTelefone = document.getElementById("usuario-telefone");
       const saldoCarteiraElement = document.getElementById("saldo-carteira");
       const valorRecebidoElement = document.getElementById("valor-recebido");
-      const valorRetirada = document.getElementById("valor-recebimento");
-      const checkinDiarioBtn = document.getElementById("checkin-diario");
+      const valorRecebimentoElement = document.getElementById("valor-recebimento");
 
-      if (usuarioNome) usuarioNome.textContent = nome;
-      if (usuarioTelefone) usuarioTelefone.textContent = telefone.slice(0, 5) + "**" + telefone.slice(-4);
-      if (saldoCarteiraElement) saldoCarteiraElement.textContent = "R$ " + saldoCarteira;
-      if (valorRecebidoElement) valorRecebidoElement.textContent = "R$ " + valorRecebido;
-      if (valorRetirada) valorRetirada.textContent = "R$ " + retirada;
-
-      const hoje = new Date().toISOString().slice(0, 10);
-      if (ultimoCheckin === hoje) {
-        if (checkinDiarioBtn) {
-          checkinDiarioBtn.disabled = true;
-          checkinDiarioBtn.textContent = "Check-in Diário (Já coletado)";
-        }
-      }
-    });
-
-    document.getElementById("checkin-diario").addEventListener("click", () => {
-      realizarCheckin();
+      usuarioNome.innerText = nome;
+      usuarioTelefone.innerText = telefone;
+      saldoCarteiraElement.innerText = `R$ ${saldoCarteira}`;
+      valorRecebidoElement.innerText = `R$ ${valorRecebido}`;
+      valorRecebimentoElement.innerText = `R$ ${retirada}`;
     });
   });
-
-  function realizarCheckin() {
-    const userId = localStorage.getItem("telefoneLogado");
-    if (!userId) {
-      alert("Usuário não logado.");
-      return;
-    }
-
-    const userRef = db.ref("usuarios/" + userId);
-
-    userRef.once("value").then(snapshot => {
-      const data = snapshot.val() || {};
-      const hoje = new Date().toISOString().slice(0, 10);
-
-      if (data.ultimoCheckin === hoje) {
-        alert("Você já coletou seu check-in diário hoje.");
-        const btn = document.getElementById("checkin-diario");
-        if (btn) {
-          btn.disabled = true;
-          btn.textContent = "Check-in Diário (Já coletado)";
-        }
-        return;
-      }
-
-      const saldoAtual = parseFloat(data.saldoCarteira || 0);
-      const novoSaldo = saldoAtual + 1;
-
-      userRef.update({
-        saldoCarteira: novoSaldo,
-        ultimoCheckin: hoje
-      }).then(() => {
-        document.getElementById("saldo-carteira").textContent = "R$ " + novoSaldo.toFixed(2);
-        const btn = document.getElementById("checkin-diario");
-        if (btn) {
-          btn.disabled = true;
-          btn.textContent = "Check-in Diário (Já coletado)";
-        }
-        alert("Check-in diário realizado! + R$1,00 creditado.");
-      }).catch(() => {
-        alert("Erro ao atualizar saldo.");
-      });
-    });
-  }
 </script>
-
 </body>
 </html>
