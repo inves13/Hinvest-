@@ -1,4 +1,8 @@
-// Config Firebase
+// Importa as funções necessárias do SDK do Firebase
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, get, child, update, push, set } from "firebase/database";
+
+// Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
   authDomain: "hinvest-f4354.firebaseapp.com",
@@ -9,10 +13,11 @@ const firebaseConfig = {
   appId: "1:646397677016:web:f05ca27a38439568bff6ad"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+// Inicializa o Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 const userId = localStorage.getItem("telefoneLogado");
-const userRef = db.ref("usuarios/" + userId);
+const userRef = ref(db, "usuarios/" + userId);
 
 document.addEventListener("DOMContentLoaded", () => {
   if (!userId) {
@@ -21,25 +26,43 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  userRef.once("value").then(snapshot => {
+  // Recupera os dados do usuário
+  get(userRef).then(snapshot => {
     const data = snapshot.val() || {};
     const saldoCarteira = parseFloat(data.saldoCarteira ?? 71.00).toFixed(2);
     const renda = parseFloat(data.renda ?? 1.00).toFixed(2);
     const recebimento = parseFloat(data.recebimento || 0).toFixed(2);
 
+    // Atualiza as informações na tela
     document.getElementById("saldo-carteira").textContent = "R$ " + saldoCarteira;
     document.getElementById("renda-recebimento").textContent = "R$ " + renda;
     document.getElementById("valor-retirada").textContent = "R$ " + recebimento;
 
+    // Preenche os dados da conta bancária, se existirem
     if (data.contaBancaria) {
       document.getElementById("nomeTitular").value = data.contaBancaria.nomeTitular;
       document.getElementById("tipoChave").value = data.contaBancaria.tipoChave;
       document.getElementById("chavePix").value = data.contaBancaria.chavePix;
       document.getElementById("salvarConta").disabled = true;
     }
+
+    // Preenche o histórico de retiradas
+    const historicoRetiradas = data.historicoRetiradas || [];
+    const extratoElement = document.getElementById("extrato");
+
+    if (historicoRetiradas.length > 0) {
+      historicoRetiradas.forEach(retirada => {
+        const li = document.createElement("li");
+        li.textContent = `Data: ${new Date(retirada.dataRetirada).toLocaleString()} | Valor: R$ ${retirada.valorSaque.toFixed(2)} | Taxa: R$ ${retirada.taxa.toFixed(2)} | Recebido: R$ ${retirada.valorLiquido.toFixed(2)}`;
+        extratoElement.appendChild(li);
+      });
+    } else {
+      extratoElement.textContent = "Não há retiradas realizadas ainda.";
+    }
   });
 });
 
+// Salvar dados da conta bancária
 document.getElementById("salvarConta").addEventListener("click", () => {
   const nome = document.getElementById("nomeTitular").value;
   const tipo = document.getElementById("tipoChave").value;
@@ -50,16 +73,19 @@ document.getElementById("salvarConta").addEventListener("click", () => {
     return;
   }
 
-  userRef.update({
+  // Atualiza a conta bancária no Firebase
+  update(userRef, {
     contaBancaria: {
       nomeTitular: nome,
       tipoChave: tipo,
       chavePix: chave
     }
+  }).then(() => {
+    alert("Conta bancária salva com sucesso!");
+    document.getElementById("salvarConta").disabled = true;
+  }).catch((error) => {
+    alert("Erro ao salvar os dados da conta bancária: " + error.message);
   });
-
-  alert("Conta bancária salva com sucesso!");
-  document.getElementById("salvarConta").disabled = true;
 });
 
 // Função de saque
@@ -81,20 +107,19 @@ form.addEventListener('submit', e => {
     return;
   }
 
-  // Verificando a taxa de 12%
+  // Calcula a taxa de 12%
   const taxa = valorSaque * 0.12;
   const valorLiquido = valorSaque - taxa;
 
-  // Dados da retirada
   const tipoChave = document.getElementById("tipoChave").value;
   const chavePix = document.getElementById("chavePix").value;
   const dataRetirada = new Date().toISOString(); // Captura a data da retirada
 
-  // Atualizar o saldo no banco de dados
-  userRef.update({
+  // Atualiza o saldo do usuário no Firebase
+  update(userRef, {
     saldoCarteira: saldoCarteira - valorSaque
   }).then(() => {
-    // Adicionar o histórico de retirada no banco de dados
+    // Adiciona o histórico de retirada no Firebase
     const historicoRetirada = {
       valorSaque: valorSaque,
       taxa: taxa,
@@ -104,11 +129,14 @@ form.addEventListener('submit', e => {
       dataRetirada: dataRetirada
     };
 
-    // Cria um novo nó para o histórico de retiradas
-    userRef.child("historicoRetiradas").push(historicoRetirada)
+    push(child(userRef, "historicoRetiradas"), historicoRetirada)
       .then(() => {
         alert(`Retirada de R$ ${valorSaque.toFixed(2)} solicitada com sucesso. Valor a ser recebido: R$ ${valorLiquido.toFixed(2)} após a taxa.`);
+        
+        // Atualiza o saldo na tela
         document.getElementById("saldo-carteira").textContent = "R$ " + (saldoCarteira - valorSaque).toFixed(2);
+
+        // Limpa o formulário
         form.reset();
       })
       .catch((error) => {
