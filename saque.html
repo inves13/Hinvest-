@@ -53,6 +53,12 @@
       font-size: 20px;
       margin-bottom: 10px;
     }
+    .extrato-retirada {
+      margin-top: 20px;
+      padding: 10px;
+      background: #333;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
@@ -79,7 +85,10 @@
 <div class="info">Valor Recebido: <span id="valor-recebimento">R$ 0,00</span></div>
 <div class="info">Valor Retirado: <span id="valor-retirada">R$ 0,00</span></div>
 
-<button class="btn-extrato" onclick="window.location.href='extrato.html'">Ver Extrato Completo</button>
+<h2>Extrato</h2>
+<div id="extrato-retirada" class="extrato-retirada">
+  <!-- As retiradas realizadas serão exibidas aqui -->
+</div>
 
 <h2>Conta Bancária</h2>
 <label>Nome do Titular</label>
@@ -128,6 +137,13 @@
     document.getElementById("saldo-carteira").textContent = "R$ " + saldo.replace(".", ",");
     document.getElementById("valor-recebimento").textContent = "R$ " + receb.replace(".", ",");
     document.getElementById("valor-retirada").textContent = "R$ " + retirada.replace(".", ",");
+
+    const extratoDiv = document.getElementById("extrato-retirada");
+    if (data.retirada && data.retirada > 0) {
+      const valorRecebido = (data.retirada * 0.88).toFixed(2); // Descontando a taxa de 12%
+      extratoDiv.innerHTML = "<div><strong>Valor Retirado:</strong> R$ " + data.retirada.toFixed(2).replace(".", ",") + "</div>" +
+                             "<div><strong>Valor Recebido:</strong> R$ " + valorRecebido.replace(".", ",") + "</div>";
+    }
 
     if (data.contaBancaria) {
       document.getElementById("nomeTitular").value = data.contaBancaria.nomeTitular || "";
