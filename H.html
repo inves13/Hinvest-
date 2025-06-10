@@ -151,7 +151,7 @@
   <section class="acoes">
     <a href="deposito.html" class="botao"><img src="10003.png" alt="Depósito"> Depósito</a>
     <a href="saque.html" class="botao"><img src="10004.png" alt="Retirada"> Retirada</a>
-    <button class="botao" id="checkin-diario"><img src="10005.png" alt="Check-in Diário"> Check-in Diário</button>
+    <button class="botao" id="checkin-diario" onclick="realizarCheckin()"><img src="10005.png" alt="Check-in Diário"> Check-in Diário</button>
     <a href="download.html" class="botao"><img src="10011.png" alt="Baixar App"> Baixar App</a>
     <a href="ajuda.html" class="botao"><img src="10011.png" alt="Ajuda"> Ajuda</a>
   </section>
@@ -242,8 +242,45 @@
       saldoCarteiraElement.innerText = `R$ ${saldoCarteira}`;
       valorRecebidoElement.innerText = `R$ ${valorRecebido}`;
       valorRecebimentoElement.innerText = `R$ ${retirada}`;
+
+      // Lógica do check-in diário
+      const checkinButton = document.getElementById('checkin-diario');
+      const currentTime = Date.now();
+      const nextCheckinTime = data.ultimoCheckin ? new Date(data.ultimoCheckin).getTime() + 24 * 60 * 60 * 1000 : 0;
+
+      if (currentTime < nextCheckinTime) {
+        checkinButton.disabled = true;
+        const timeLeft = nextCheckinTime - currentTime;
+        checkinButton.innerText = `Próximo check-in em ${(timeLeft / 1000 / 60 / 60).toFixed(0)} horas`;
+      }
     });
   });
+
+  function realizarCheckin() {
+    const userId = localStorage.getItem("telefoneLogado");
+
+    if (!userId) {
+      alert("Usuário não logado.");
+      return;
+    }
+
+    const userRef = db.ref("usuarios/" + userId);
+    const currentTime = new Date().toISOString();
+
+    userRef.once("value").then(snapshot => {
+      const data = snapshot.val() || {};
+      const saldoCarteira = parseFloat(data.saldoCarteira || 0);
+
+      // Atualiza saldo e registra horário do último check-in
+      userRef.update({
+        saldoCarteira: saldoCarteira + 1,
+        ultimoCheckin: currentTime
+      }).then(() => {
+        alert("Check-in realizado com sucesso! R$ 1.00 adicionado à sua carteira.");
+        location.reload();
+      });
+    });
+  }
 </script>
 </body>
 </html>
