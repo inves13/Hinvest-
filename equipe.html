@@ -193,7 +193,8 @@
   }
 
   function mascararTelefone(tel) {
-    return tel.substr(0, 5) + "****" + tel.substr(tel.length - 4);
+    // Exibindo os dois últimos números com asterisco
+    return tel.substr(0, 5) + "**" + tel.substr(tel.length - 4);
   }
 
   function copiarTexto(id) {
