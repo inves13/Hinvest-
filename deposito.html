@@ -273,9 +273,8 @@
       return;
     }
 
-    document.getElementById('pix-key').style.display = 'block';
-    document.getElementById('pix-key-value').textContent = pixKeys[selectedValue];
-    document.getElementById('action-buttons').style.display = 'flex';
+    document.getElementById('alert-message').style.display = 'block';
+    document.getElementById('alert-message').textContent = 'Depósito não disponível no momento.';
   }
 
   function copyPixKey() {
@@ -293,9 +292,6 @@
   }
 
   function confirmDeposit() {
-    // Adicionar lógica de verificação de depósito aqui
-    // Por exemplo, se o depósito não cair, exibe a mensagem de alerta
-
     document.getElementById('alert-message').style.display = 'block';
   }
 </script>
