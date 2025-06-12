@@ -85,10 +85,12 @@
 <div class="info">Valor Recebido: <span id="valor-recebimento">R$ 0,00</span></div>
 <div class="info">Valor Retirado: <span id="valor-retirada">R$ 0,00</span></div>
 
-<h2>Extrato</h2>
+<h2>Extrato de Retirada</h2>
 <div id="extrato-retirada" class="extrato-retirada">
   <!-- As retiradas realizadas serão exibidas aqui -->
 </div>
+
+<button class="btn-extrato" id="verExtrato">Ver Extrato de Retirada</button>
 
 <h2>Conta Bancária</h2>
 <label>Nome do Titular</label>
@@ -127,7 +129,6 @@
   const db = firebase.database();
   const userId = localStorage.getItem('telefoneLogado');
   const userRef = db.ref("usuarios/" + userId);
-  const saquesRef = db.ref("saques");
 
   function atualizarTela(data) {
     const saldo = parseFloat(data.saldoCarteira || 0).toFixed(2);
@@ -139,17 +140,11 @@
     document.getElementById("valor-retirada").textContent = "R$ " + retirada.replace(".", ",");
 
     const extratoDiv = document.getElementById("extrato-retirada");
-    if (data.retirada && data.retirada > 0) {
-      const valorRecebido = (data.retirada * 0.88).toFixed(2); // Descontando a taxa de 12%
-      extratoDiv.innerHTML = "<div><strong>Valor Retirado:</strong> R$ " + data.retirada.toFixed(2).replace(".", ",") + "</div>" +
-                             "<div><strong>Valor Recebido:</strong> R$ " + valorRecebido.replace(".", ",") + "</div>";
-    }
-
-    if (data.contaBancaria) {
-      document.getElementById("nomeTitular").value = data.contaBancaria.nomeTitular || "";
-      document.getElementById("tipoChave").value = data.contaBancaria.tipoChave || "CPF";
-      document.getElementById("chavePix").value = data.contaBancaria.chavePix || "";
-      document.getElementById("salvarConta").disabled = true;
+    if (data.extrato && data.extrato.length > 0) {
+      extratoDiv.innerHTML = "";
+      data.extrato.forEach(saque => {
+        extratoDiv.innerHTML += `<div><strong>Retirada:</strong> R$ ${saque.valor.toFixed(2).replace(".", ",")} <br><strong>Valor Recebido:</strong> R$ ${saque.valorLiquido.toFixed(2).replace(".", ",")} <br><strong>Data:</strong> ${saque.dataSolicitacao}</div><hr>`;
+      });
     }
 
     const temPlanoAtivo = data.investimentos && data.investimentos.some(investimento => investimento.status === 'comprado');
@@ -210,49 +205,36 @@
   document.getElementById("confirmarSaque").addEventListener("click", () => {
     const valor = parseFloat(document.getElementById("valorSaque").value);
     if (valor < 20) {
-      alert("O valor mínimo para saque é R$ 20.");
+      alert("O valor mínimo de saque é R$20.");
       return;
     }
 
     userRef.once("value").then(snapshot => {
       const data = snapshot.val();
-      const saldo = parseFloat(data.saldoCarteira || 0);
-
-      if (saldo < valor) {
-        alert("Saldo insuficiente.");
+      if (data.saldoCarteira < valor) {
+        alert("Saldo insuficiente para o saque.");
         return;
       }
 
-      const taxa = valor * 0.12;
-      const valorLiquido = valor - taxa;
+      const valorLiquido = valor - (valor * 0.12);
+      const dataSaque = new Date().toLocaleString();
 
-      // Atualiza o saldo com o valor líquido
-      const novoSaldo = saldo - valor;
       userRef.update({
-        saldoCarteira: novoSaldo,
-        recebimento: valorLiquido,
-        retirada: valor
+        saldoCarteira: data.saldoCarteira - valor,
+        retirada: (data.retirada || 0) + valor,
+        extrato: (data.extrato || []).concat([{ valor, valorLiquido, dataSolicitacao: dataSaque }])
       });
 
-      // Adiciona o saque ao extrato
-      saquesRef.push({
-        userId: userId,
-        valor: valor,
-        taxa: taxa,
-        valorLiquido: valorLiquido,
-        dataSolicitacao: new Date().toISOString(),
-        status: "aprovado"
-      });
-
-      alert("Saque realizado com sucesso. Valor líquido de R$ " + valorLiquido.toFixed(2).replace(".", ",") + " foi transferido.");
-
-      atualizarTela({
-        saldoCarteira: novoSaldo,
-        recebimento: valorLiquido,
-        retirada: valor
-      });
+      alert("Saque solicitado com sucesso!");
+      atualizarTela({ ...data, extrato: [...(data.extrato || []), { valor, valorLiquido, dataSolicitacao: dataSaque }] });
     });
   });
+
+  // Função do botão de extrato
+  document.getElementById("verExtrato").addEventListener("click", () => {
+    window.location.href = "extrato.html";
+  });
 </script>
+
 </body>
 </html>
