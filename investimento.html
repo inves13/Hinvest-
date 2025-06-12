@@ -75,16 +75,16 @@
     const userRef = db.ref("usuarios/" + userId);
 
     const planos = [
-      { nome: "Plano Bronze", valor: 60, retornoDiario: 60 * 0.05 },
-      { nome: "Plano Prata", valor: 160, retornoDiario: 160 * 0.05 },
-      { nome: "Plano Ouro", valor: 300, retornoDiario: 300 * 0.05 },
-      { nome: "Plano Platina", valor: 450, retornoDiario: 450 * 0.05 },
-      { nome: "Plano Diamante", valor: 500, retornoDiario: 500 * 0.05 },
-      { nome: "Plano Master", valor: 650, retornoDiario: 650 * 0.05 },
-      { nome: "Plano VIP", valor: 700, retornoDiario: 700 * 0.05 },
-      { nome: "Plano Supremo", valor: 850, retornoDiario: 850 * 0.05 },
-      { nome: "Plano Elite", valor: 900, retornoDiario: 900 * 0.05 },
-      { nome: "Plano Imperador", valor: 1050, retornoDiario: 1050 * 0.05 }
+      { nome: "Plano Bronze", valor: 60, retornoDiario: 12 }, // Retorno diário ajustado
+      { nome: "Plano Prata", valor: 160, retornoDiario: 15 }, // Retorno diário ajustado
+      { nome: "Plano Ouro", valor: 300, retornoDiario: 18 }, // Retorno diário ajustado
+      { nome: "Plano Platina", valor: 450, retornoDiario: 22.5 }, // Retorno diário ajustado
+      { nome: "Plano Diamante", valor: 500, retornoDiario: 25 }, // Retorno diário ajustado
+      { nome: "Plano Master", valor: 650, retornoDiario: 32.5 }, // Retorno diário ajustado
+      { nome: "Plano VIP", valor: 700, retornoDiario: 35 }, // Retorno diário ajustado
+      { nome: "Plano Supremo", valor: 850, retornoDiario: 42.5 }, // Retorno diário ajustado
+      { nome: "Plano Elite", valor: 900, retornoDiario: 45 }, // Retorno diário ajustado
+      { nome: "Plano Imperador", valor: 1050, retornoDiario: 52.5 } // Retorno diário ajustado
     ];
 
     function carregarPlanos(saldo) {
