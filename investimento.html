@@ -47,7 +47,7 @@
 <body>
 
   <h1>Comprar Planos</h1>
-  <h2>Saldo: R$ <span id="saldo">0.00</span></h2>
+  <h2>Saldo: USDT <span id="saldo">0.00</span></h2>
 
   <button class="meus-produtos-button" onclick="mostrarMeusProdutos()">Meus Produtos</button>
 
@@ -75,16 +75,16 @@
     const userRef = db.ref("usuarios/" + userId);
 
     const planos = [
-      { nome: "Plano Bronze", valor: 60, retornoDiario: 12 }, // Retorno diário ajustado
-      { nome: "Plano Prata", valor: 160, retornoDiario: 15 }, // Retorno diário ajustado
-      { nome: "Plano Ouro", valor: 300, retornoDiario: 18 }, // Retorno diário ajustado
-      { nome: "Plano Platina", valor: 450, retornoDiario: 22.5 }, // Retorno diário ajustado
-      { nome: "Plano Diamante", valor: 500, retornoDiario: 25 }, // Retorno diário ajustado
-      { nome: "Plano Master", valor: 650, retornoDiario: 32.5 }, // Retorno diário ajustado
-      { nome: "Plano VIP", valor: 700, retornoDiario: 35 }, // Retorno diário ajustado
-      { nome: "Plano Supremo", valor: 850, retornoDiario: 42.5 }, // Retorno diário ajustado
-      { nome: "Plano Elite", valor: 900, retornoDiario: 45 }, // Retorno diário ajustado
-      { nome: "Plano Imperador", valor: 1050, retornoDiario: 52.5 } // Retorno diário ajustado
+      { nome: "Plano Bronze", valor: 60, retornoDiario: 12 }, 
+      { nome: "Plano Prata", valor: 160, retornoDiario: 15 }, 
+      { nome: "Plano Ouro", valor: 300, retornoDiario: 18 }, 
+      { nome: "Plano Platina", valor: 450, retornoDiario: 22.5 }, 
+      { nome: "Plano Diamante", valor: 500, retornoDiario: 25 }, 
+      { nome: "Plano Master", valor: 650, retornoDiario: 32.5 }, 
+      { nome: "Plano VIP", valor: 700, retornoDiario: 35 }, 
+      { nome: "Plano Supremo", valor: 850, retornoDiario: 42.5 }, 
+      { nome: "Plano Elite", valor: 900, retornoDiario: 45 }, 
+      { nome: "Plano Imperador", valor: 1050, retornoDiario: 52.5 } 
     ];
 
     function carregarPlanos(saldo) {
@@ -97,10 +97,10 @@
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
-          <h3>${plano.nome} - R$${plano.valor}</h3>
+          <h3>${plano.nome} - ${plano.valor} USDT</h3>
           <img src="1004.png" alt="Imagem do plano ${plano.valor}" style="width: 100%; height: auto; border-radius: 8px;">
-          <p>Retorno diário: R$${plano.retornoDiario.toFixed(2)}</p>
-          <p>Lucro total (50 dias): R$${(plano.retornoDiario * 50).toFixed(2)}</p>
+          <p>Retorno diário: ${plano.retornoDiario} USDT</p>
+          <p>Lucro total (50 dias): ${(plano.retornoDiario * 50).toFixed(2)} USDT</p>
           <p>Dias restantes: 50</p>
           <button class="buy-button" onclick="comprarPlano('${plano.nome}', ${plano.valor}, ${plano.retornoDiario})">Comprar</button>
         `;
@@ -138,7 +138,7 @@
           imagem: `imagens/PLANO_${valor}.png`,
           status: "comprado",
           tempoCompra: new Date().getTime(),
-          ultimoRetorno: new Date().getTime() // Marca o tempo do último retorno
+          ultimoRetorno: new Date().getTime()
         };
 
         investimentos.push(novoInvestimento);
@@ -170,21 +170,21 @@
           investimentos.forEach((inv, index) => {
             const tempoCompra = inv.tempoCompra;
             const agora = new Date().getTime();
-            const horasRestantes = Math.max(24 - (agora - inv.ultimoRetorno) / (1000 * 60 * 60), 0); // Horas restantes para completar as 24h
+            const horasRestantes = Math.max(24 - (agora - inv.ultimoRetorno) / (1000 * 60 * 60), 0);
 
-            const lucroTotal = inv.retornoDiario * 50; // Lucro total com base em 50 dias
+            const lucroTotal = inv.retornoDiario * 50; 
             const card = document.createElement("div");
             card.className = "card";
             card.innerHTML = `
-              <h3>${inv.nome} - R$${inv.valor}</h3>
+              <h3>${inv.nome} - ${inv.valor} USDT</h3>
               <img src="1004.png" style="width: 100%; height: auto; border-radius: 8px;">
               <p>Data da compra: ${inv.data}</p>
-              <p>Retorno diário: R$${inv.retornoDiario}</p>
-              <p>Lucro total (50 dias): R$${lucroTotal.toFixed(2)}</p>
+              <p>Retorno diário: ${inv.retornoDiario} USDT</p>
+              <p>Lucro total (50 dias): ${lucroTotal.toFixed(2)} USDT</p>
               <p>Dias restantes: ${inv.diasRestantes}</p>
               <p class="contador">Restante: ${Math.ceil(horasRestantes)} horas</p>
               ${horasRestantes <= 0 && inv.status === "comprado" ? 
-                `<button class="coletar-button" onclick="coletarRendimento('${inv.nome}', ${inv.retornoDiario}, ${index})">Coletar R$${inv.retornoDiario}</button>` : 
+                `<button class="coletar-button" onclick="coletarRendimento('${inv.nome}', ${inv.retornoDiario}, ${index})">Coletar ${inv.retornoDiario} USDT</button>` : 
                 ""}
             `;
             container.appendChild(card);
@@ -201,20 +201,21 @@
         const novoSaldo = saldoAtual + retornoDiario;
         const investimentos = data.investimentos || [];
 
-        investimentos[index].status = "retornado"; // Atualiza o status do plano para "retornado"
-        investimentos[index].ultimoRetorno = new Date().getTime(); // Atualiza o horário do último retorno
+        investimentos[index].status = "retornado"; 
+        investimentos[index].ultimoRetorno = new Date().getTime(); 
 
         userRef.update({
           saldoCarteira: novoSaldo,
-          saldo: novoSaldo,
           investimentos: investimentos
         }).then(() => {
-          alert(`Você coletou R$${retornoDiario.toFixed(2)} de rendimento!`);
+          alert(`Você coletou ${retornoDiario} USDT de ${nome}`);
+          mostrarMeusProdutos();
           atualizarSaldo();
         });
       });
     }
 
+    // Carregar saldo e produtos ao iniciar
     atualizarSaldo();
   </script>
 </body>
