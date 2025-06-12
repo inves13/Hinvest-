@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Extrato - HInvest</title>
+  <title>Extrato de Retiradas - HInvest</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,40 +11,53 @@
       color: #fff;
       padding: 20px;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    h2 {
+      color: #0f0;
     }
-    th, td {
+    .titulo-destaque {
+      color: #00ffcc;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .extrato {
+      background: #333;
+      border-radius: 5px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+    .extrato div {
       padding: 10px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #444;
     }
-    th {
-      background-color: #333;
+    .extrato div:last-child {
+      border-bottom: none;
     }
-    tr:nth-child(even) {
-      background-color: #222;
+    .extrato strong {
+      color: #00ffcc;
+    }
+    .btn-back {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .btn-back:hover {
+      background-color: #218838;
     }
   </style>
 </head>
 <body>
 
-<h2>Extrato de Saques</h2>
+<h2>Extrato de Retiradas</h2>
+<div id="extrato" class="extrato">
+  <!-- Histórico de retiradas será exibido aqui -->
+</div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Data</th>
-      <th>Valor Bruto</th>
-      <th>Taxa</th>
-      <th>Valor Líquido</th>
-    </tr>
-  </thead>
-  <tbody id="extrato-table">
-    <!-- Extrato será carregado aqui -->
-  </tbody>
-</table>
+<!-- Alterado o link para voltar para saque.html -->
+<a href="saque.html" class="btn-back">Voltar para a Carteira</a>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -62,38 +75,32 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
   const userId = localStorage.getItem('telefoneLogado');
+  const userRef = db.ref("usuarios/" + userId);
 
-  if (!userId) {
-    alert("Usuário não logado.");
-    window.location.href = "index.html";
-  }
-
-  db.ref("saques").orderByChild("dataSolicitacao").on("value", snapshot => {
-    const saques = snapshot.val();
-    const tableBody = document.getElementById("extrato-table");
-    tableBody.innerHTML = "";  // Limpa a tabela antes de adicionar novas transações
-
-    if (saques) {
-      Object.values(saques).forEach(saque => {
-        if (saque.status === "aprovado" && saque.userId === userId) {
-          const valorBruto = saque.valor;
-          const taxa = saque.taxa;
-          const valorLiquido = saque.valorLiquido;
-          const data = new Date(saque.dataSolicitacao).toLocaleString();
-
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${data}</td>
-            <td>R$ ${valorBruto.toFixed(2).replace(".", ",")}</td>
-            <td>R$ ${taxa.toFixed(2).replace(".", ",")}</td>
-            <td>R$ ${valorLiquido.toFixed(2).replace(".", ",")}</td>
-          `;
-          tableBody.appendChild(row);
-        }
-      });
-    } else {
-      tableBody.innerHTML = '<tr><td colspan="4">Nenhuma transação encontrada.</td></tr>';
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!userId) {
+      alert("Usuário não logado.");
+      window.location.href = "index.html";
+      return;
     }
+    userRef.once("value").then(snapshot => {
+      const data = snapshot.val();
+      if (data && data.extrato && data.extrato.length > 0) {
+        const extratoDiv = document.getElementById("extrato");
+        extratoDiv.innerHTML = ''; // Limpa o extrato antes de adicionar os novos dados.
+        data.extrato.forEach(saque => {
+          extratoDiv.innerHTML += `
+            <div>
+              <strong>Retirada:</strong> R$ ${saque.valor.toFixed(2).replace(".", ",")} <br>
+              <strong>Valor Recebido:</strong> R$ ${saque.valorLiquido.toFixed(2).replace(".", ",")} <br>
+              <strong>Data:</strong> ${saque.dataSolicitacao}
+            </div>
+          `;
+        });
+      } else {
+        document.getElementById("extrato").innerHTML = "<p>Não há registros de retiradas.</p>";
+      }
+    });
   });
 </script>
 
