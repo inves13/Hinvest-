@@ -196,11 +196,10 @@
   </div>
 
   <div class="payment-method">
-    <label for="method">Método de Depósito</label>
-    <select id="method" name="method">
+    <label for="pix">Método de Depósito</label>
+    <select id="pix" name="pix">
       <option value="pix">PIX</option>
       <option value="bank">Transferência Bancária</option>
-      <option value="usdt">USDT</option>
     </select>
   </div>
 
@@ -228,11 +227,6 @@
   <div class="pix-key" id="pix-key">
     <p>Chave Pix: <span id="pix-key-value"></span></p>
     <button class="copy-btn" onclick="copyPixKey()">Copiar chave</button>
-  </div>
-
-  <div class="usdt-key" id="usdt-key" style="display:none;">
-    <p>Endereço USDT: <span id="usdt-key-value"></span></p>
-    <button class="copy-btn" onclick="copyUsdtKey()">Copiar endereço</button>
   </div>
 
   <div class="action-buttons" id="action-buttons">
@@ -264,19 +258,6 @@
     "1050": "depósitodepósito-ainda.não.liberaram@pix",
   };
 
-  const usdtKeys = {
-    "60": "0x1234567890abcdef1234567890abcdef12345678",
-    "160": "0xabcdefabcdefabcdefabcdefabcdefabcdef12345678",
-    "300": "0xabcdef1234567890abcdef1234567890abcdef1234",
-    "450": "0x567890abcdefabcdefabcdefabcdef1234567890abcdef",
-    "500": "0x9876543210abcdef9876543210abcdef9876543210",
-    "650": "0x1234567890abcdef1234567890abcdef1234567890",
-    "700": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdef12",
-    "850": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdef11",
-    "900": "0x1234567890abcdefabcdefabcdefabcdefabcdef1122",
-    "1050": "0x1234567890abcdefabcdefabcdefabcdefabcdef1133",
-  };
-
   amountButtons.forEach(button => {
     button.addEventListener('click', () => {
       selectedValue = button.getAttribute('data-value');
@@ -292,18 +273,8 @@
       return;
     }
 
-    const method = document.getElementById('method').value;
-
-    if (method === 'pix') {
-      document.getElementById('pix-key').style.display = 'block';
-      document.getElementById('pix-key-value').textContent = pixKeys[selectedValue];
-      document.getElementById('usdt-key').style.display = 'none';
-    } else if (method === 'usdt') {
-      document.getElementById('usdt-key').style.display = 'block';
-      document.getElementById('usdt-key-value').textContent = usdtKeys[selectedValue];
-      document.getElementById('pix-key').style.display = 'none';
-    }
-
+    document.getElementById('pix-key').style.display = 'block';
+    document.getElementById('pix-key-value').textContent = pixKeys[selectedValue];
     document.getElementById('action-buttons').style.display = 'flex';
   }
 
@@ -314,22 +285,17 @@
       .catch(() => alert('Erro ao copiar chave Pix.'));
   }
 
-  function copyUsdtKey() {
-    const usdtKey = document.getElementById('usdt-key-value').textContent;
-    navigator.clipboard.writeText(usdtKey)
-      .then(() => alert('Endereço USDT copiado com sucesso!'))
-      .catch(() => alert('Erro ao copiar endereço USDT.'));
-  }
-
   function cancelDeposit() {
     document.getElementById('pix-key').style.display = 'none';
-    document.getElementById('usdt-key').style.display = 'none';
     document.getElementById('action-buttons').style.display = 'none';
     selectedValue = null;
     selectedAmountDisplay.textContent = 'R$ 0';
   }
 
   function confirmDeposit() {
+    // Adicionar lógica de verificação de depósito aqui
+    // Por exemplo, se o depósito não cair, exibe a mensagem de alerta
+
     document.getElementById('alert-message').style.display = 'block';
   }
 </script>
