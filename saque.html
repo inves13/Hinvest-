@@ -5,7 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Carteira - HInvest</title>
   <style>
-    /* Estilos permanecem os mesmos */
+    body {
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      padding: 20px;
+    }
+    h2 {
+      color: #0f0;
+    }
+    .info {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #666;
+    }
+    .btn-extrato {
+      background: #007bff;
+      margin-top: 20px;
+    }
+    .aviso {
+      background: #111;
+      border: 1px solid #333;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      color: #ff0;
+    }
+    .titulo-destaque {
+      color: #00ffcc;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .extrato-retirada {
+      margin-top: 20px;
+      padding: 10px;
+      background: #333;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
@@ -112,11 +165,11 @@
       const data = snapshot.val() || {};
       atualizarTela(data);
 
-      // Carregar dados de conta bancária diretamente do Firebase
+      // Carregar dados da conta bancária
       if (data.contaBancaria) {
-        document.getElementById('nomeTitular').value = data.contaBancaria.nomeTitular;
-        document.getElementById('tipoChave').value = data.contaBancaria.tipoChave;
-        document.getElementById('chavePix').value = data.contaBancaria.chavePix;
+        document.getElementById("nomeTitular").value = data.contaBancaria.nomeTitular;
+        document.getElementById("tipoChave").value = data.contaBancaria.tipoChave;
+        document.getElementById("chavePix").value = data.contaBancaria.chavePix;
       }
     });
   });
@@ -131,10 +184,12 @@
       return;
     }
 
-    // Salvar dados diretamente no Firebase
-    const contaBancaria = { nomeTitular: nome, tipoChave: tipo, chavePix: chave };
     userRef.update({
-      contaBancaria: contaBancaria
+      contaBancaria: {
+        nomeTitular: nome,
+        tipoChave: tipo,
+        chavePix: chave
+      }
     });
 
     alert("Conta bancária salva com sucesso!");
