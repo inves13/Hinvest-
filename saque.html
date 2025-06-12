@@ -226,9 +226,11 @@
       const valorLiquido = valor - (valor * 0.12);
       const dataSaque = new Date().toLocaleString();
 
+      // Atualizando o saldo corretamente
       userRef.update({
-        saldoCarteira: data.saldoCarteira - valor,
-        retirada: (data.retirada || 0) + valor,
+        saldoCarteira: data.saldoCarteira - valor,  // Reduzindo o saldo na carteira
+        recebimento: (data.recebimento || 0) + valor,  // Aumentando o saldo de recebimento
+        retirada: (data.retirada || 0) + valor,  // Aumentando o valor retirado
         extrato: (data.extrato || []).concat([{ valor, valorLiquido, dataSolicitacao: dataSaque }])
       });
 
