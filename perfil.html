@@ -154,14 +154,13 @@
     <div onclick="irPara('download.html')">⬇️ <br> Download</div>
     <div onclick="irPara('saque.html')">💳 <br> Conta PIX</div>
     <div onclick="irPara('senha.html')">🔒 <br> Senha</div>
-    <!-- Botão de Resgatar Presente -->
     <div onclick="irPara('presente.html')">🎁 <br> Resgatar presentes</div>
   </div>
 </div>
 
 <script>
   function irPara(pagina) {
-    console.log("Redirecionando para: " + pagina); // Verifique o redirecionamento
+    console.log("Redirecionando para: " + pagina);
     window.location.href = pagina;
   }
 
@@ -186,8 +185,8 @@
     usuarioRef.once('value').then((snapshot) => {
       const dados = snapshot.val();
       if (dados) {
-        document.getElementById("nomeCompleto").textContent = dados.nome_completo || "Nome não disponível";
-        document.getElementById("nome_completo").value = dados.nome_completo || "";
+        document.getElementById("nomeCompleto").textContent = dados.nome || "Nome não disponível";
+        document.getElementById("nome_completo").value = dados.nome || "";
         document.getElementById("email_usuario").value = dados.email || "";
         document.getElementById("data_nascimento").value = dados.data_nascimento || "";
         document.getElementById("cep").value = dados.cep || "";
