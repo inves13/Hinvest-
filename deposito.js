@@ -1,115 +1,105 @@
-// Inicializando o Firebase
+// Configuração Firebase
 const firebaseConfig = {
-    apiKey: "sua-api-key",
-    authDomain: "seu-auth-domain",
-    projectId: "seu-project-id",
-    storageBucket: "seu-storage-bucket",
-    messagingSenderId: "seu-messaging-sender-id",
-    appId: "seu-app-id"
+  apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+  authDomain: "hinvest-f4354.firebaseapp.com",
+  databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+  projectId: "hinvest-f4354",
+  storageBucket: "hinvest-f4354.firebasestorage.app",
+  messagingSenderId: "646397677016",
+  appId: "1:646397677016:web:f05ca27a38439568bff6ad"
 };
 
-// Inicializando o Firebase
+// Inicializa o Firebase
 firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
-// Referência para os botões de valor
+// Elementos do DOM
 const amountButtons = document.querySelectorAll('.amount-button');
 const selectedAmountDisplay = document.getElementById('selected-amount');
+let selectedValue = null;
+
+// Chaves Pix por valor
 const pixKeys = {
-    "60": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/12345",
-    "160": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/67890",
-    "300": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/abcdef",
-    "450": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/ghijk",
-    "500": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/lmnop",
-    "650": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/qrstuv",
-    "700": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/wxyz",
-    "850": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/123abc",
-    "900": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/xyz123",
-    "1050": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/456def"
+  "60": "pix60@hfinvest.com",
+  "160": "pix160@hfinvest.com",
+  "300": "pix300@hfinvest.com",
+  "450": "pix450@hfinvest.com",
+  "500": "pix500@hfinvest.com",
+  "650": "pix650@hfinvest.com",
+  "700": "pix700@hfinvest.com",
+  "850": "pix850@hfinvest.com",
+  "900": "pix900@hfinvest.com",
+  "1050": "pix1050@hfinvest.com"
 };
 
-// Seleção do valor
+// Clique nos botões de valor
 amountButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const value = button.getAttribute('data-value');
-        selectedAmountDisplay.textContent = `R$ ${value}`;
-        amountButtons.forEach(b => b.classList.remove('selected'));
-        button.classList.add('selected');
-        showPixKey(value);
-    });
+  button.addEventListener('click', () => {
+    selectedValue = button.getAttribute('data-value');
+    selectedAmountDisplay.textContent = `R$ ${selectedValue}`;
+    amountButtons.forEach(btn => btn.classList.remove('selected'));
+    button.classList.add('selected');
+  });
 });
 
-// Exibir a chave PIX
-function showPixKey(value) {
-    const pixKeyElement = document.getElementById('pix-key');
-    const pixKeyValue = document.getElementById('pix-key-value');
-    const pixKeyText = pixKeys[value];
+// Função de depósito
+function deposit() {
+  if (!selectedValue) {
+    alert('Por favor, selecione um valor de depósito.');
+    return;
+  }
 
-    if (pixKeyText) {
-        pixKeyElement.style.display = 'block';
-        pixKeyValue.textContent = pixKeyText;
-    } else {
-        pixKeyElement.style.display = 'none';
-    }
+  const pixKey = pixKeys[selectedValue];
+  document.getElementById('pix-key-value').textContent = pixKey;
+  document.getElementById('pix-key').style.display = 'block';
+  document.getElementById('action-buttons').style.display = 'flex';
+  document.getElementById('alert-message').style.display = 'none';
 }
 
-// Copiar a chave PIX
+// Copiar chave Pix
 function copyPixKey() {
-    const pixKeyText = document.getElementById('pix-key-value').textContent;
-    navigator.clipboard.writeText(pixKeyText).then(() => {
-        alert('Chave Pix copiada!');
-    }).catch((error) => {
-        console.error('Erro ao copiar chave Pix:', error);
-    });
+  const pixKey = document.getElementById('pix-key-value').textContent;
+  navigator.clipboard.writeText(pixKey)
+    .then(() => alert('Chave Pix copiada com sucesso!'))
+    .catch(() => alert('Erro ao copiar chave Pix.'));
 }
 
 // Cancelar depósito
 function cancelDeposit() {
-    // Limpa a seleção e oculta a chave Pix
-    selectedAmountDisplay.textContent = 'R$ 0';
-    document.getElementById('pix-key').style.display = 'none';
-    amountButtons.forEach(b => b.classList.remove('selected'));
+  document.getElementById('pix-key').style.display = 'none';
+  document.getElementById('action-buttons').style.display = 'none';
+  selectedValue = null;
+  selectedAmountDisplay.textContent = 'R$ 0';
+  amountButtons.forEach(btn => btn.classList.remove('selected'));
+  document.getElementById('alert-message').style.display = 'none';
 }
 
-// Continuar com o depósito
-function continueDeposit() {
-    const selectedAmount = selectedAmountDisplay.textContent;
-    if (selectedAmount !== "R$ 0") {
-        // Lógica de comunicação com o backend ou Firebase
-        alert("Pagamento Confirmado! Seu depósito está sendo processado.");
+// Confirmar depósito e salvar no Firebase
+function confirmDeposit() {
+  const metodo = document.getElementById('pix').value;
+  const chave = pixKeys[selectedValue] || "chave_indefinida";
+  const data = new Date().toLocaleString();
 
-        // Atualizando o Firebase
-        firebase.firestore().collection("depositos").add({
-            valor: selectedAmount,
-            status: "Pagamento Concluído",
-            usuario: "Usuário Exemplo", // Substitua pelo nome ou ID do usuário
-            data: new Date()
-        }).then(() => {
-            alert("Depósito atualizado no sistema!");
-        }).catch((error) => {
-            console.error("Erro ao registrar depósito:", error);
-        });
-    } else {
-        alert("Por favor, selecione um valor para o depósito.");
-    }
+  const deposito = {
+    valor: `R$ ${selectedValue}`,
+    metodo: metodo,
+    chavePix: chave,
+    dataHora: data,
+    status: "pendente"
+  };
+
+  database.ref("depositos").push(deposito)
+    .then(() => {
+      document.getElementById('alert-message').style.display = 'block';
+      document.getElementById('alert-message').textContent = 'Depósito registrado. Aguarde confirmação.';
+    })
+    .catch((error) => {
+      alert("Erro ao registrar depósito: " + error.message);
+    });
 }
 
-// Função de depósito
-function deposit() {
-    const selectedAmount = selectedAmountDisplay.textContent;
-    if (selectedAmount !== "R$ 0") {
-        document.getElementById('action-buttons').style.display = 'flex';
-    } else {
-        alert("Por favor, selecione um valor para o depósito.");
-    }
-}
-
-// Exibição do estado do depósito
-function updateDepositStatus(status) {
-    const depositStatusElement = document.getElementById('deposit-status');
-    depositStatusElement.textContent = `Status: ${status}`;
-}
-
-// Inicialização do script
-document.addEventListener('DOMContentLoaded', () => {
-    updateDepositStatus('Aguardando seleção de valor...');
-});
+// Expor funções globais (caso use em script externo no HTML)
+window.deposit = deposit;
+window.copyPixKey = copyPixKey;
+window.cancelDeposit = cancelDeposit;
+window.confirmDeposit = confirmDeposit;
