@@ -140,8 +140,6 @@
       display: block;
       margin: 0 auto;
     }
-
-    /* Alterações feitas */
     .acoes {
       display: flex;
       justify-content: space-between;
@@ -154,132 +152,228 @@
       flex: 1;
       max-width: 48%;
     }
+    #verificacao-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.95);
+      color: #fff;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 20px;
+      text-align: center;
+    }
+    #verificacao-overlay input {
+      margin-bottom: 10px;
+      padding: 10px;
+      width: 100%;
+      max-width: 300px;
+      border-radius: 5px;
+      border: none;
+    }
+    #verificacao-overlay button {
+      padding: 10px 20px;
+      background: green;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
+<div class="logo">
+  <img src="1004.png" alt="Logo" />
+</div>
 
-  <div class="logo">
-    <img src="1004.png" alt="Logo" />
-  </div>
+<section class="usuario-info">
+  <p id="usuario-nome">Carregando...</p>
+  <p id="usuario-telefone">**********</p>
+</section>
 
-  <section class="usuario-info">
-    <p id="usuario-nome">Luis Fernando</p>
-    <p id="usuario-telefone">75998**2201</p>
-  </section>
+<section class="acoes">
+  <a href="deposito.html" class="botao"><img src="10003.png" alt="Depósito"> Depósito</a>
+  <a href="saque.html" class="botao"><img src="10004.png" alt="Retirada"> Retirada</a>
+  <button class="botao" id="checkin-diario" onclick="realizarCheckin()"><img src="10005.png" alt="Check-in"> Check-in Diário</button>
+  <a href="download.html" class="botao"><img src="10011.png" alt="Baixar App"> Baixar App</a>
+  <a href="ajuda.html" class="botao"><img src="10011.png" alt="Ajuda"> Ajuda</a>
+</section>
 
-  <section class="acoes">
-    <a href="deposito.html" class="botao"><img src="10003.png" alt="Depósito"> Depósito</a>
-    <a href="saque.html" class="botao"><img src="10004.png" alt="Retirada"> Retirada</a>
-    <button class="botao" id="checkin-diario" onclick="realizarCheckin()"><img src="10005.png" alt="Check-in"> Check-in Diário</button>
-    <a href="download.html" class="botao"><img src="10011.png" alt="Baixar App"> Baixar App</a>
-    <a href="ajuda.html" class="botao"><img src="10011.png" alt="Ajuda"> Ajuda</a>
-  </section>
+<div class="notificacao">
+  <span>🔔</span>
+  <marquee behavior="scroll" direction="left" scrollamount="5">
+    🚨 NOTIFICAÇÃO IMPORTANTE! Recarga disponível a partir de 17 de junho. Enquanto isso, use o link de afiliado e monte sua rede!
+  </marquee>
+</div>
 
-  <div class="notificacao">
-    <span>🔔</span>
-    <marquee behavior="scroll" direction="left" scrollamount="5">
-      🚨 NOTIFICAÇÃO IMPORTANTE! Recarga disponível a partir de 17 de junho. Enquanto isso, use o link de afiliado e monte sua rede!
-    </marquee>
-  </div>
-
-  <section class="carteira">
-    <h2>Minha carteira</h2>
-    <div class="saldos">
-      <div class="saldo">
-        <img src="10004.png" alt="Saldo Carteira">
-        <p id="saldo-carteira">R$ 100.00</p>
-        <span>Carteira</span>
-      </div>
-      <div class="saldo">
-        <img src="10004.png" alt="Recebido">
-        <p id="valor-recebido">R$ 100.00</p>
-        <span>Recebido</span>
-      </div>
-      <div class="saldo">
-        <img src="10004.png" alt="Recebimento">
-        <p id="valor-recebimento">R$ 0.00</p>
-        <span>Recebimento</span>
-      </div>
+<section class="carteira">
+  <h2>Minha carteira</h2>
+  <div class="saldos">
+    <div class="saldo">
+      <img src="10004.png" alt="Saldo Carteira">
+      <p id="saldo-carteira">R$ 0.00</p>
+      <span>Carteira</span>
     </div>
-  </section>
+    <div class="saldo">
+      <img src="10004.png" alt="Recebido">
+      <p id="valor-recebido">R$ 0.00</p>
+      <span>Recebido</span>
+    </div>
+    <div class="saldo">
+      <img src="10004.png" alt="Recebimento">
+      <p id="valor-recebimento">R$ 0.00</p>
+      <span>Recebimento</span>
+    </div>
+  </div>
+</section>
 
-  <nav class="menu-inferior">
-    <a href="H.html" class="ativo"><img src="30001.png" alt="Início"> Início</a>
-    <a href="investimento.html"><img src="10016.png" alt="Investimento"> Investimento</a>
-    <a href="equipe.html"><img src="10017.png" alt="Equipe"> Equipe</a>
-    <a href="perfil.html"><img src="10017.png" alt="Perfil"> Perfil</a>
-  </nav>
+<nav class="menu-inferior">
+  <a href="H.html" class="ativo"><img src="30001.png" alt="Início"> Início</a>
+  <a href="investimento.html"><img src="10016.png" alt="Investimento"> Investimento</a>
+  <a href="equipe.html"><img src="10017.png" alt="Equipe"> Equipe</a>
+  <a href="perfil.html"><img src="10017.png" alt="Perfil"> Perfil</a>
+</nav>
+
+<!-- Overlay de verificação -->
+<div id="verificacao-overlay">
+  <h2>Verifique seus dados</h2>
+  <p style="color: yellow; font-size: 16px; margin-bottom: 20px;">
+    ⚠️ Esta verificação é obrigatória. Como lidamos com pagamentos reais, é necessário preencher com seu nome verdadeiro, CPF e data de nascimento corretos. A H Invest é uma plataforma segura e seus dados estão protegidos.
+  </p>
+  <input type="text" id="input-nome" placeholder="Nome completo">
+  <input type="text" id="input-cpf" placeholder="CPF">
+  <input type="date" id="input-nascimento" placeholder="Data de nascimento">
+  <button onclick="enviarVerificacao()">Enviar dados</button>
+</div>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-    authDomain: "hinvest-f4354.firebaseapp.com",
-    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-    projectId: "hinvest-f4354",
-    storageBucket: "hinvest-f4354.appspot.com",
-    messagingSenderId: "646397677016",
-    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+  authDomain: "hinvest-f4354.firebaseapp.com",
+  databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+  projectId: "hinvest-f4354",
+  storageBucket: "hinvest-f4354.appspot.com",
+  messagingSenderId: "646397677016",
+  appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+function cpfValido(cpf) {
+  cpf = cpf.replace(/[^\d]+/g, '');
+  if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+  let soma = 0;
+  for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
+  let resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpf.charAt(9))) return false;
+  soma = 0;
+  for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
+  resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpf.charAt(10))) return false;
+  return true;
+}
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const userId = localStorage.getItem("telefoneLogado");
-    if (!userId) {
-      alert("Usuário não logado.");
-      window.location.href = "index.html";
-      return;
+function enviarVerificacao() {
+  const nome = document.getElementById("input-nome").value.trim();
+  const cpf = document.getElementById("input-cpf").value.trim();
+  const nascimento = document.getElementById("input-nascimento").value;
+
+  if (!nome || !cpf || !nascimento) {
+    alert("Preencha todos os campos.");
+    return;
+  }
+
+  if (!cpfValido(cpf)) {
+    alert("CPF inválido. Digite um CPF verdadeiro.");
+    return;
+  }
+
+  const userId = localStorage.getItem("telefoneLogado");
+  const userRef = db.ref("usuarios/" + userId);
+  userRef.update({
+    verificacao: {
+      nomeCompleto: nome,
+      cpf: cpf,
+      nascimento: nascimento,
+      status: "verificado"
     }
-    const userRef = db.ref("usuarios/" + userId);
-    userRef.once("value").then(snapshot => {
-      const data = snapshot.val() || {};
-      const nome = data.nome || "Usuário";
-      const telefone = userId;
-      const saldoCarteira = parseFloat(data.saldoCarteira ?? 10).toFixed(2);
-      const valorRecebido = parseFloat(data.recebimento || 0).toFixed(2);
-      const retirada = parseFloat(data.retirada || 0).toFixed(2);
-      
-      // Formatação do nome e telefone
-      document.getElementById("usuario-nome").innerText = `${nome} do usuário`;
-      document.getElementById("usuario-telefone").innerText = `${telefone.replace(/^(\d{5})(\d{2})(\d{4})$/, "$1**$3")}`;
-      
-      document.getElementById("saldo-carteira").innerText = `R$ ${saldoCarteira}`;
-      document.getElementById("valor-recebido").innerText = `R$ ${valorRecebido}`;
-      document.getElementById("valor-recebimento").innerText = `R$ ${retirada}`;
+  }).then(() => {
+    document.getElementById("verificacao-overlay").style.display = "none";
+    alert("Verificação enviada com sucesso!");
+  });
+}
 
-      const checkinButton = document.getElementById('checkin-diario');
-      const currentTime = Date.now();
-      const nextCheckinTime = data.ultimoCheckin ? new Date(data.ultimoCheckin).getTime() + 86400000 : 0;
-      if (currentTime < nextCheckinTime) {
-        checkinButton.disabled = true;
-        const timeLeft = nextCheckinTime - currentTime;
-        checkinButton.innerText = `Próximo check-in em ${(timeLeft/3600000).toFixed(0)}h`;
-      }
+function verificarSeJaFoiVerificado(userId) {
+  const overlay = document.getElementById("verificacao-overlay");
+  const userRef = db.ref("usuarios/" + userId);
+  userRef.once("value").then(snapshot => {
+    const data = snapshot.val();
+    const verificado = data?.verificacao?.status === "verificado";
+    if (!verificado) {
+      overlay.style.display = "flex";
+    }
+  });
+}
+
+function realizarCheckin() {
+  const userId = localStorage.getItem("telefoneLogado");
+  if (!userId) return;
+  const userRef = db.ref("usuarios/" + userId);
+  const currentTime = new Date().toISOString();
+  userRef.once("value").then(snapshot => {
+    const data = snapshot.val() || {};
+    const saldo = parseFloat(data.saldoCarteira || 0);
+    userRef.update({
+      saldoCarteira: saldo + 1,
+      ultimoCheckin: currentTime
+    }).then(() => {
+      alert("Check-in realizado! +R$1,00");
+      location.reload();
     });
   });
+}
 
-  function realizarCheckin() {
-    const userId = localStorage.getItem("telefoneLogado");
-    if (!userId) {
-      alert("Usuário não logado.");
-      return;
-    }
-    const userRef = db.ref("usuarios/" + userId);
-    const currentTime = new Date().toISOString();
-    userRef.once("value").then(snapshot => {
-      const data = snapshot.val() || {};
-      const saldoCarteira = parseFloat(data.saldoCarteira || 0);
-      userRef.update({
-        saldoCarteira: saldoCarteira + 1,
-        ultimoCheckin: currentTime
-      }).then(() => {
-        alert("Check-in realizado! +R$ 1,00 na carteira.");
-        location.reload();
-      });
-    });
+document.addEventListener("DOMContentLoaded", () => {
+  const userId = localStorage.getItem("telefoneLogado");
+  if (!userId) {
+    alert("Usuário não logado.");
+    location.href = "index.html";
+    return;
   }
-</script>
 
+  const userRef = db.ref("usuarios/" + userId);
+  userRef.once("value").then(snapshot => {
+    const data = snapshot.val() || {};
+    const nome = data.nome || "Usuário";
+    const telefone = userId;
+    const saldoCarteira = parseFloat(data.saldoCarteira || 0).toFixed(2);
+    const valorRecebido = parseFloat(data.recebimento || 0).toFixed(2);
+    const retirada = parseFloat(data.retirada || 0).toFixed(2);
+
+    document.getElementById("usuario-nome").innerText = `${nome}`;
+    document.getElementById("usuario-telefone").innerText = telefone.replace(/^(\d{5})(\d{2})(\d{4})$/, "$1**$3");
+
+    document.getElementById("saldo-carteira").innerText = `R$ ${saldoCarteira}`;
+    document.getElementById("valor-recebido").innerText = `R$ ${valorRecebido}`;
+    document.getElementById("valor-recebimento").innerText = `R$ ${retirada}`;
+
+    verificarSeJaFoiVerificado(userId);
+
+    const currentTime = Date.now();
+    const nextCheckinTime = data.ultimoCheckin ? new Date(data.ultimoCheckin).getTime() + 86400000 : 0;
+    const checkinButton = document.getElementById('checkin-diario');
+    if (currentTime < nextCheckinTime) {
+      checkinButton.disabled = true;
+      const timeLeft = nextCheckinTime - currentTime;
+      checkinButton.innerText = `Próximo check-in em ${(timeLeft / 3600000).toFixed(0)}h`;
+    }
+  });
+});
+</script>
 </body>
 </html>
