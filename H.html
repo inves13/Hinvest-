@@ -7,193 +7,38 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
-    body {
-      margin: 0;
-      background-color: #000;
-      font-family: Arial, sans-serif;
-      color: #fff;
-    }
-    .usuario-info {
-      text-align: center;
-      margin-top: 20px;
-    }
-    .usuario-info p {
-      font-size: 18px;
-      margin: 5px 0;
-    }
-    .carteira {
-      padding: 20px 15px;
-      background-color: #000000;
-      margin: 20px;
-      border-radius: 10px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .carteira h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-weight: 700;
-      font-size: 26px;
-      color: #008000;
-    }
-    .saldos {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .saldo {
-      flex: 1;
-      background: #111;
-      border-radius: 10px;
-      padding: 15px 10px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.3);
-      text-align: center;
-      min-width: 100px;
-    }
-    .saldo img {
-      max-width: 45px;
-      margin-bottom: 10px;
-    }
-    .saldo p {
-      font-size: 20px;
-      font-weight: 700;
-      margin: 5px 0;
-      color: #00d900;
-      user-select: none;
-    }
-    .saldo span {
-      display: block;
-      font-size: 14px;
-      color: #ccc;
-      font-weight: 500;
-    }
-    .botao {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background-color: #008000;
-      color: white;
-      padding: 10px;
-      margin: 10px auto;
-      text-decoration: none;
-      border-radius: 8px;
-      justify-content: center;
-      cursor: pointer;
-      border: none;
-      font-size: 16px;
-      max-width: 220px;
-      user-select: none;
-    }
-    .botao img {
-      max-width: 24px;
-    }
-    .botao:disabled {
-      background-color: #999;
-      cursor: not-allowed;
-    }
-    .notificacao {
-      background-color: yellow;
-      color: #000;
-      padding: 10px;
-      font-weight: bold;
-      margin: 10px 20px;
-      border-radius: 8px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .menu-inferior {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #000000;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-      user-select: none;
-    }
-    .menu-inferior a {
-      text-align: center;
-      color: #fff;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
-    }
-    .menu-inferior img {
-      width: 30px;
-      height: 30px;
-      display: block;
-      margin: 0 auto 4px;
-    }
-    .ativo {
-      font-weight: 700;
-      color: #008000;
-    }
-    .logo img {
-      max-width: 400px;
-      width: 100%;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-    }
-    .acoes {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 20px;
-      padding: 0 15px;
-    }
-    .acoes .botao {
-      flex: 1;
-      max-width: 48%;
-    }
-    #verificacao-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.95);
-      color: #fff;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      padding: 20px;
-      text-align: center;
-    }
-    #verificacao-overlay input {
-      margin-bottom: 10px;
-      padding: 10px;
-      width: 100%;
-      max-width: 300px;
-      border-radius: 5px;
-      border: none;
-    }
-    #verificacao-overlay button {
-      padding: 10px 20px;
-      background: green;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      margin-top: 10px;
-    }
+    body { margin: 0; background-color: #000; font-family: Arial, sans-serif; color: #fff; }
+    .usuario-info { text-align: center; margin-top: 20px; }
+    .usuario-info p { font-size: 18px; margin: 5px 0; }
+    .carteira { padding: 20px 15px; background-color: #000000; margin: 20px; border-radius: 10px; max-width: 600px; margin-left: auto; margin-right: auto; }
+    .carteira h2 { text-align: center; margin-bottom: 20px; font-weight: 700; font-size: 26px; color: #008000; }
+    .saldos { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .saldo { flex: 1; background: #111; border-radius: 10px; padding: 15px 10px; box-shadow: 0 0 8px rgba(0,0,0,0.3); text-align: center; min-width: 100px; }
+    .saldo img { max-width: 45px; margin-bottom: 10px; }
+    .saldo p { font-size: 20px; font-weight: 700; margin: 5px 0; color: #00d900; user-select: none; }
+    .saldo span { display: block; font-size: 14px; color: #ccc; font-weight: 500; }
+    .botao { display: flex; align-items: center; gap: 10px; background-color: #008000; color: white; padding: 10px; margin: 10px auto; text-decoration: none; border-radius: 8px; justify-content: center; cursor: pointer; border: none; font-size: 16px; max-width: 220px; user-select: none; }
+    .botao img { max-width: 24px; }
+    .botao:disabled { background-color: #999; cursor: not-allowed; }
+    .notificacao { background-color: yellow; color: #000; padding: 10px; font-weight: bold; margin: 10px 20px; border-radius: 8px; max-width: 600px; margin-left: auto; margin-right: auto; }
+    .menu-inferior { position: fixed; bottom: 0; left: 0; right: 0; background: #000000; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); user-select: none; }
+    .menu-inferior a { text-align: center; color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; }
+    .menu-inferior img { width: 30px; height: 30px; display: block; margin: 0 auto 4px; }
+    .ativo { font-weight: 700; color: #008000; }
+    .logo img { max-width: 400px; width: 100%; height: auto; display: block; margin: 0 auto; }
+    .acoes { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding: 0 15px; }
+    .acoes .botao { flex: 1; max-width: 48%; }
+    #verificacao-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); color: #fff; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; padding: 20px; text-align: center; }
+    #verificacao-overlay input { margin-bottom: 10px; padding: 10px; width: 100%; max-width: 300px; border-radius: 5px; border: none; }
+    #verificacao-overlay button { padding: 10px 20px; background: green; color: white; border: none; border-radius: 8px; font-size: 16px; margin-top: 10px; }
   </style>
 </head>
 <body>
-<div class="logo">
-  <img src="1004.png" alt="Logo" />
-</div>
-
+<div class="logo"><img src="1004.png" alt="Logo" /></div>
 <section class="usuario-info">
   <p id="usuario-nome">Carregando...</p>
   <p id="usuario-telefone">**********</p>
 </section>
-
 <section class="acoes">
   <a href="deposito.html" class="botao"><img src="10003.png" alt="Depósito"> Depósito</a>
   <a href="saque.html" class="botao"><img src="10004.png" alt="Retirada"> Retirada</a>
@@ -201,14 +46,12 @@
   <a href="download.html" class="botao"><img src="10011.png" alt="Baixar App"> Baixar App</a>
   <a href="ajuda.html" class="botao"><img src="10011.png" alt="Ajuda"> Ajuda</a>
 </section>
-
 <div class="notificacao">
   <span>🔔</span>
   <marquee behavior="scroll" direction="left" scrollamount="5">
-    🚨 NOTIFICAÇÃO IMPORTANTE! Recarga disponível a partir de 17 de junho. Enquanto isso, use o link de afiliado e monte sua rede!
+    🚨 Plataforma confiável! Preencha com nome completo, CPF e data de nascimento corretos. Dados falsos podem causar bloqueio na hora do saque!
   </marquee>
 </div>
-
 <section class="carteira">
   <h2>Minha carteira</h2>
   <div class="saldos">
@@ -229,26 +72,22 @@
     </div>
   </div>
 </section>
-
 <nav class="menu-inferior">
   <a href="H.html" class="ativo"><img src="30001.png" alt="Início"> Início</a>
   <a href="investimento.html"><img src="10016.png" alt="Investimento"> Investimento</a>
   <a href="equipe.html"><img src="10017.png" alt="Equipe"> Equipe</a>
   <a href="perfil.html"><img src="10017.png" alt="Perfil"> Perfil</a>
 </nav>
-
-<!-- Overlay de verificação -->
 <div id="verificacao-overlay">
   <h2>Verifique seus dados</h2>
-  <p style="color: yellow; font-size: 16px; margin-bottom: 20px;">
-    ⚠️ Esta verificação é obrigatória. Como lidamos com pagamentos reais, é necessário preencher com seu nome verdadeiro, CPF e data de nascimento corretos. A H Invest é uma plataforma segura e seus dados estão protegidos.
+  <p style="color: yellow; font-weight: bold;">
+    ⚠️ Plataforma confiável! Nome, CPF e nascimento são obrigatórios. Dados errados causam bloqueio no saque.
   </p>
   <input type="text" id="input-nome" placeholder="Nome completo">
   <input type="text" id="input-cpf" placeholder="CPF">
   <input type="date" id="input-nascimento" placeholder="Data de nascimento">
   <button onclick="enviarVerificacao()">Enviar dados</button>
 </div>
-
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
@@ -274,25 +113,21 @@ function cpfValido(cpf) {
   for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
   resto = (soma * 10) % 11;
   if (resto === 10 || resto === 11) resto = 0;
-  if (resto !== parseInt(cpf.charAt(10))) return false;
-  return true;
+  return resto === parseInt(cpf.charAt(10));
 }
 
 function enviarVerificacao() {
   const nome = document.getElementById("input-nome").value.trim();
   const cpf = document.getElementById("input-cpf").value.trim();
   const nascimento = document.getElementById("input-nascimento").value;
-
   if (!nome || !cpf || !nascimento) {
     alert("Preencha todos os campos.");
     return;
   }
-
   if (!cpfValido(cpf)) {
     alert("CPF inválido. Digite um CPF verdadeiro.");
     return;
   }
-
   const userId = localStorage.getItem("telefoneLogado");
   const userRef = db.ref("usuarios/" + userId);
   userRef.update({
@@ -312,9 +147,10 @@ function verificarSeJaFoiVerificado(userId) {
   const overlay = document.getElementById("verificacao-overlay");
   const userRef = db.ref("usuarios/" + userId);
   userRef.once("value").then(snapshot => {
-    const data = snapshot.val();
-    const verificado = data?.verificacao?.status === "verificado";
-    if (!verificado) {
+    const data = snapshot.val() || {};
+    const verificacao = data.verificacao || {};
+    const status = verificacao.status || "";
+    if (status.toLowerCase() !== "verificado") {
       overlay.style.display = "flex";
     }
   });
@@ -345,7 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
     location.href = "index.html";
     return;
   }
-
   const userRef = db.ref("usuarios/" + userId);
   userRef.once("value").then(snapshot => {
     const data = snapshot.val() || {};
@@ -354,16 +189,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const saldoCarteira = parseFloat(data.saldoCarteira || 0).toFixed(2);
     const valorRecebido = parseFloat(data.recebimento || 0).toFixed(2);
     const retirada = parseFloat(data.retirada || 0).toFixed(2);
-
     document.getElementById("usuario-nome").innerText = `${nome}`;
     document.getElementById("usuario-telefone").innerText = telefone.replace(/^(\d{5})(\d{2})(\d{4})$/, "$1**$3");
-
     document.getElementById("saldo-carteira").innerText = `R$ ${saldoCarteira}`;
     document.getElementById("valor-recebido").innerText = `R$ ${valorRecebido}`;
     document.getElementById("valor-recebimento").innerText = `R$ ${retirada}`;
-
     verificarSeJaFoiVerificado(userId);
 
+    // Verifica check-in
     const currentTime = Date.now();
     const nextCheckinTime = data.ultimoCheckin ? new Date(data.ultimoCheckin).getTime() + 86400000 : 0;
     const checkinButton = document.getElementById('checkin-diario');
