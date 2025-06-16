@@ -25,7 +25,7 @@
         <div id="tela-recuperacao">
             <h2>Recuperar Senha</h2>
             <form class="formulario">
-                <input type="tel" id="recuperar-telefone" placeholder="Digite seu telefone" required pattern="[0-9]{10,11}">
+                <input type="email" id="recuperar-email" placeholder="Digite seu e-mail" required>
                 <button type="button" class="botao" onclick="enviarCodigo()">Enviar Código</button>
             </form>
             <p class="trocar" onclick="mostrarLogin()">Já tem conta? Faça login</p>
@@ -46,23 +46,28 @@
     <script>
         let codigoEnviado = ""; // Variável global para armazenar o código gerado
 
-        // Função para enviar o código de recuperação via SMS (simulado)
+        // Função para enviar o código de recuperação via e-mail (simulado)
         function enviarCodigo() {
-            let telefoneRecuperacao = document.getElementById("recuperar-telefone").value.trim();
-            telefoneRecuperacao = telefoneRecuperacao.replace(/\D/g, ""); // Remove qualquer caractere não numérico
+            let emailRecuperacao = document.getElementById("recuperar-email").value.trim();
 
-            if (telefoneRecuperacao.length < 10 || telefoneRecuperacao.length > 11) {
-                alert("Por favor, insira um número de telefone válido!");
+            if (!validarEmail(emailRecuperacao)) {
+                alert("Por favor, insira um e-mail válido!");
                 return;
             }
 
             // Gerar um código único para recuperação (simulação de envio)
             codigoEnviado = gerarCodigoUnico();
-            alert("O código foi enviado para o número " + telefoneRecuperacao + ". Verifique seu SMS!");
+            alert("O código foi enviado para o e-mail " + emailRecuperacao + ". Verifique sua caixa de entrada!");
 
             // Exibir a tela para inserir a nova senha
             document.getElementById("tela-recuperacao").classList.add("hidden");
             document.getElementById("tela-nova-senha").classList.remove("hidden");
+        }
+
+        // Função para validar e-mail
+        function validarEmail(email) {
+            const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return regexEmail.test(email);
         }
 
         // Função para gerar um código aleatório
@@ -96,19 +101,9 @@
                 return;
             }
 
-            // Salvar a nova senha no localStorage (ou banco de dados, se necessário)
-            let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-            let telefoneRecuperacao = document.getElementById("recuperar-telefone").value.trim();
-
-            let usuario = usuarios.find(user => user.telefone === telefoneRecuperacao);
-            if (usuario) {
-                usuario.senha = novaSenha;
-                localStorage.setItem("usuarios", JSON.stringify(usuarios));
-                alert("Senha alterada com sucesso!");
-                window.location.href = "login.html"; // Redireciona para a página de login
-            } else {
-                alert("Telefone não encontrado. Tente novamente.");
-            }
+            // Aqui você pode adicionar a lógica para atualizar a senha no seu banco de dados
+            alert("Senha alterada com sucesso!");
+            window.location.href = "login.html"; // Redireciona para a página de login
         }
 
         function mostrarLogin() {
