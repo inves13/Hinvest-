@@ -79,17 +79,21 @@
     const userRef = db.ref("usuarios/" + userId);
 
     const planos = [
-      { nome: "Plano Bronze", valor: 60, retornoDiario: 12 },
-      { nome: "Plano Prata", valor: 160, retornoDiario: 15 },
-      { nome: "Plano Ouro", valor: 300, retornoDiario: 18 },
-      { nome: "Plano Platina", valor: 450, retornoDiario: 22.5 },
-      { nome: "Plano Diamante", valor: 500, retornoDiario: 25 },
-      { nome: "Plano Master", valor: 650, retornoDiario: 32.5 },
-      { nome: "Plano VIP", valor: 700, retornoDiario: 35 },
-      { nome: "Plano Supremo", valor: 850, retornoDiario: 42.5 },
-      { nome: "Plano Elite", valor: 900, retornoDiario: 45 },
-      { nome: "Plano Imperador", valor: 1050, retornoDiario: 52.5 }
+      { nome: "Plano Bronze", valor: 60 },
+      { nome: "Plano Prata", valor: 160 },
+      { nome: "Plano Ouro", valor: 300 },
+      { nome: "Plano Platina", valor: 450 },
+      { nome: "Plano Diamante", valor: 500 },
+      { nome: "Plano Master", valor: 650 },
+      { nome: "Plano VIP", valor: 700 },
+      { nome: "Plano Supremo", valor: 850 },
+      { nome: "Plano Elite", valor: 900 },
+      { nome: "Plano Imperador", valor: 1050 }
     ];
+
+    function calcularRetornoDiario(valorPlano) {
+      return (valorPlano * 3) / 100; // 3% do valor do plano
+    }
 
     function carregarPlanos(saldo) {
       const container = document.getElementById("planos");
@@ -98,20 +102,22 @@
       container.style.display = "block";
 
       planos.forEach((plano, index) => {
+        const retornoDiario = calcularRetornoDiario(plano.valor);
+        const lucroTotal = retornoDiario * 50; // Lucro total em 50 dias
+
+        const isDisabled = saldo < plano.valor; // Se o saldo for menor que o valor do plano, desabilita o botão
+        const buttonClass = isDisabled ? "buy-button disabled" : "buy-button"; // Aplica a classe "disabled"
+        
         const card = document.createElement("div");
         card.className = "card";
-        
-        // Verificar se o plano é um dos cinco últimos
-        const isDisabled = index >= 5; // Se for o 6º plano ou mais, desabilita o botão
-        const buttonClass = isDisabled ? "buy-button disabled" : "buy-button"; // Aplica a classe "disabled"
         
         card.innerHTML = `
           <h3>${plano.nome} - R$${plano.valor}</h3>
           <img src="1004.png" alt="Imagem do plano ${plano.valor}" style="width: 100%; height: auto; border-radius: 8px;">
-          <p>Retorno diário: R$${plano.retornoDiario.toFixed(2)}</p>
-          <p>Lucro total (50 dias): R$${(plano.retornoDiario * 50).toFixed(2)}</p>
+          <p>Retorno diário: R$${retornoDiario.toFixed(2)}</p>
+          <p>Lucro total (50 dias): R$${lucroTotal.toFixed(2)}</p>
           <p>Dias restantes: 50</p>
-          <button class="${buttonClass}" onclick="comprarPlano('${plano.nome}', ${plano.valor}, ${plano.retornoDiario})" ${isDisabled ? 'disabled' : ''}>Comprar</button>
+          <button class="${buttonClass}" onclick="comprarPlano('${plano.nome}', ${plano.valor}, ${retornoDiario})" ${isDisabled ? 'disabled' : ''}>Comprar</button>
         `;
         container.appendChild(card);
       });
