@@ -3,61 +3,122 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Planos de Investimento</title>
+  <title>📈 H Invest — Planos de Investimento</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
     body {
-      font-family: Arial, sans-serif;
-      background: #000;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
       color: #fff;
-      text-align: center;
+      margin: 0;
       padding: 20px;
+      text-align: center;
     }
+
+    h1 {
+      font-size: 32px;
+      color: #00ff88;
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      font-size: 20px;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
     .card {
-      background: #111;
-      border: 1px solid #444;
-      border-radius: 8px;
-      margin: 15px auto;
-      padding: 15px;
+      background: #121212;
+      border: 2px solid #00ff88;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px auto;
       width: 90%;
-      max-width: 400px;
+      max-width: 380px;
+      box-shadow: 0 0 20px #00ff8866;
+      transition: 0.3s;
     }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 30px #00ff88aa;
+    }
+
+    .card h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #00ff88;
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .card p {
+      margin: 5px 0;
+      font-size: 16px;
+    }
+
     .buy-button, .meus-produtos-button, .coletar-button {
-      background: #28a745;
-      color: white;
-      padding: 10px;
-      margin-top: 10px;
+      background: linear-gradient(45deg, #00ff88, #00c3ff);
+      color: #000;
+      padding: 12px;
+      margin-top: 15px;
       border: none;
       width: 100%;
-      border-radius: 4px;
+      border-radius: 8px;
+      font-size: 16px;
       font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ff88;
+      transition: 0.3s;
     }
+
+    .buy-button:hover, .meus-produtos-button:hover, .coletar-button:hover {
+      background: linear-gradient(45deg, #00c3ff, #00ff88);
+      box-shadow: 0 0 20px #00ff88;
+      transform: scale(1.03);
+    }
+
     .buy-button.disabled {
-      background: rgba(40, 167, 69, 0.3);
+      background: #444;
+      color: #999;
       cursor: not-allowed;
+      box-shadow: none;
     }
-    #planos, #meus-produtos {
-      margin-top: 20px;
-    }
-    .comprado {
-      color: green;
+
+    .contador {
+      font-size: 16px;
+      color: #ffcc00;
       font-weight: bold;
     }
-    .contador {
-      font-size: 18px;
-      color: yellow;
+
+    .comprado {
+      color: #00ff88;
+      font-weight: bold;
+      margin-top: 5px;
     }
+
+    #planos, #meus-produtos {
+      margin-top: 30px;
+    }
+
   </style>
 </head>
 <body>
 
-  <h1>Comprar Planos</h1>
-  <h2>Saldo: R$ <span id="saldo">0.00</span></h2>
+  <h1>📈 H Invest</h1>
+  <h2>💰 Saldo: R$ <span id="saldo">0.00</span></h2>
 
-  <button class="meus-produtos-button" onclick="mostrarMeusProdutos()">Meus Produtos</button>
+  <button class="meus-produtos-button" onclick="mostrarMeusProdutos()">🎒 Meus Produtos</button>
 
   <div id="planos"></div>
   <div id="meus-produtos" style="display:none;"></div>
 
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
@@ -74,7 +135,6 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
     const userId = localStorage.getItem("telefoneLogado");
     const userRef = db.ref("usuarios/" + userId);
 
@@ -92,7 +152,7 @@
     ];
 
     function calcularRetornoDiario(valorPlano) {
-      return (valorPlano * 3) / 100; // 3% do valor do plano
+      return (valorPlano * 3) / 100;
     }
 
     function carregarPlanos(saldo) {
@@ -103,21 +163,19 @@
 
       planos.forEach((plano, index) => {
         const retornoDiario = calcularRetornoDiario(plano.valor);
-        const lucroTotal = retornoDiario * 50; // Lucro total em 50 dias
+        const lucroTotal = retornoDiario * 50;
+        const isDisabled = saldo < plano.valor;
+        const buttonClass = isDisabled ? "buy-button disabled" : "buy-button";
 
-        const isDisabled = saldo < plano.valor; // Se o saldo for menor que o valor do plano, desabilita o botão
-        const buttonClass = isDisabled ? "buy-button disabled" : "buy-button"; // Aplica a classe "disabled"
-        
         const card = document.createElement("div");
         card.className = "card";
-        
         card.innerHTML = `
-          <h3>${plano.nome} - R$${plano.valor}</h3>
-          <img src="1004.png" alt="Imagem do plano ${plano.valor}" style="width: 100%; height: auto; border-radius: 8px;">
-          <p>Retorno diário: R$${retornoDiario.toFixed(2)}</p>
-          <p>Lucro total (50 dias): R$${lucroTotal.toFixed(2)}</p>
-          <p>Dias restantes: 50</p>
-          <button class="${buttonClass}" onclick="comprarPlano('${plano.nome}', ${plano.valor}, ${retornoDiario})" ${isDisabled ? 'disabled' : ''}>Comprar</button>
+          <h3>📊 ${plano.nome}</h3>
+          <img src="1004.png" alt="Plano ${plano.valor}">
+          <p>💸 Valor: <strong>R$${plano.valor}</strong></p>
+          <p>📈 Retorno diário: R$${retornoDiario.toFixed(2)}</p>
+          <p>💰 Lucro total (50 dias): R$${lucroTotal.toFixed(2)}</p>
+          <button class="${buttonClass}" onclick="comprarPlano('${plano.nome}', ${plano.valor}, ${retornoDiario})" ${isDisabled ? 'disabled' : ''}>🛒 Comprar</button>
         `;
         container.appendChild(card);
       });
@@ -173,9 +231,8 @@
       userRef.once("value").then(snapshot => {
         const data = snapshot.val() || {};
         const investimentos = data.investimentos || [];
-
         const container = document.getElementById("meus-produtos");
-        container.innerHTML = "<h2>Meus Produtos</h2>";
+        container.innerHTML = "<h2>🎒 Meus Produtos</h2>";
         document.getElementById("planos").style.display = "none";
         container.style.display = "block";
 
@@ -186,22 +243,22 @@
             const tempoCompra = inv.tempoCompra;
             const agora = new Date().getTime();
             const horasRestantes = Math.max(24 - (agora - inv.ultimoRetorno) / (1000 * 60 * 60), 0);
-
             const lucroTotal = inv.retornoDiario * 50;
+
             const card = document.createElement("div");
             card.className = "card";
             card.innerHTML = `
-              <h3>${inv.nome} - R$${inv.valor}</h3>
-              <img src="1004.png" style="width: 100%; height: auto; border-radius: 8px;">
-              <p>Data da compra: ${inv.data}</p>
-              <p>Retorno diário: R$${inv.retornoDiario}</p>
-              <p>Lucro total (50 dias): R$${lucroTotal.toFixed(2)}</p>
-              <p>Dias restantes: ${inv.diasRestantes}</p>
-              <p class="contador">Restante: ${Math.ceil(horasRestantes)} horas</p>
-              <p class="comprado">Plano Ativo</p>
-              ${horasRestantes <= 0 && inv.status === "comprado" ? 
-                `<button class="coletar-button" onclick="coletarRendimento('${inv.nome}', ${inv.retornoDiario}, ${index})">Coletar R$${inv.retornoDiario}</button>` : 
-                ""}
+              <h3>${inv.nome}</h3>
+              <img src="1004.png">
+              <p>📅 Compra: ${inv.data}</p>
+              <p>📈 Retorno diário: R$${inv.retornoDiario}</p>
+              <p>💰 Lucro total: R$${lucroTotal.toFixed(2)}</p>
+              <p>📆 Dias restantes: ${inv.diasRestantes}</p>
+              <p class="contador">⏰ ${Math.ceil(horasRestantes)}h para próximo retorno</p>
+              <p class="comprado">✅ Plano Ativo</p>
+              ${horasRestantes <= 0 && inv.status === "comprado"
+                ? `<button class="coletar-button" onclick="coletarRendimento('${inv.nome}', ${inv.retornoDiario}, ${index})">📥 Coletar R$${inv.retornoDiario}</button>` 
+                : ""}
             `;
             container.appendChild(card);
           });
@@ -232,7 +289,7 @@
       });
     }
 
-    atualizarSaldo();  // Inicializa o saldo ao carregar a página
+    atualizarSaldo();
   </script>
 </body>
 </html>
