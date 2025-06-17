@@ -6,7 +6,6 @@
   <title>📈 H Invest — Planos de Investimento</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
     body {
       font-family: 'Roboto', sans-serif;
       background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
@@ -15,19 +14,16 @@
       padding: 20px;
       text-align: center;
     }
-
     h1 {
       font-size: 32px;
       color: #00ff88;
       margin-bottom: 5px;
     }
-
     h2 {
       font-size: 20px;
       color: #fff;
       margin-bottom: 20px;
     }
-
     .card {
       background: #121212;
       border: 2px solid #00ff88;
@@ -39,29 +35,24 @@
       box-shadow: 0 0 20px #00ff8866;
       transition: 0.3s;
     }
-
     .card:hover {
       transform: translateY(-5px);
       box-shadow: 0 0 30px #00ff88aa;
     }
-
     .card h3 {
       font-size: 24px;
       margin-bottom: 10px;
       color: #00ff88;
     }
-
     .card img {
       width: 100%;
       border-radius: 10px;
       margin-bottom: 15px;
     }
-
     .card p {
       margin: 5px 0;
       font-size: 16px;
     }
-
     .buy-button, .meus-produtos-button, .coletar-button {
       background: linear-gradient(45deg, #00ff88, #00c3ff);
       color: #000;
@@ -76,36 +67,30 @@
       box-shadow: 0 0 10px #00ff88;
       transition: 0.3s;
     }
-
     .buy-button:hover, .meus-produtos-button:hover, .coletar-button:hover {
       background: linear-gradient(45deg, #00c3ff, #00ff88);
       box-shadow: 0 0 20px #00ff88;
       transform: scale(1.03);
     }
-
     .buy-button.disabled {
       background: #444;
       color: #999;
       cursor: not-allowed;
       box-shadow: none;
     }
-
     .contador {
       font-size: 16px;
       color: #ffcc00;
       font-weight: bold;
     }
-
     .comprado {
       color: #00ff88;
       font-weight: bold;
       margin-top: 5px;
     }
-
     #planos, #meus-produtos {
       margin-top: 30px;
     }
-
   </style>
 </head>
 <body>
@@ -173,8 +158,9 @@
           <h3>📊 ${plano.nome}</h3>
           <img src="1004.png" alt="Plano ${plano.valor}">
           <p>💸 Valor: <strong>R$${plano.valor}</strong></p>
-          <p>📈 Retorno diário: R$${retornoDiario.toFixed(2)}</p>
-          <p>💰 Lucro total (50 dias): R$${lucroTotal.toFixed(2)}</p>
+          <p>📈 Retorno diário: R$${retornoDiario.toFixed(2)} (3% ao dia)</p>
+          <p>💰 Lucro total em 50 dias: R$${lucroTotal.toFixed(2)}</p>
+          <p>📅 Duração: 50 dias de rendimento</p>
           <button class="${buttonClass}" onclick="comprarPlano('${plano.nome}', ${plano.valor}, ${retornoDiario})" ${isDisabled ? 'disabled' : ''}>🛒 Comprar</button>
         `;
         container.appendChild(card);
