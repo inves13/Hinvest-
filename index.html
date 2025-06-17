@@ -11,6 +11,7 @@
       background: #111;
       color: #fff;
     }
+
     input, button {
       display: block;
       width: 100%;
@@ -19,31 +20,37 @@
       font-size: 16px;
       border-radius: 8px;
       border: none;
-    }
-    input {
-      background: #222;
-      color: #fff;
+      transition: 0.3s;
     }
 
-    /* Botões com gradiente azul + verde brilhante */
+    input {
+      background: linear-gradient(145deg, #00ffcc, #007bff);
+      color: #fff;
+      border: 1px solid #00ffcc;
+      box-shadow: 0 0 8px #00ffcc88;
+    }
+
+    input::placeholder {
+      color: #e0e0e0;
+    }
+
     button {
-      background: linear-gradient(90deg, #00ff99, #0099ff);
+      background: linear-gradient(145deg, #00ffcc, #007bff);
       color: white;
-      font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0 0 10px #00ffcc, 0 0 20px #0099ff;
+      font-weight: bold;
+      box-shadow: 0 0 10px #00ffcc;
     }
 
     button:hover {
-      background: linear-gradient(90deg, #0099ff, #00ff99);
-      box-shadow: 0 0 15px #00ffcc, 0 0 25px #0099ff;
+      opacity: 0.9;
+      box-shadow: 0 0 15px #00ffcc;
     }
 
     button:disabled {
       background: #555;
-      box-shadow: none;
       cursor: not-allowed;
+      box-shadow: none;
     }
 
     .form-box {
@@ -54,9 +61,11 @@
       margin: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
+
     h2, h3 {
       text-align: center;
     }
+
     #codigo-gerado {
       text-align: center;
       margin-top: 15px;
@@ -66,6 +75,7 @@
       white-space: pre-wrap;
       cursor: pointer;
     }
+
     .link {
       text-align: center;
       margin-top: 10px;
@@ -73,6 +83,7 @@
       cursor: pointer;
       text-decoration: underline;
     }
+
     .msg {
       text-align: center;
       margin-top: 10px;
