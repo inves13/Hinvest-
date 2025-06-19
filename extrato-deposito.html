@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Extrato de Depósitos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <style>
+    body {
+      background-color: #111;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      color: #0f0;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .extrato-card {
+      background-color: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    .status {
+      font-weight: bold;
+    }
+    .aprovado {
+      color: #2ecc71;
+    }
+    .aguardando {
+      color: #f1c40f;
+    }
+    button {
+      background-color: #2ecc71;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      padding: 5px 10px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Extrato de Depósitos</h2>
+<div id="depositosContainer"></div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.appspot.com",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  function carregarDepositos() {
+    const container = document.getElementById("depositosContainer");
+    db.ref("depositos").on("value", snapshot => {
+      container.innerHTML = "";
+      snapshot.forEach(child => {
+        const dep = child.val();
+        const statusClass = dep.status === "Aprovado" ? "aprovado" : "aguardando";
+        container.innerHTML += `
+          <div class="extrato-card">
+            <b>ID:</b> ${child.key}<br>
+            <b>Nome:</b> ${dep.nome}<br>
+            <b>Telefone:</b> ${dep.telefone}<br>
+            <b>CPF:</b> ${dep.cpf}<br>
+            <b>Valor:</b> R$${parseFloat(dep.valor).toFixed(2)}<br>
+            <b>Método:</b> ${dep.metodo}<br>
+            <b>Data:</b> ${new Date(dep.data).toLocaleString()}<br>
+            <span class="status ${statusClass}">${dep.status || "Aguardando"}</span><br>
+            ${dep.status !== "Aprovado" ? `<button onclick="aprovarDeposito('${child.key}')">Aprovar</button>` : ""}
+          </div>
+        `;
+      });
+    });
+  }
+
+  function aprovarDeposito(id) {
+    db.ref("depositos/" + id).update({ status: "Aprovado" }).then(() => {
+      alert("Depósito aprovado!");
+    });
+  }
+
+  carregarDepositos();
+</script>
+
+</body>
+</html>
