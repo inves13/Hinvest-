@@ -233,6 +233,26 @@
         </div>
       </div>
 
+      <!-- Campo Telefone Adicionado -->
+      <div class="form-group">
+        <label for="telefoneTitular">Telefone do Titular <span aria-hidden="true" style="color:#ff4444;">*</span></label>
+        <input
+          type="tel"
+          id="telefoneTitular"
+          name="telefoneTitular"
+          placeholder="(00) 00000-0000"
+          maxlength="15"
+          autocomplete="tel"
+          required
+          aria-required="true"
+          aria-describedby="telefoneError"
+          pattern="^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$"
+        />
+        <div id="telefoneError" role="alert" style="color:#ff4444; display:none; font-size:14px; margin-top:4px;">
+          Por favor, preencha um telefone válido.
+        </div>
+      </div>
+
       <div class="form-group">
         <label for="cpfTitular">CPF do Titular <span aria-hidden="true" style="color:#ff4444;">*</span></label>
         <input
@@ -396,10 +416,12 @@
   const alertMessage = document.getElementById('alert-message');
 
   const nomeInput = document.getElementById('nomeTitular');
+  const telefoneInput = document.getElementById('telefoneTitular');
   const cpfInput = document.getElementById('cpfTitular');
   const metodoSelect = document.getElementById('pix');
 
   const nomeError = document.getElementById('nomeError');
+  const telefoneError = document.getElementById('telefoneError');
   const cpfError = document.getElementById('cpfError');
   const valorError = document.getElementById('valorError');
 
@@ -445,6 +467,29 @@
     return true;
   }
 
+  // Máscara simples para telefone (opcional, só para melhorar UX)
+  telefoneInput.addEventListener('input', () => {
+    let t = telefoneInput.value.replace(/\D/g, '');
+    if (t.length > 11) t = t.slice(0,11);
+    if (t.length > 10) {
+      t = t.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+    } else if (t.length > 5) {
+      t = t.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    } else if (t.length > 2) {
+      t = t.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+    } else if (t.length > 0) {
+      t = t.replace(/^(\d*)/, '($1');
+    }
+    telefoneInput.value = t;
+  });
+
+  // Validação telefone simples
+  function validarTelefone(tel) {
+    // Formato esperado: (xx) xxxx-xxxx ou (xx) xxxxx-xxxx
+    const regexTel = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
+    return regexTel.test(tel);
+  }
+
   // Gerenciar seleção de valor
   amountButtons.forEach((btn, i) => {
     btn.addEventListener('click', () => {
@@ -481,6 +526,13 @@
       valid = false;
     } else {
       nomeError.style.display = 'none';
+    }
+
+    if (!telefoneInput.value.trim() || !validarTelefone(telefoneInput.value.trim())) {
+      telefoneError.style.display = 'block';
+      valid = false;
+    } else {
+      telefoneError.style.display = 'none';
     }
 
     if (!cpfInput.value.trim() || !validarCPF(cpfInput.value.trim())) {
@@ -543,6 +595,7 @@
   // Confirmar depósito: salvar no Firebase e resetar
   document.getElementById('confirmBtn').addEventListener('click', () => {
     const nome = nomeInput.value.trim();
+    const telefone = telefoneInput.value.trim();
     const cpf = cpfInput.value.trim();
     const metodo = metodoSelect.value;
     const valor = parseInt(selectedValue);
@@ -550,6 +603,7 @@
     // Criar objeto a salvar
     const novoDeposito = {
       nome,
+      telefone,
       cpf,
       metodo,
       valor,
@@ -582,4 +636,4 @@
   });
 </script>
 </body>
-  </html>
+</html>
