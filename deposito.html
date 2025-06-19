@@ -9,7 +9,7 @@
       margin: 0;
       padding: 0;
       background-color: #111;
-      color: #fff;
+      color: #ddd;
       font-family: Arial, sans-serif;
     }
     .deposit-container {
@@ -18,7 +18,7 @@
       padding: 20px;
       background: #222;
       border-radius: 12px;
-      box-shadow: 0 0 12px #00ff88aa;
+      box-shadow: 0 0 16px #00ff88aa;
     }
     .header {
       display: flex;
@@ -28,14 +28,18 @@
       padding: 15px 20px;
       border-radius: 10px;
       margin-bottom: 20px;
+      color: #00ff88;
+      user-select: none;
     }
     .header h2 {
       margin: 0;
       font-size: 24px;
-      color: #00ff88;
-      user-select: none;
     }
-    .support-btn {
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .support-btn, .extrato-btn {
       display: flex;
       align-items: center;
       background-color: #00ff88;
@@ -46,148 +50,157 @@
       font-weight: bold;
       transition: background-color 0.3s ease;
       user-select: none;
+      cursor: pointer;
+      font-size: 14px;
     }
-    .support-btn:hover {
+    .support-btn:hover, .extrato-btn:hover {
       background-color: #00cc66;
     }
     .support-btn img {
       margin-right: 8px;
     }
-    .form-group {
-      margin-bottom: 18px;
-    }
-    label {
-      font-weight: bold;
+
+    form label {
       display: block;
       margin-bottom: 6px;
-      user-select: none;
+      font-weight: bold;
+      color: #00ff88;
     }
-    input, select {
+    form input[type="text"],
+    form input[type="tel"],
+    form select {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: 6px;
-      border: none;
-      background-color: #333;
-      color: #fff;
+      padding: 10px;
       font-size: 16px;
-      box-sizing: border-box;
+      border-radius: 8px;
+      border: 2px solid #00ff88;
+      background-color: #222;
+      color: #ddd;
       outline-offset: 2px;
-      outline-color: transparent;
-      transition: outline-color 0.2s ease;
-      user-select: text;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-    input:focus, select:focus {
-      outline-color: #00ff88;
+    form input[type="text"]:focus,
+    form input[type="tel"]:focus,
+    form select:focus {
+      border-color: #0088ff;
+      box-shadow: 0 0 8px #0088ff;
+      background-color: #111;
+      color: #eee;
     }
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group span[aria-hidden="true"] {
+      color: #ff4444;
+    }
+
     .amount-buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 6px;
+      margin-top: 8px;
     }
     .amount-button {
-      background-color: #333;
-      color: #fff;
-      padding: 12px 18px;
-      border: none;
-      border-radius: 6px;
+      flex: 1 1 80px;
+      text-align: center;
+      padding: 12px 0;
+      border-radius: 12px;
+      background-color: #222;
+      color: #ccc;
+      font-weight: bold;
+      border: 2px solid #444;
       cursor: pointer;
-      font-weight: 600;
-      font-size: 16px;
       user-select: none;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }
     .amount-button:hover {
-      background-color: #00ff88;
-      color: #000;
+      background-color: #004477;
+      border-color: #00aaff;
+      color: #00aaff;
     }
     .amount-button.selected {
-      background-color: #00ff88;
+      background: linear-gradient(135deg, #00ff88, #0088ff);
+      border-color: #00ff88;
       color: #000;
-      pointer-events: none;
+      font-weight: 900;
+      box-shadow: 0 0 12px #00ff88aa;
     }
-    #deposit-now {
-      width: 100%;
-      background-color: #00ff88;
-      color: #000;
-      padding: 14px;
-      border: none;
-      border-radius: 6px;
+
+    #selected-amount {
+      color: #00ff88;
+      font-weight: 700;
       font-size: 18px;
-      font-weight: bold;
-      margin-top: 20px;
+    }
+
+    button[type="submit"],
+    .copy-btn,
+    .cancel-btn,
+    .continue-btn {
+      background: linear-gradient(135deg, #00ff88, #0088ff);
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-weight: 700;
+      font-size: 16px;
+      color: #000;
       cursor: pointer;
       user-select: none;
-      transition: background-color 0.3s ease;
+      box-shadow: 0 0 10px #00ff88aa;
+      margin-top: 10px;
+      transition: background 0.3s ease;
     }
-    #deposit-now:hover {
-      background-color: #00cc66;
+    button[type="submit"]:hover,
+    .copy-btn:hover,
+    .cancel-btn:hover,
+    .continue-btn:hover {
+      background: linear-gradient(135deg, #00cc66, #0055cc);
+      color: #eee;
     }
+
+    .copy-btn, .cancel-btn, .continue-btn {
+      margin-right: 10px;
+    }
+
     .pix-key {
-      margin-top: 25px;
+      margin-top: 20px;
       background-color: #111;
-      padding: 18px 15px;
-      border-radius: 8px;
-      display: none;
-      user-select: text;
-    }
-    .pix-key p {
+      padding: 15px 20px;
+      border-radius: 10px;
       font-size: 18px;
-      margin: 0 0 10px 0;
-      word-break: break-all;
+      color: #00ff88;
+      display: none;
+      user-select: all;
+      box-shadow: 0 0 10px #00ff88aa;
     }
-    .copy-btn {
-      background-color: #00ff88;
-      color: #000;
-      border: none;
-      padding: 12px 16px;
-      border-radius: 6px;
-      cursor: pointer;
+    .pix-key strong {
+      font-weight: 900;
+      color: #0088ff;
+    }
+
+    .alert-message {
+      margin-top: 15px;
       font-weight: bold;
       font-size: 16px;
-      user-select: none;
-      transition: background-color 0.3s ease;
-    }
-    .copy-btn:hover {
-      background-color: #00cc66;
-    }
-    .action-buttons {
-      margin-top: 20px;
       display: none;
-      gap: 12px;
-      user-select: none;
     }
-    .cancel-btn, .continue-btn {
-      flex: 1;
-      padding: 14px 0;
-      border: none;
-      border-radius: 6px;
-      font-size: 18px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background-color 0.3s ease;
-      user-select: none;
+    .alert-error {
+      color: #ff4444;
     }
-    .cancel-btn {
-      background-color: #ff4444;
-      color: #fff;
+    .alert-success {
+      color: #00ff88;
     }
-    .cancel-btn:hover {
-      background-color: #cc3333;
+
+    #action-buttons {
+      margin-top: 15px;
+      display: none;
     }
-    .continue-btn {
-      background-color: #00c853;
-      color: #fff;
-    }
-    .continue-btn:hover {
-      background-color: #009c3a;
-    }
-    .alert-message {
-      margin-top: 20px;
-      font-weight: bold;
-      font-size: 17px;
-      text-align: center;
-      user-select: none;
+
+    /* Mensagens de erro */
+    [role="alert"] {
+      margin-top: 4px;
+      font-size: 14px;
+      color: #ff4444;
       display: none;
     }
   </style>
@@ -196,28 +209,39 @@
 
   <div class="deposit-container" role="main" aria-label="Formulário de depósito online">
     <div class="header">
-      <h2>Depósito Online</h2>
-      <a
-        class="support-btn"
-        href="https://wa.me/5575998282201?text=Já%20recarreguei%20na%20plataforma%20da%20H%20investe"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Contato de suporte via WhatsApp"
-      >
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/6/69/WhatsApp.svg"
-          width="22"
-          height="22"
-          alt="Ícone WhatsApp"
-          aria-hidden="true"
-        />
-        Suporte
-      </a>
+      <h2>Extrato do Depósito</h2>
+      <div class="header-buttons">
+        <a
+          class="extrato-btn"
+          href="extrato-deposito.html"
+          aria-label="Ver extrato de depósito"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Ver Extrato
+        </a>
+        <a
+          class="support-btn"
+          href="https://wa.me/5575998282201?text=Já%20recarreguei%20na%20plataforma%20da%20H%20investe"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Contato de suporte via WhatsApp"
+        >
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/6/69/WhatsApp.svg"
+            width="22"
+            height="22"
+            alt="Ícone WhatsApp"
+            aria-hidden="true"
+          />
+          Suporte
+        </a>
+      </div>
     </div>
 
     <form id="depositForm" novalidate>
       <div class="form-group">
-        <label for="nomeTitular">Nome Completo do Titular <span aria-hidden="true" style="color:#ff4444;">*</span></label>
+        <label for="nomeTitular">Nome Completo do Titular <span aria-hidden="true">*</span></label>
         <input
           type="text"
           id="nomeTitular"
@@ -228,14 +252,11 @@
           aria-required="true"
           aria-describedby="nomeError"
         />
-        <div id="nomeError" role="alert" style="color:#ff4444; display:none; font-size:14px; margin-top:4px;">
-          Por favor, preencha o nome completo.
-        </div>
+        <div id="nomeError" role="alert">Por favor, preencha o nome completo.</div>
       </div>
 
-      <!-- Campo Telefone Adicionado -->
       <div class="form-group">
-        <label for="telefoneTitular">Telefone do Titular <span aria-hidden="true" style="color:#ff4444;">*</span></label>
+        <label for="telefoneTitular">Telefone do Titular <span aria-hidden="true">*</span></label>
         <input
           type="tel"
           id="telefoneTitular"
@@ -248,13 +269,11 @@
           aria-describedby="telefoneError"
           pattern="^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$"
         />
-        <div id="telefoneError" role="alert" style="color:#ff4444; display:none; font-size:14px; margin-top:4px;">
-          Por favor, preencha um telefone válido.
-        </div>
+        <div id="telefoneError" role="alert">Por favor, preencha um telefone válido.</div>
       </div>
 
       <div class="form-group">
-        <label for="cpfTitular">CPF do Titular <span aria-hidden="true" style="color:#ff4444;">*</span></label>
+        <label for="cpfTitular">CPF do Titular <span aria-hidden="true">*</span></label>
         <input
           type="text"
           id="cpfTitular"
@@ -266,9 +285,7 @@
           aria-required="true"
           aria-describedby="cpfError"
         />
-        <div id="cpfError" role="alert" style="color:#ff4444; display:none; font-size:14px; margin-top:4px;">
-          CPF inválido. Por favor, corrija.
-        </div>
+        <div id="cpfError" role="alert">CPF inválido. Por favor, corrija.</div>
       </div>
 
       <div class="form-group">
@@ -280,7 +297,7 @@
       </div>
 
       <div class="form-group">
-        <p>Escolha o valor do depósito: <span aria-hidden="true" style="color:#ff4444;">*</span></p>
+        <p>Escolha o valor do depósito: <span aria-hidden="true">*</span></p>
         <div class="amount-buttons" role="radiogroup" aria-label="Valores para depósito">
           <button
             type="button"
@@ -364,9 +381,7 @@
           >R$ 1050</button>
         </div>
         <p style="margin-top:8px;">Valor Selecionado: <strong id="selected-amount">R$ 0</strong></p>
-        <div id="valorError" role="alert" style="color:#ff4444; display:none; font-size:14px; margin-top:4px;">
-          Selecione um valor para continuar.
-        </div>
+        <div id="valorError" role="alert">Selecione um valor para continuar.</div>
       </div>
 
       <button
@@ -477,24 +492,15 @@
       t = t.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
     } else if (t.length > 2) {
       t = t.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
-    } else if (t.length > 0) {
+    } else {
       t = t.replace(/^(\d*)/, '($1');
     }
     telefoneInput.value = t;
   });
 
-  // Validação telefone simples
-  function validarTelefone(tel) {
-    // Formato esperado: (xx) xxxx-xxxx ou (xx) xxxxx-xxxx
-    const regexTel = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
-    return regexTel.test(tel);
-  }
-
-  // Gerenciar seleção de valor
+  // Controle seleção valor
   amountButtons.forEach((btn, i) => {
     btn.addEventListener('click', () => {
-      selectedValue = btn.getAttribute('data-value');
-      selectedAmountDisplay.textContent = `R$ ${selectedValue}`;
       amountButtons.forEach(b => {
         b.classList.remove('selected');
         b.setAttribute('aria-checked', 'false');
@@ -503,22 +509,51 @@
       btn.classList.add('selected');
       btn.setAttribute('aria-checked', 'true');
       btn.setAttribute('tabindex', '0');
+      selectedValue = btn.dataset.value;
+      selectedAmountDisplay.textContent = `R$ ${selectedValue}`;
       valorError.style.display = 'none';
+
+      // Exibe chave pix correta e botoes
+      pixKeyValue.textContent = pixKeys[selectedValue];
+      pixKeySection.style.display = 'block';
+      actionButtons.style.display = 'block';
       alertMessage.style.display = 'none';
-      pixKeySection.style.display = 'none';
-      actionButtons.style.display = 'none';
     });
   });
 
-  // Função para mostrar mensagens de alerta
-  function showAlert(message, isError = true) {
-    alertMessage.style.display = 'block';
-    alertMessage.style.color = isError ? '#ff4444' : '#00ff88';
-    alertMessage.textContent = message;
-  }
+  // Copiar chave pix
+  document.getElementById('copyPixBtn').addEventListener('click', () => {
+    navigator.clipboard.writeText(pixKeys[selectedValue])
+      .then(() => {
+        alertMessage.textContent = 'Chave Pix copiada para a área de transferência!';
+        alertMessage.className = 'alert-message alert-success';
+        alertMessage.style.display = 'block';
+      })
+      .catch(() => {
+        alertMessage.textContent = 'Falha ao copiar a chave Pix.';
+        alertMessage.className = 'alert-message alert-error';
+        alertMessage.style.display = 'block';
+      });
+  });
 
-  // Validação geral do formulário
-  function validarFormulario() {
+  // Botão cancelar
+  document.getElementById('cancelBtn').addEventListener('click', () => {
+    pixKeySection.style.display = 'none';
+    actionButtons.style.display = 'none';
+    alertMessage.style.display = 'none';
+
+    amountButtons.forEach(b => {
+      b.classList.remove('selected');
+      b.setAttribute('aria-checked', 'false');
+      b.setAttribute('tabindex', '-1');
+    });
+    selectedValue = null;
+    selectedAmountDisplay.textContent = 'R$ 0';
+  });
+
+  // Botão confirmar depósito
+  document.getElementById('confirmBtn').addEventListener('click', () => {
+    // Validações simples
     let valid = true;
 
     if (!nomeInput.value.trim()) {
@@ -528,14 +563,16 @@
       nomeError.style.display = 'none';
     }
 
-    if (!telefoneInput.value.trim() || !validarTelefone(telefoneInput.value.trim())) {
+    // Telefone (regex simples)
+    const telRegex = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
+    if (!telRegex.test(telefoneInput.value.trim())) {
       telefoneError.style.display = 'block';
       valid = false;
     } else {
       telefoneError.style.display = 'none';
     }
 
-    if (!cpfInput.value.trim() || !validarCPF(cpfInput.value.trim())) {
+    if (!validarCPF(cpfInput.value.trim())) {
       cpfError.style.display = 'block';
       valid = false;
     } else {
@@ -549,77 +586,40 @@
       valorError.style.display = 'none';
     }
 
-    return valid;
-  }
-
-  // Form submit handler
-  document.getElementById('depositForm').addEventListener('submit', e => {
-    e.preventDefault();
-    alertMessage.style.display = 'none';
-
-    if (!validarFormulario()) {
-      showAlert('Por favor, preencha todos os campos corretamente.');
+    if (!valid) {
+      alertMessage.textContent = 'Corrija os erros acima para continuar.';
+      alertMessage.className = 'alert-message alert-error';
+      alertMessage.style.display = 'block';
       return;
     }
 
-    // Mostrar chave PIX e ações
-    pixKeyValue.textContent = pixKeys[selectedValue] || "Chave Pix indisponível";
-    pixKeySection.style.display = 'block';
-    actionButtons.style.display = 'flex';
-
-    // Scroll para chave PIX
-    pixKeySection.scrollIntoView({behavior: "smooth"});
-
-    // Desabilitar botão depositar para evitar múltiplos cliques
-    document.getElementById('deposit-now').disabled = true;
-  });
-
-  // Copiar chave Pix
-  document.getElementById('copyPixBtn').addEventListener('click', () => {
-    const pixText = pixKeyValue.textContent;
-    navigator.clipboard.writeText(pixText).then(() => {
-      showAlert('Chave Pix copiada para a área de transferência!', false);
-    }).catch(() => {
-      showAlert('Erro ao copiar chave Pix.', true);
-    });
-  });
-
-  // Cancelar ação (esconder chave e botões)
-  document.getElementById('cancelBtn').addEventListener('click', () => {
-    pixKeySection.style.display = 'none';
-    actionButtons.style.display = 'none';
     alertMessage.style.display = 'none';
-    document.getElementById('deposit-now').disabled = false;
-  });
 
-  // Confirmar depósito: salvar no Firebase e resetar
-  document.getElementById('confirmBtn').addEventListener('click', () => {
-    const nome = nomeInput.value.trim();
-    const telefone = telefoneInput.value.trim();
-    const cpf = cpfInput.value.trim();
-    const metodo = metodoSelect.value;
-    const valor = parseInt(selectedValue);
-
-    // Criar objeto a salvar
-    const novoDeposito = {
-      nome,
-      telefone,
-      cpf,
-      metodo,
-      valor,
+    // Enviar para Firebase
+    const deposito = {
+      nome: nomeInput.value.trim(),
+      telefone: telefoneInput.value.trim(),
+      cpf: cpfInput.value.trim(),
+      metodo: metodoSelect.value,
+      valor: Number(selectedValue),
+      chavePix: pixKeys[selectedValue],
       data: new Date().toISOString()
     };
 
-    // Salvar no nó 'depositos' com chave automática
-    const depositosRef = database.ref('depositos');
-    depositosRef.push(novoDeposito)
+    // Desativa botões para evitar múltiplos envios
+    actionButtons.querySelectorAll('button').forEach(b => b.disabled = true);
+
+    database.ref('depositos').push(deposito)
       .then(() => {
-        showAlert('Depósito registrado com sucesso! Aguarde confirmação.', false);
+        alertMessage.textContent = `Depósito de R$ ${selectedValue} registrado com sucesso!`;
+        alertMessage.className = 'alert-message alert-success';
+        alertMessage.style.display = 'block';
+
+        // Reset form e UI
         pixKeySection.style.display = 'none';
         actionButtons.style.display = 'none';
-        document.getElementById('deposit-now').disabled = false;
-        // Resetar formulário
-        document.getElementById('depositForm').reset();
+
+        depositForm.reset();
         selectedValue = null;
         selectedAmountDisplay.textContent = 'R$ 0';
         amountButtons.forEach(b => {
@@ -627,13 +627,25 @@
           b.setAttribute('aria-checked', 'false');
           b.setAttribute('tabindex', '-1');
         });
-        nomeInput.focus();
+
+        actionButtons.querySelectorAll('button').forEach(b => b.disabled = false);
       })
       .catch(() => {
-        showAlert('Erro ao registrar depósito. Tente novamente.', true);
-        document.getElementById('deposit-now').disabled = false;
+        alertMessage.textContent = 'Erro ao registrar depósito. Tente novamente.';
+        alertMessage.className = 'alert-message alert-error';
+        alertMessage.style.display = 'block';
+
+        actionButtons.querySelectorAll('button').forEach(b => b.disabled = false);
       });
   });
+
+  // Previne submit padrão do form para tratar pelo botão
+  const depositForm = document.getElementById('depositForm');
+  depositForm.addEventListener('submit', e => {
+    e.preventDefault();
+    document.getElementById('confirmBtn').click();
+  });
 </script>
+
 </body>
 </html>
