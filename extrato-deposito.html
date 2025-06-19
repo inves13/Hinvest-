@@ -34,15 +34,6 @@
     .aguardando {
       color: #f1c40f;
     }
-    button {
-      background-color: #2ecc71;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      padding: 5px 10px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
@@ -80,17 +71,10 @@
             <b>Valor:</b> R$${parseFloat(dep.valor).toFixed(2)}<br>
             <b>Método:</b> ${dep.metodo}<br>
             <b>Data:</b> ${new Date(dep.data).toLocaleString()}<br>
-            <span class="status ${statusClass}">${dep.status || "Aguardando"}</span><br>
-            ${dep.status !== "Aprovado" ? `<button onclick="aprovarDeposito('${child.key}')">Aprovar</button>` : ""}
+            <span class="status ${statusClass}">${dep.status || "Aguardando"}</span>
           </div>
         `;
       });
-    });
-  }
-
-  function aprovarDeposito(id) {
-    db.ref("depositos/" + id).update({ status: "Aprovado" }).then(() => {
-      alert("Depósito aprovado!");
     });
   }
 
