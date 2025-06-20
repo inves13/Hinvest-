@@ -1,3 +1,5 @@
+<!-- CÓDIGO ATUALIZADO: VERDE + AZUL BRILHANTE -->
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,56 +10,86 @@
     body {
       font-family: Arial, sans-serif;
       background: #000;
-      color: #fff;
+      color: white;
       padding: 20px;
     }
+
     h2 {
-      color: #0f0;
+      color: #00ffcc;
     }
+
     .info {
       margin-bottom: 10px;
+      color: #00ffcc;
     }
+
     label {
       display: block;
       margin-top: 10px;
+      color: #00ffcc;
     }
-    input, select, button {
+
+    input, select {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
       font-size: 16px;
-    }
-    button {
-      background: #28a745;
+      background-color: #111;
+      border: 2px solid #00ffcc;
+      border-radius: 8px;
       color: white;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      background: linear-gradient(45deg, #00ff88, #00bfff);
+      color: black;
       border: none;
+      border-radius: 10px;
       cursor: pointer;
+      transition: opacity 0.3s;
     }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
     button:disabled {
-      background: #666;
+      background: #555;
+      color: #aaa;
+      cursor: not-allowed;
     }
+
     .btn-extrato {
-      background: #007bff;
       margin-top: 20px;
     }
+
     .aviso {
       background: #111;
-      border: 1px solid #333;
+      border: 1px solid #00bfff;
       padding: 15px;
       margin-bottom: 20px;
-      border-radius: 5px;
-      color: #ff0;
+      border-radius: 10px;
+      color: #00ffcc;
     }
+
     .titulo-destaque {
       color: #00ffcc;
       font-size: 20px;
       margin-bottom: 10px;
+      font-weight: bold;
     }
+
     .extrato-retirada {
       margin-top: 20px;
       padding: 10px;
-      background: #333;
-      border-radius: 5px;
+      background: #222;
+      border-radius: 10px;
+      color: white;
     }
   </style>
 </head>
@@ -148,11 +180,7 @@
     }
 
     const temPlanoAtivo = data.investimentos && data.investimentos.some(investimento => investimento.status === 'comprado');
-    if (temPlanoAtivo) {
-      document.getElementById("confirmarSaque").disabled = false;
-    } else {
-      document.getElementById("confirmarSaque").disabled = true;
-    }
+    document.getElementById("confirmarSaque").disabled = !temPlanoAtivo;
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -165,7 +193,6 @@
       const data = snapshot.val() || {};
       atualizarTela(data);
 
-      // Carregar dados da conta bancária
       if (data.contaBancaria) {
         document.getElementById("nomeTitular").value = data.contaBancaria.nomeTitular;
         document.getElementById("tipoChave").value = data.contaBancaria.tipoChave;
@@ -185,11 +212,7 @@
     }
 
     userRef.update({
-      contaBancaria: {
-        nomeTitular: nome,
-        tipoChave: tipo,
-        chavePix: chave
-      }
+      contaBancaria: { nomeTitular: nome, tipoChave: tipo, chavePix: chave }
     });
 
     alert("Conta bancária salva com sucesso!");
@@ -226,11 +249,10 @@
       const valorLiquido = valor - (valor * 0.12);
       const dataSaque = new Date().toLocaleString();
 
-      // Atualizando o saldo corretamente
       userRef.update({
-        saldoCarteira: data.saldoCarteira - valor,  // Reduzindo o saldo na carteira
-        recebimento: (data.recebimento || 0) + valor,  // Aumentando o saldo de recebimento
-        retirada: (data.retirada || 0) + valor,  // Aumentando o valor retirado
+        saldoCarteira: data.saldoCarteira - valor,
+        recebimento: (data.recebimento || 0) + valor,
+        retirada: (data.retirada || 0) + valor,
         extrato: (data.extrato || []).concat([{ valor, valorLiquido, dataSolicitacao: dataSaque }])
       });
 
@@ -239,7 +261,6 @@
     });
   });
 
-  // Função do botão de extrato
   document.getElementById("verExtrato").addEventListener("click", () => {
     window.location.href = "extrato.html";
   });
