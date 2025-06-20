@@ -4,35 +4,59 @@
   <meta charset="UTF-8">
   <title>Extrato de Depósitos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
   <style>
     body {
-      background-color: #111;
-      color: #eee;
+      background-color: #000;
+      color: #fff;
       font-family: Arial, sans-serif;
       padding: 20px;
     }
+
     h2 {
-      color: #0f0;
-      margin-bottom: 20px;
       text-align: center;
+      color: #00ffcc;
+      margin-bottom: 20px;
     }
+
     .extrato-card {
-      background-color: #1b1b1b;
-      border: 1px solid #333;
-      border-radius: 6px;
+      background: #111;
+      border: 1px solid #00bfff;
+      border-radius: 10px;
       padding: 15px;
       margin-bottom: 15px;
+      box-shadow: 0 0 10px #00ffcc33;
+      transition: transform 0.2s;
     }
+
+    .extrato-card:hover {
+      transform: scale(1.02);
+    }
+
+    .extrato-card b {
+      color: #00ffcc;
+    }
+
     .status {
       font-weight: bold;
+      display: inline-block;
+      margin-top: 10px;
+      padding: 5px 10px;
+      border-radius: 5px;
     }
+
     .aprovado {
-      color: #2ecc71;
+      background: linear-gradient(45deg, #00ff88, #00bfff);
+      color: #000;
     }
+
     .aguardando {
-      color: #f1c40f;
+      background: #ffaa00;
+      color: #000;
     }
   </style>
 </head>
