@@ -11,47 +11,66 @@
       color: #fff;
       padding: 20px;
     }
+
     h2 {
-      color: #0f0;
+      color: #00ffcc;
     }
+
     .titulo-destaque {
       color: #00ffcc;
       font-size: 20px;
       margin-bottom: 10px;
     }
+
     .extrato {
-      background: #333;
-      border-radius: 5px;
+      background: #111;
+      border: 1px solid #00bfff;
+      border-radius: 10px;
       padding: 15px;
       margin-top: 20px;
     }
+
     .extrato div {
       padding: 10px;
-      border-bottom: 1px solid #444;
+      border-bottom: 1px solid #00bfff;
     }
+
     .extrato div:last-child {
       border-bottom: none;
     }
+
     .extrato strong {
       color: #00ffcc;
     }
+
     .status-aguardando {
-      color: #FFA500; /* Laranja */
+      color: #ffcc00;
+      font-weight: bold;
     }
+
     .status-sucesso {
-      color: #28a745; /* Verde */
+      color: #00ff88;
+      font-weight: bold;
     }
-    .btn-back {
+
+    .btn-back,
+    .btn-aprovar {
       display: inline-block;
-      margin-top: 20px;
+      margin-top: 15px;
       padding: 10px 20px;
-      background-color: #28a745;
-      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      color: black;
+      background: linear-gradient(45deg, #00ff88, #00bfff);
+      cursor: pointer;
       text-decoration: none;
-      border-radius: 5px;
+      transition: opacity 0.3s;
     }
-    .btn-back:hover {
-      background-color: #218838;
+
+    .btn-back:hover,
+    .btn-aprovar:hover {
+      opacity: 0.9;
     }
   </style>
 </head>
@@ -62,8 +81,7 @@
   <!-- Histórico de retiradas será exibido aqui -->
 </div>
 
-<!-- Alterado o link para voltar para saque.html -->
-<a href="saque.html" class="btn-back">Voltar para a Carteira</a>
+<a href="saque.html" class="btn-back">⬅ Voltar para a Carteira</a>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -93,15 +111,22 @@
       const data = snapshot.val();
       if (data && data.extrato && data.extrato.length > 0) {
         const extratoDiv = document.getElementById("extrato");
-        extratoDiv.innerHTML = ''; // Limpa o extrato antes de adicionar os novos dados.
-        data.extrato.forEach(saque => {
+        extratoDiv.innerHTML = '';
+
+        data.extrato.forEach((saque, index) => {
           const statusClass = saque.status === "Aguardando" ? "status-aguardando" : "status-sucesso";
+          const statusText = saque.status || "Aprovado";
+          const btnAprovar = saque.status === "Aguardando" ? `
+            <button class="btn-aprovar" onclick="aprovarSaque(${index})">Aprovar</button>
+          ` : '';
+
           extratoDiv.innerHTML += `
             <div>
               <strong>Retirada:</strong> R$ ${saque.valor.toFixed(2).replace(".", ",")} <br>
               <strong>Valor Recebido:</strong> R$ ${saque.valorLiquido.toFixed(2).replace(".", ",")} <br>
               <strong>Data:</strong> ${saque.dataSolicitacao} <br>
-              <strong>Status:</strong> <span class="${statusClass}">${saque.status}</span>
+              <strong>Status:</strong> <span class="${statusClass}">${statusText}</span><br>
+              ${btnAprovar}
             </div>
           `;
         });
@@ -110,6 +135,19 @@
       }
     });
   });
+
+  function aprovarSaque(index) {
+    userRef.once("value").then(snapshot => {
+      const data = snapshot.val();
+      if (data && data.extrato && data.extrato[index]) {
+        data.extrato[index].status = "Aprovado";
+        userRef.update({ extrato: data.extrato }).then(() => {
+          alert("Saque aprovado com sucesso!");
+          location.reload();
+        });
+      }
+    });
+  }
 </script>
 
 </body>
