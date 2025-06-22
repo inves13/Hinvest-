@@ -8,102 +8,129 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 
   <style>
     body {
-      background-color: #000;
-      color: #fff;
+      background-color: #111;
+      color: #ddd;
       font-family: Arial, sans-serif;
-      padding: 20px;
+      margin: 0;
+      padding: 0;
     }
 
     h2 {
       text-align: center;
-      color: #00ffcc;
-      margin-bottom: 20px;
+      color: #00ff88;
+      padding: 20px;
+    }
+
+    #depositosContainer {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 10px;
+      background: #222;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
     }
 
     .extrato-card {
-      background: #111;
-      border: 1px solid #00bfff;
-      border-radius: 10px;
+      background-color: #333;
       padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 0 10px #00ffcc33;
-      transition: transform 0.2s;
-    }
-
-    .extrato-card:hover {
-      transform: scale(1.02);
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: 1px solid #00ff88;
+      color: #fff;
     }
 
     .extrato-card b {
-      color: #00ffcc;
+      color: #00ff88;
     }
 
     .status {
       font-weight: bold;
-      display: inline-block;
+      padding: 5px;
       margin-top: 10px;
-      padding: 5px 10px;
+      display: inline-block;
       border-radius: 5px;
     }
 
     .aprovado {
-      background: linear-gradient(45deg, #00ff88, #00bfff);
+      background-color: #00ff88;
       color: #000;
     }
 
     .aguardando {
-      background: #ffaa00;
-      color: #000;
+      background-color: #ff4444;
+      color: #fff;
     }
   </style>
 </head>
 <body>
 
-<h2>Extrato de Depósitos</h2>
-<div id="depositosContainer"></div>
+  <h2>Extrato de Depósitos</h2>
+  <div id="depositosContainer"></div>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-    authDomain: "hinvest-f4354.firebaseapp.com",
-    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-    projectId: "hinvest-f4354",
-    storageBucket: "hinvest-f4354.appspot.com",
-    messagingSenderId: "646397677016",
-    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-  };
+  <script>
+    // Inicializando o Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+      authDomain: "hinvest-f4354.firebaseapp.com",
+      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+      projectId: "hinvest-f4354",
+      storageBucket: "hinvest-f4354.firebasestorage.app",
+      messagingSenderId: "646397677016",
+      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+    };
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
 
-  function carregarDepositos() {
-    const container = document.getElementById("depositosContainer");
-    db.ref("depositos").on("value", snapshot => {
-      container.innerHTML = "";
-      snapshot.forEach(child => {
-        const dep = child.val();
-        const statusClass = dep.status === "Aprovado" ? "aprovado" : "aguardando";
-        container.innerHTML += `
-          <div class="extrato-card">
-            <b>ID:</b> ${child.key}<br>
-            <b>Nome:</b> ${dep.nome}<br>
-            <b>Telefone:</b> ${dep.telefone}<br>
-            <b>CPF:</b> ${dep.cpf}<br>
-            <b>Valor:</b> R$${parseFloat(dep.valor).toFixed(2)}<br>
-            <b>Método:</b> ${dep.metodo}<br>
-            <b>Data:</b> ${new Date(dep.data).toLocaleString()}<br>
-            <span class="status ${statusClass}">${dep.status || "Aguardando"}</span>
-          </div>
-        `;
+    // Função para carregar os depósitos do usuário logado
+    function carregarDepositos() {
+      const telefone = localStorage.getItem("telefoneLogado"); // Acesso ao telefone armazenado
+      if (!telefone) {
+        // Se o usuário não estiver logado, redireciona para o login
+        window.location.href = 'index.html'; // Substitua 'index.html' pelo seu arquivo de login
+        return;
+      }
+
+      const container = document.getElementById("depositosContainer");
+      db.ref(`usuarios/${telefone}/extratosDepositos`).on("value", snapshot => {
+        container.innerHTML = "";
+        if (snapshot.exists()) {
+          snapshot.forEach(child => {
+            const dep = child.val();
+            const statusClass = dep.status === "Aprovado" ? "aprovado" : "aguardando";
+            container.innerHTML += `
+              <div class="extrato-card">
+                <b>ID:</b> ${child.key}<br>
+                <b>Valor:</b> R$${parseFloat(dep.valor).toFixed(2)}<br>
+                <b>Método de Pagamento:</b> ${dep.metodoPagamento}<br>
+                <b>Chave Pix:</b> ${dep.chavePix}<br>
+                <b>Data:</b> ${new Date(dep.data).toLocaleString()}<br>
+                <span class="status ${statusClass}">${dep.status || "Aguardando"}</span>
+              </div>
+            `;
+          });
+        } else {
+          container.innerHTML = "<p>Nenhum depósito encontrado.</p>";
+        }
       });
-    });
-  }
+    }
 
-  carregarDepositos();
-</script>
+    // Verifica se o usuário está logado e chama a função de carregar depósitos
+    window.onload = function() {
+      const telefone = localStorage.getItem("telefoneLogado");
+      if (telefone) {
+        carregarDepositos();
+      } else {
+        // Se o usuário não estiver logado, redireciona para o login
+        window.location.href = 'index.html'; // Substitua 'index.html' pelo seu arquivo de login
+      }
+    }
+  </script>
 
 </body>
 </html>
