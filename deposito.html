@@ -91,10 +91,6 @@
       margin-bottom: 20px;
     }
 
-    .form-group span[aria-hidden="true"] {
-      color: #ff4444;
-    }
-
     .amount-buttons {
       display: flex;
       flex-wrap: wrap;
@@ -193,14 +189,6 @@
 
     #action-buttons {
       margin-top: 15px;
-      display: none;
-    }
-
-    /* Mensagens de erro */
-    [role="alert"] {
-      margin-top: 4px;
-      font-size: 14px;
-      color: #ff4444;
       display: none;
     }
   </style>
@@ -385,10 +373,11 @@
       </div>
 
       <button
-        type="submit"
-        id="deposit-now"
+        type="button"
+        id="confirmDepositBtn"
+        class="continue-btn"
         aria-label="Depositar agora"
-      >Depositar agora</button>
+      >Confirmar Depósito</button>
     </form>
 
     <section class="pix-key" id="pix-key" aria-live="polite" aria-atomic="true">
@@ -398,254 +387,110 @@
       </button>
     </section>
 
-    <div class="action-buttons" id="action-buttons" role="group" aria-label="Ações para o depósito">
-      <button class="cancel-btn" type="button" id="cancelBtn">Cancelar</button>
-      <button class="continue-btn" type="button" id="confirmBtn">Confirmar Depósito</button>
-    </div>
-
     <div class="alert-message" id="alert-message" role="alert" aria-live="assertive"></div>
   </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-<script>
-  // Firebase config & init
-  const firebaseConfig = {
-    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-    authDomain: "hinvest-f4354.firebaseapp.com",
-    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-    projectId: "hinvest-f4354",
-    storageBucket: "hinvest-f4354.appspot.com",
-    messagingSenderId: "646397677016",
-    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script>
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+      authDomain: "hinvest-f4354.firebaseapp.com",
+      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+      projectId: "hinvest-f4354",
+      storageBucket: "hinvest-f4354.appspot.com",
+      messagingSenderId: "646397677016",
+      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-  // Elementos
-  const amountButtons = document.querySelectorAll('.amount-button');
-  const selectedAmountDisplay = document.getElementById('selected-amount');
-  const pixKeySection = document.getElementById('pix-key');
-  const pixKeyValue = document.getElementById('pix-key-value');
-  const actionButtons = document.getElementById('action-buttons');
-  const alertMessage = document.getElementById('alert-message');
+    // Pegar telefone do usuário logado
+    const telefone = localStorage.getItem("telefoneLogado");
 
-  const nomeInput = document.getElementById('nomeTitular');
-  const telefoneInput = document.getElementById('telefoneTitular');
-  const cpfInput = document.getElementById('cpfTitular');
-  const metodoSelect = document.getElementById('pix');
-
-  const nomeError = document.getElementById('nomeError');
-  const telefoneError = document.getElementById('telefoneError');
-  const cpfError = document.getElementById('cpfError');
-  const valorError = document.getElementById('valorError');
-
-  let selectedValue = null;
-
-  const pixKeys = {
-    "60": "pix60@hfinvest.com",
-    "160": "pix160@hfinvest.com",
-    "300": "pix300@hfinvest.com",
-    "450": "pix450@hfinvest.com",
-    "500": "pix500@hfinvest.com",
-    "650": "pix650@hfinvest.com",
-    "700": "pix700@hfinvest.com",
-    "850": "pix850@hfinvest.com",
-    "900": "pix900@hfinvest.com",
-    "1050": "pix1050@hfinvest.com"
-  };
-
-  // Máscara simples para CPF (xxx.xxx.xxx-xx)
-  cpfInput.addEventListener('input', () => {
-    let v = cpfInput.value.replace(/\D/g, '');
-    if (v.length > 11) v = v.slice(0,11);
-    v = v.replace(/(\d{3})(\d)/, '$1.$2');
-    v = v.replace(/(\d{3})(\d)/, '$1.$2');
-    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-    cpfInput.value = v;
-  });
-
-  // Validação CPF
-  function validarCPF(cpf) {
-    cpf = cpf.replace(/\D/g, '');
-    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
-    let soma = 0, resto;
-    for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i-1, i)) * (11 - i);
-    resto = (soma * 10) % 11;
-    if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf.substring(9, 10))) return false;
-    soma = 0;
-    for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
-    resto = (soma * 10) % 11;
-    if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf.substring(10, 11))) return false;
-    return true;
-  }
-
-  // Máscara simples para telefone (opcional, só para melhorar UX)
-  telefoneInput.addEventListener('input', () => {
-    let t = telefoneInput.value.replace(/\D/g, '');
-    if (t.length > 11) t = t.slice(0,11);
-    if (t.length > 10) {
-      t = t.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
-    } else if (t.length > 5) {
-      t = t.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-    } else if (t.length > 2) {
-      t = t.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
-    } else {
-      t = t.replace(/^(\d*)/, '($1');
-    }
-    telefoneInput.value = t;
-  });
-
-  // Controle seleção valor
-  amountButtons.forEach((btn, i) => {
-    btn.addEventListener('click', () => {
-      amountButtons.forEach(b => {
-        b.classList.remove('selected');
-        b.setAttribute('aria-checked', 'false');
-        b.setAttribute('tabindex', '-1');
-      });
-      btn.classList.add('selected');
-      btn.setAttribute('aria-checked', 'true');
-      btn.setAttribute('tabindex', '0');
-      selectedValue = btn.dataset.value;
-      selectedAmountDisplay.textContent = `R$ ${selectedValue}`;
-      valorError.style.display = 'none';
-
-      // Exibe chave pix correta e botoes
-      pixKeyValue.textContent = pixKeys[selectedValue];
-      pixKeySection.style.display = 'block';
-      actionButtons.style.display = 'block';
-      alertMessage.style.display = 'none';
-    });
-  });
-
-  // Copiar chave pix
-  document.getElementById('copyPixBtn').addEventListener('click', () => {
-    navigator.clipboard.writeText(pixKeys[selectedValue])
-      .then(() => {
-        alertMessage.textContent = 'Chave Pix copiada para a área de transferência!';
-        alertMessage.className = 'alert-message alert-success';
-        alertMessage.style.display = 'block';
-      })
-      .catch(() => {
-        alertMessage.textContent = 'Falha ao copiar a chave Pix.';
-        alertMessage.className = 'alert-message alert-error';
-        alertMessage.style.display = 'block';
-      });
-  });
-
-  // Botão cancelar
-  document.getElementById('cancelBtn').addEventListener('click', () => {
-    pixKeySection.style.display = 'none';
-    actionButtons.style.display = 'none';
-    alertMessage.style.display = 'none';
-
-    amountButtons.forEach(b => {
-      b.classList.remove('selected');
-      b.setAttribute('aria-checked', 'false');
-      b.setAttribute('tabindex', '-1');
-    });
-    selectedValue = null;
-    selectedAmountDisplay.textContent = 'R$ 0';
-  });
-
-  // Botão confirmar depósito
-  document.getElementById('confirmBtn').addEventListener('click', () => {
-    // Validações simples
-    let valid = true;
-
-    if (!nomeInput.value.trim()) {
-      nomeError.style.display = 'block';
-      valid = false;
-    } else {
-      nomeError.style.display = 'none';
+    if (!telefone) {
+      alert("Usuário não logado. Faça login novamente.");
+      window.location.href = "index.html"; // redireciona para login
     }
 
-    // Telefone (regex simples)
-    const telRegex = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
-    if (!telRegex.test(telefoneInput.value.trim())) {
-      telefoneError.style.display = 'block';
-      valid = false;
-    } else {
-      telefoneError.style.display = 'none';
-    }
+    // Elementos do DOM
+    const amountButtons = document.querySelectorAll('.amount-button');
+    const selectedAmountDisplay = document.getElementById('selected-amount');
+    let selectedValue = null;
 
-    if (!validarCPF(cpfInput.value.trim())) {
-      cpfError.style.display = 'block';
-      valid = false;
-    } else {
-      cpfError.style.display = 'none';
-    }
-
-    if (!selectedValue) {
-      valorError.style.display = 'block';
-      valid = false;
-    } else {
-      valorError.style.display = 'none';
-    }
-
-    if (!valid) {
-      alertMessage.textContent = 'Corrija os erros acima para continuar.';
-      alertMessage.className = 'alert-message alert-error';
-      alertMessage.style.display = 'block';
-      return;
-    }
-
-    alertMessage.style.display = 'none';
-
-    // Enviar para Firebase
-    const deposito = {
-      nome: nomeInput.value.trim(),
-      telefone: telefoneInput.value.trim(),
-      cpf: cpfInput.value.trim(),
-      metodo: metodoSelect.value,
-      valor: Number(selectedValue),
-      chavePix: pixKeys[selectedValue],
-      data: new Date().toISOString()
+    // Chaves Pix por valor
+    const pixKeys = {
+      "60": "pix60@hfinvest.com",
+      "160": "pix160@hfinvest.com",
+      "300": "pix300@hfinvest.com",
+      "450": "pix450@hfinvest.com",
+      "500": "pix500@hfinvest.com",
+      "650": "pix650@hfinvest.com",
+      "700": "pix700@hfinvest.com",
+      "850": "pix850@hfinvest.com",
+      "900": "pix900@hfinvest.com",
+      "1050": "pix1050@hfinvest.com"
     };
 
-    // Desativa botões para evitar múltiplos envios
-    actionButtons.querySelectorAll('button').forEach(b => b.disabled = true);
-
-    database.ref('depositos').push(deposito)
-      .then(() => {
-        alertMessage.textContent = `Depósito de R$ ${selectedValue} registrado com sucesso!`;
-        alertMessage.className = 'alert-message alert-success';
-        alertMessage.style.display = 'block';
-
-        // Reset form e UI
-        pixKeySection.style.display = 'none';
-        actionButtons.style.display = 'none';
-
-        depositForm.reset();
-        selectedValue = null;
-        selectedAmountDisplay.textContent = 'R$ 0';
-        amountButtons.forEach(b => {
-          b.classList.remove('selected');
-          b.setAttribute('aria-checked', 'false');
-          b.setAttribute('tabindex', '-1');
-        });
-
-        actionButtons.querySelectorAll('button').forEach(b => b.disabled = false);
-      })
-      .catch(() => {
-        alertMessage.textContent = 'Erro ao registrar depósito. Tente novamente.';
-        alertMessage.className = 'alert-message alert-error';
-        alertMessage.style.display = 'block';
-
-        actionButtons.querySelectorAll('button').forEach(b => b.disabled = false);
+    // Clique nos botões de valor
+    amountButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        selectedValue = button.getAttribute('data-value');
+        selectedAmountDisplay.textContent = `R$ ${selectedValue}`;
+        amountButtons.forEach(btn => btn.classList.remove('selected'));
+        button.classList.add('selected');
+        
+        const pixKey = pixKeys[selectedValue];
+        document.getElementById('pix-key-value').textContent = pixKey;
+        document.getElementById('pix-key').style.display = 'block';
       });
-  });
+    });
 
-  // Previne submit padrão do form para tratar pelo botão
-  const depositForm = document.getElementById('depositForm');
-  depositForm.addEventListener('submit', e => {
-    e.preventDefault();
-    document.getElementById('confirmBtn').click();
-  });
-</script>
+    // Copiar chave Pix
+    function copyPixKey() {
+      const pixKey = document.getElementById('pix-key-value').textContent;
+      navigator.clipboard.writeText(pixKey)
+        .then(() => alert('Chave Pix copiada com sucesso!'))
+        .catch(() => alert('Erro ao copiar chave Pix.'));
+    }
 
+    // Adicionar o ouvinte de evento ao botão de copiar chave
+    document.getElementById('copyPixBtn').addEventListener('click', () => {
+      copyPixKey(); // Chama a função de copiar chave Pix
+    });
+
+    // Confirmar depósito e salvar dentro do usuário
+    function confirmDeposit() {
+      const metodo = document.getElementById('pix').value;
+      const chave = pixKeys[selectedValue] || "chave_indefinida";
+      const data = new Date().toISOString();
+
+      const deposito = {
+        valor: Number(selectedValue),
+        metodoPagamento: metodo,
+        chavePix: chave,
+        data: data,
+        status: "pendente",
+        telefone: telefone
+      };
+
+      // Salvar dentro de usuarios/{telefone}/extratosDepositos
+      database.ref(`usuarios/${telefone}/extratosDepositos`).push(deposito)
+        .then(() => {
+          document.getElementById('alert-message').style.display = 'block';
+          document.getElementById('alert-message').textContent = 'Depósito registrado com sucesso. Aguarde confirmação.';
+        })
+        .catch((error) => {
+          alert("Erro ao registrar depósito: " + error.message);
+        });
+    }
+
+    // Adicionar o ouvinte de evento ao botão de confirmação
+    document.getElementById('confirmDepositBtn').addEventListener('click', () => {
+      confirmDeposit(); // Chama a função de confirmação do depósito
+    });
+  </script>
 </body>
 </html>
