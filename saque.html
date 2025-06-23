@@ -1,5 +1,3 @@
-<!-- CÓDIGO ATUALIZADO: VERDE + AZUL BRILHANTE -->
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -83,14 +81,6 @@
       margin-bottom: 10px;
       font-weight: bold;
     }
-
-    .extrato-retirada {
-      margin-top: 20px;
-      padding: 10px;
-      background: #222;
-      border-radius: 10px;
-      color: white;
-    }
   </style>
 </head>
 <body>
@@ -117,11 +107,7 @@
 <div class="info">Valor Recebido: <span id="valor-recebimento">R$ 0,00</span></div>
 <div class="info">Valor Retirado: <span id="valor-retirada">R$ 0,00</span></div>
 
-<h2>Extrato de Retirada</h2>
-<div id="extrato-retirada" class="extrato-retirada">
-  <!-- As retiradas realizadas serão exibidas aqui -->
-</div>
-
+<!-- Botão de Ver Extrato -->
 <button class="btn-extrato" id="verExtrato">Ver Extrato de Retirada</button>
 
 <h2>Conta Bancária</h2>
@@ -170,14 +156,6 @@
     document.getElementById("saldo-carteira").textContent = "R$ " + saldo.replace(".", ",");
     document.getElementById("valor-recebimento").textContent = "R$ " + receb.replace(".", ",");
     document.getElementById("valor-retirada").textContent = "R$ " + retirada.replace(".", ",");
-
-    const extratoDiv = document.getElementById("extrato-retirada");
-    if (data.extrato && data.extrato.length > 0) {
-      extratoDiv.innerHTML = "";
-      data.extrato.forEach(saque => {
-        extratoDiv.innerHTML += `<div><strong>Retirada:</strong> R$ ${saque.valor.toFixed(2).replace(".", ",")} <br><strong>Valor Recebido:</strong> R$ ${saque.valorLiquido.toFixed(2).replace(".", ",")} <br><strong>Data:</strong> ${saque.dataSolicitacao}</div><hr>`;
-      });
-    }
 
     const temPlanoAtivo = data.investimentos && data.investimentos.some(investimento => investimento.status === 'comprado');
     document.getElementById("confirmarSaque").disabled = !temPlanoAtivo;
@@ -257,7 +235,7 @@
       });
 
       alert("Saque solicitado com sucesso!");
-      atualizarTela({ ...data, extrato: [...(data.extrato || []), { valor, valorLiquido, dataSolicitacao: dataSaque }] });
+      atualizarTela(data);
     });
   });
 
