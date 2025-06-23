@@ -90,12 +90,36 @@
       font-size: 14px;
       color: yellow;
     }
+
+    /* Alerta animado */
+    #alerta-conectado {
+      position: fixed;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(145deg, #00ffcc, #007bff);
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 50px;
+      box-shadow: 0 0 20px #00ffcc;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.6s ease;
+    }
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
+
+  <!-- Alerta de login -->
+  <div id="alerta-conectado"><span style="font-size: 22px;">✅</span> Conectado com sucesso!</div>
+
   <div class="form-box">
     <img src="1004.png" alt="Imagem H Invest" style="display:block; margin: 0 auto 20px auto; max-width: 100%; border-radius: 12px;" />
     <h2>H Invest</h2>
@@ -161,6 +185,7 @@
   }
 
   const msg = document.getElementById("msg");
+  const alerta = document.getElementById("alerta-conectado");
 
   document.getElementById("cadastro-form").addEventListener("submit", function(e) {
     e.preventDefault();
@@ -229,6 +254,13 @@
             });
           }
 
+          alerta.style.top = "10px";
+          alerta.style.opacity = "1";
+          setTimeout(() => {
+            alerta.style.top = "-60px";
+            alerta.style.opacity = "0";
+          }, 1600);
+
           msg.innerText = "Redirecionando...";
           setTimeout(() => {
             window.location.href = "H.html";
@@ -260,6 +292,14 @@
 
         if (user.senha === senha) {
           localStorage.setItem("telefoneLogado", telefone);
+
+          alerta.style.top = "10px";
+          alerta.style.opacity = "1";
+          setTimeout(() => {
+            alerta.style.top = "-60px";
+            alerta.style.opacity = "0";
+          }, 1600);
+
           msg.innerText = "Login bem-sucedido!";
           setTimeout(() => {
             window.location.href = "H.html";
