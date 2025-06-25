@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serviço ao Cliente</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Serviço ao Cliente - H Investe</title>
     <style>
         body {
             background-color: #121212;
@@ -28,19 +28,25 @@
             margin: 15px 0;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .help-box:hover {
+            background-color: #333333;
         }
         .help-box img {
             width: 40px;
             height: 40px;
+            flex-shrink: 0;
         }
         .help-box a {
             color: white;
             text-decoration: none;
             font-size: 18px;
+            padding-left: 15px;
             flex-grow: 1;
             text-align: left;
-            padding-left: 15px;
         }
     </style>
 </head>
@@ -49,21 +55,10 @@
     <div class="container">
         <div class="title">Serviço ao Cliente</div>
 
-        <!-- WhatsApp Atendimento -->
+        <!-- Grupo H Investe -->
         <div class="help-box">
             <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-            <a href="https://whatsapp.com/channel/0029Vb5EKmi2ER6gXvscS50s" target="_blank">Grupo do WhatsApp</a>
-        </div>
-        <!-- Grupo Telegram -->
-        <div class="help-box">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
-            <a href="https://whatsapp.com/channel/0029VbALjOJIXnlkUMaala27" target="_blank">Grupo do Telegram</a>
-        </div>
-
-        <!-- Outro Grupo WhatsApp -->
-        <div class="help-box">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-            <a href="https://whatsapp.com/channel/0029VbALjOJIXnlkUMaala27" target="_blank">Grupo do WhatsApp</a>
+            <a href="https://chatgrupohinvest.netlify.app/" target="_blank" rel="noopener noreferrer">Entrar no Grupo H Investe</a>
         </div>
     </div>
 
