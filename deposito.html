@@ -3,494 +3,337 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Depósito Online</title>
+  <title>Depósito Online - Plataforma</title>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #111;
-      color: #ddd;
-      font-family: Arial, sans-serif;
-    }
-    .deposit-container {
-      max-width: 500px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #222;
-      border-radius: 12px;
-      box-shadow: 0 0 16px #00ff88aa;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #111;
-      padding: 15px 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
+    body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:0; }
+    .container { max-width:500px; margin:20px auto; background:#222; border-radius:12px; padding:20px; box-shadow:0 0 20px #00ff88aa; }
+    .header { display:flex; justify-content:space-between; align-items:center; color:#00ff88; }
+    .header h2 { margin:0; }
+    .btn { background:linear-gradient(135deg,#00ff88,#0088ff); border:none; padding:10px 16px; border-radius:8px; color:#000; font-weight:bold; cursor:pointer; text-decoration:none; }
+    .btn:hover { background:linear-gradient(135deg,#00cc66,#0055cc); color:#fff; }
+    .form-group { margin:15px 0; }
+    label { color:#00ff88; font-weight:bold; display:block; margin-bottom:6px; }
+    input, select { width:100%; padding:10px; border:2px solid #00ff88; border-radius:8px; background:#111; color:#eee; }
+    .amounts { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+    .amount-btn { flex:1 1 45%; text-align:center; padding:12px 0; background:#333; border:2px solid #555; border-radius:10px; cursor:pointer; color:#eee; font-weight:bold; user-select:none; }
+    .amount-btn.selected { background:linear-gradient(135deg,#00ff88,#0088ff); color:#000; border-color:#00ff88; }
+    .pix-box, .cronometro, .alerta { margin-top:15px; padding:10px; background:#111; border-radius:8px; }
+    .pix-box strong { color:#00ff88; }
+    .cronometro { color:#ff4444; font-size:18px; font-weight:bold; text-align:center; }
+    .hidden { display:none !important; }
+    #avisoPagamento {
+      margin-top: 12px;
       color: #00ff88;
-      user-select: none;
-    }
-    .header h2 {
-      margin: 0;
-      font-size: 24px;
-    }
-    .header-buttons {
-      display: flex;
-      gap: 10px;
-    }
-    .support-btn, .extrato-btn {
-      display: flex;
-      align-items: center;
-      background-color: #00ff88;
-      color: #000;
-      padding: 8px 14px;
-      border-radius: 6px;
-      text-decoration: none;
       font-weight: bold;
-      transition: background-color 0.3s ease;
-      user-select: none;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .support-btn:hover, .extrato-btn:hover {
-      background-color: #00cc66;
-    }
-    .support-btn img {
-      margin-right: 8px;
-    }
-
-    form label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: #00ff88;
-    }
-    form input[type="text"],
-    form input[type="tel"],
-    form select {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 2px solid #00ff88;
-      background-color: #222;
-      color: #ddd;
-      outline-offset: 2px;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    form input[type="text"]:focus,
-    form input[type="tel"]:focus,
-    form select:focus {
-      border-color: #0088ff;
-      box-shadow: 0 0 8px #0088ff;
-      background-color: #111;
-      color: #eee;
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .amount-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 8px;
-    }
-    .amount-button {
-      flex: 1 1 80px;
-      text-align: center;
-      padding: 12px 0;
-      border-radius: 12px;
-      background-color: #222;
-      color: #ccc;
-      font-weight: bold;
-      border: 2px solid #444;
-      cursor: pointer;
-      user-select: none;
-      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-    }
-    .amount-button:hover {
-      background-color: #004477;
-      border-color: #00aaff;
-      color: #00aaff;
-    }
-    .amount-button.selected {
-      background: linear-gradient(135deg, #00ff88, #0088ff);
-      border-color: #00ff88;
-      color: #000;
-      font-weight: 900;
-      box-shadow: 0 0 12px #00ff88aa;
-    }
-
-    #selected-amount {
-      color: #00ff88;
-      font-weight: 700;
-      font-size: 18px;
-    }
-
-    button[type="submit"],
-    .copy-btn,
-    .cancel-btn,
-    .continue-btn {
-      background: linear-gradient(135deg, #00ff88, #0088ff);
-      border: none;
-      border-radius: 10px;
-      padding: 12px 20px;
-      font-weight: 700;
-      font-size: 16px;
-      color: #000;
-      cursor: pointer;
-      user-select: none;
-      box-shadow: 0 0 10px #00ff88aa;
-      margin-top: 10px;
-      transition: background 0.3s ease;
-    }
-    button[type="submit"]:hover,
-    .copy-btn:hover,
-    .cancel-btn:hover,
-    .continue-btn:hover {
-      background: linear-gradient(135deg, #00cc66, #0055cc);
-      color: #eee;
-    }
-
-    .copy-btn, .cancel-btn, .continue-btn {
-      margin-right: 10px;
-    }
-
-    .pix-key {
-      margin-top: 20px;
-      background-color: #111;
-      padding: 15px 20px;
-      border-radius: 10px;
-      font-size: 18px;
-      color: #00ff88;
-      display: none;
-      user-select: all;
-      box-shadow: 0 0 10px #00ff88aa;
-    }
-    .pix-key strong {
-      font-weight: 900;
-      color: #0088ff;
-    }
-
-    .alert-message {
-      margin-top: 15px;
-      font-weight: bold;
-      font-size: 16px;
-      display: none;
-    }
-    .alert-error {
-      color: #ff4444;
-    }
-    .alert-success {
-      color: #00ff88;
-    }
-
-    #action-buttons {
-      margin-top: 15px;
-      display: none;
+      font-size: 0.95rem;
     }
   </style>
 </head>
 <body>
+<div class="container" role="main" aria-label="Formulário de depósito online">
+  <div class="header">
+    <h2>Depósito</h2>
+    <div>
+      <a class="btn" href="extrato-deposito.html" target="_blank" rel="noopener noreferrer" aria-label="Abrir extrato de depósitos">Extrato</a>
+      <a class="btn" href="https://wa.me/5575998282201" target="_blank" rel="noopener noreferrer" aria-label="Contato de suporte via WhatsApp">Suporte</a>
+    </div>
+  </div>
+  
+  <form id="depositForm" novalidate>
+    <div class="form-group">
+      <label for="nomeTitular">Nome Completo</label>
+      <input type="text" id="nomeTitular" name="nomeTitular" required aria-required="true" autocomplete="name" />
+    </div>
+    <div class="form-group">
+      <label for="telefoneTitular">Telefone</label>
+      <input type="tel" id="telefoneTitular" name="telefoneTitular" required aria-required="true" autocomplete="tel" placeholder="(00) 00000-0000"/>
+    </div>
+    <div class="form-group">
+      <label for="cpfTitular">CPF</label>
+      <input type="text" id="cpfTitular" name="cpfTitular" required aria-required="true" maxlength="14" placeholder="000.000.000-00" />
+    </div>
 
-  <div class="deposit-container" role="main" aria-label="Formulário de depósito online">
-    <div class="header">
-      <h2>Extrato do Depósito</h2>
-      <div class="header-buttons">
-        <a
-          class="extrato-btn"
-          href="extrato-deposito.html"
-          aria-label="Ver extrato de depósito"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Ver Extrato
-        </a>
-        <a
-          class="support-btn"
-          href="https://wa.me/5575998282201?text=Já%20recarreguei%20na%20plataforma%20da%20H%20investe"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Contato de suporte via WhatsApp"
-        >
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/6/69/WhatsApp.svg"
-            width="22"
-            height="22"
-            alt="Ícone WhatsApp"
-            aria-hidden="true"
-          />
-          Suporte
-        </a>
+    <div class="form-group">
+      <label for="pix">Método de Depósito</label>
+      <select id="pix" name="pix" aria-label="Método de depósito">
+        <option value="pix">PIX</option>
+        <option value="bank">Transferência Bancária</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Escolha o valor</label>
+      <div class="amounts" id="amountBtns" role="radiogroup" aria-label="Valores para depósito"></div>
+      <div id="avisoPagamento" class="hidden" aria-live="polite" aria-atomic="true">
+        ⚠️ Copie a chave PIX acima, vá até o banco e faça o pagamento. Depois volte aqui para confirmar o depósito.
       </div>
     </div>
 
-    <form id="depositForm" novalidate>
-      <div class="form-group">
-        <label for="nomeTitular">Nome Completo do Titular <span aria-hidden="true">*</span></label>
-        <input
-          type="text"
-          id="nomeTitular"
-          name="nomeTitular"
-          placeholder="Digite o nome completo"
-          autocomplete="name"
-          required
-          aria-required="true"
-          aria-describedby="nomeError"
-        />
-        <div id="nomeError" role="alert">Por favor, preencha o nome completo.</div>
-      </div>
+    <div class="pix-box hidden" id="pixBox" aria-live="polite" aria-atomic="true">
+      Chave Pix: <strong id="pixKey"></strong>
+      <button type="button" id="copyPixBtn" class="btn" aria-label="Copiar chave Pix para área de transferência" style="margin-top:10px;">Copiar chave Pix</button>
+    </div>
+    <div class="cronometro hidden" id="timer" aria-live="polite" aria-atomic="true" role="timer">05:00</div>
 
-      <div class="form-group">
-        <label for="telefoneTitular">Telefone do Titular <span aria-hidden="true">*</span></label>
-        <input
-          type="tel"
-          id="telefoneTitular"
-          name="telefoneTitular"
-          placeholder="(00) 00000-0000"
-          maxlength="15"
-          autocomplete="tel"
-          required
-          aria-required="true"
-          aria-describedby="telefoneError"
-          pattern="^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$"
-        />
-        <div id="telefoneError" role="alert">Por favor, preencha um telefone válido.</div>
-      </div>
+    <div class="form-group" id="actionButtons" style="margin-top:20px;">
+      <button type="button" class="btn hidden" id="confirmar" aria-label="Confirmar depósito">Confirmar Depósito</button>
+      <button type="button" class="btn hidden" id="cancelar" aria-label="Cancelar depósito" style="background: linear-gradient(135deg, #ff4444, #aa0000); margin-left:10px;">Cancelar</button>
+    </div>
 
-      <div class="form-group">
-        <label for="cpfTitular">CPF do Titular <span aria-hidden="true">*</span></label>
-        <input
-          type="text"
-          id="cpfTitular"
-          name="cpfTitular"
-          placeholder="000.000.000-00"
-          maxlength="14"
-          autocomplete="off"
-          required
-          aria-required="true"
-          aria-describedby="cpfError"
-        />
-        <div id="cpfError" role="alert">CPF inválido. Por favor, corrija.</div>
-      </div>
+    <div class="alerta hidden" id="alerta" role="alert" aria-live="assertive" style="margin-top:15px;"></div>
+  </form>
+</div>
 
-      <div class="form-group">
-        <label for="pix">Método de Depósito</label>
-        <select id="pix" name="pix" aria-label="Método de depósito">
-          <option value="pix">PIX</option>
-          <option value="bank">Transferência Bancária</option>
-        </select>
-      </div>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+<script>
+  // Firebase config e init
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.appspot.com",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-      <div class="form-group">
-        <p>Escolha o valor do depósito: <span aria-hidden="true">*</span></p>
-        <div class="amount-buttons" role="radiogroup" aria-label="Valores para depósito">
-          <button
-            type="button"
-            class="amount-button"
-            data-value="60"
-            role="radio"
-            aria-checked="false"
-            tabindex="0"
-          >R$ 60</button>
-          <button
-            type="button"
-            class="amount-button"
-            data-value="160"
-            role="radio"
-            aria-checked="false"
-            tabindex="-1"
-          >R$ 160</button>
-          <button
-            type="button"
-            class="amount-button"
-            data-value="300"
-            role="radio"
-            aria-checked="false"
-            tabindex="-1"
-          >R$ 300</button>
-          <button
-            type="button"
-            class="amount-button"
-            data-value="450"
-            role="radio"
-            aria-checked="false"
-            tabindex="-1"
-          >R$ 450</button>
-          <button
-            type="button"
-            class="amount-button"
-            data-value="500"
-            role="radio"
-            aria-checked="false"
-            tabindex="-1"
-          >R$ 500</button>
-          <button
-            type="button"
-            class="amount-button"
-            data-value="650"
-            role="radio"
-            aria-checked="false"
-            tabindex="-1"
-          >R$ 650</button>
-          <button
-            type="button"
-            class="amount-button"
-            data-value="700"
-            role="radio"
-            aria-checked="false"
-            tabindex="-1"
-          >R$ 700</button>
-          <button
-            type="button"
-            class="amount-button"
-            data-value="850"
-            role="radio"
-            aria-checked="false"
-            tabindex="-1"
-          >R$ 850</button>
-          <button
-            type="button"
-            class="amount-button"
-            data-value="900"
-            role="radio"
-            aria-checked="false"
-            tabindex="-1"
-          >R$ 900</button>
-          <button
-            type="button"
-            class="amount-button"
-            data-value="1050"
-            role="radio"
-            aria-checked="false"
-            tabindex="-1"
-          >R$ 1050</button>
-        </div>
-        <p style="margin-top:8px;">Valor Selecionado: <strong id="selected-amount">R$ 0</strong></p>
-        <div id="valorError" role="alert">Selecione um valor para continuar.</div>
-      </div>
+  // Valores e chaves PIX
+  const valores = [60,160,300,450,500,650,700,850,900,1050];
+  const pixKeys = {
+    "60": "pix60@hfinvest.com",
+    "160": "pix160@hfinvest.com",
+    "300": "pix300@hfinvest.com",
+    "450": "pix450@hfinvest.com",
+    "500": "pix500@hfinvest.com",
+    "650": "pix650@hfinvest.com",
+    "700": "pix700@hfinvest.com",
+    "850": "pix850@hfinvest.com",
+    "900": "pix900@hfinvest.com",
+    "1050": "pix1050@hfinvest.com"
+  };
 
-      <button
-        type="button"
-        id="confirmDepositBtn"
-        class="continue-btn"
-        aria-label="Depositar agora"
-      >Confirmar Depósito</button>
-    </form>
+  const telefoneLogado = localStorage.getItem("telefoneLogado") || "desconhecido";
 
-    <section class="pix-key" id="pix-key" aria-live="polite" aria-atomic="true">
-      <p>Chave Pix: <strong id="pix-key-value"></strong></p>
-      <button class="copy-btn" type="button" id="copyPixBtn" aria-label="Copiar chave Pix para área de transferência">
-        Copiar chave
-      </button>
-    </section>
+  const amountDiv = document.getElementById("amountBtns");
+  const pixBox = document.getElementById("pixBox");
+  const pixKeyEl = document.getElementById("pixKey");
+  const timerEl = document.getElementById("timer");
+  const confirmarBtn = document.getElementById("confirmar");
+  const cancelarBtn = document.getElementById("cancelar");
+  const alerta = document.getElementById("alerta");
+  const copyPixBtn = document.getElementById("copyPixBtn");
+  const avisoPagamento = document.getElementById("avisoPagamento");
+  const depositForm = document.getElementById("depositForm");
 
-    <div class="alert-message" id="alert-message" role="alert" aria-live="assertive"></div>
-  </div>
+  const nomeInput = document.getElementById("nomeTitular");
+  const telefoneInput = document.getElementById("telefoneTitular");
+  const cpfInput = document.getElementById("cpfTitular");
+  const metodoInput = document.getElementById("pix");
 
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <script>
-    // Configuração do Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-      authDomain: "hinvest-f4354.firebaseapp.com",
-      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-      projectId: "hinvest-f4354",
-      storageBucket: "hinvest-f4354.appspot.com",
-      messagingSenderId: "646397677016",
-      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+  let valorSelecionado = null;
+  let timerInterval = null;
+  let tempoRestante = 300;
 
-    // Pegar telefone do usuário logado
-    const telefone = localStorage.getItem("telefoneLogado");
-
-    if (!telefone) {
-      alert("Usuário não logado. Faça login novamente.");
-      window.location.href = "index.html"; // redireciona para login
-    }
-
-    // Elementos do DOM
-    const amountButtons = document.querySelectorAll('.amount-button');
-    const selectedAmountDisplay = document.getElementById('selected-amount');
-    let selectedValue = null;
-
-    // Chaves Pix por valor
-    const pixKeys = {
-      "60": "00020101021226900014br.gov.bcb.pix2568qrcode.siliumpay.com.br/dynamic/b443fe52-bc51-42b1-816f-c0d66f8d3e795204000053039865802BR5910TOTAL LTDA6009Sao Paulo62070503***63042F1E",
-      "160": "pix160@hfinvest.com",
-      "300": "pix300@hfinvest.com",
-      "450": "pix450@hfinvest.com",
-      "500": "pix500@hfinvest.com",
-      "650": "pix650@hfinvest.com",
-      "700": "pix700@hfinvest.com",
-      "850": "pix850@hfinvest.com",
-      "900": "pix900@hfinvest.com",
-      "1050": "pix1050@hfinvest.com"
-    };
-
-    // Clique nos botões de valor
-    amountButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        selectedValue = button.getAttribute('data-value');
-        selectedAmountDisplay.textContent = `R$ ${selectedValue}`;
-        amountButtons.forEach(btn => btn.classList.remove('selected'));
-        button.classList.add('selected');
-        
-        const pixKey = pixKeys[selectedValue];
-        document.getElementById('pix-key-value').textContent = pixKey;
-        document.getElementById('pix-key').style.display = 'block';
-      });
+  function criarBotoesValores() {
+    valores.forEach((v, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "amount-btn";
+      btn.textContent = `R$ ${v}`;
+      btn.setAttribute("role", "radio");
+      btn.setAttribute("aria-checked", "false");
+      btn.tabIndex = i === 0 ? 0 : -1;
+      btn.addEventListener("click", () => selecionarValor(btn, v));
+      amountDiv.appendChild(btn);
     });
+  }
 
-    // Copiar chave Pix
-    function copyPixKey() {
-      const pixKey = document.getElementById('pix-key-value').textContent;
-      navigator.clipboard.writeText(pixKey)
-        .then(() => alert('Chave Pix copiada com sucesso!'))
-        .catch(() => alert('Erro ao copiar chave Pix.'));
+  function validarFormulario() {
+    const nomeVal = nomeInput.value.trim();
+    const telefoneVal = telefoneInput.value.trim();
+    const cpfVal = cpfInput.value.trim();
+
+    if(nomeVal.length < 3) return false;
+
+    // Telefone regex (com máscara, já formatado)
+    const telRegex = /^\(\d{2}\)\s?\d{4,5}-\d{4}$/;
+    if(!telRegex.test(telefoneVal)) return false;
+
+    // CPF formatado: 000.000.000-00
+    const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+    if(!cpfRegex.test(cpfVal)) return false;
+
+    return true;
+  }
+
+  function selecionarValor(btn, valor) {
+    if(!validarFormulario()) {
+      alerta.textContent = "Preencha nome, telefone e CPF corretamente antes de escolher o valor.";
+      alerta.classList.remove("hidden");
+      avisoPagamento.classList.add("hidden");
+      return;
     }
+    alerta.classList.add("hidden");
 
-    // Adicionar o ouvinte de evento ao botão de copiar chave
-    document.getElementById('copyPixBtn').addEventListener('click', () => {
-      copyPixKey(); // Chama a função de copiar chave Pix
+    amountDiv.querySelectorAll("button").forEach(b => {
+      b.classList.remove("selected");
+      b.setAttribute("aria-checked", "false");
+      b.tabIndex = -1;
     });
+    btn.classList.add("selected");
+    btn.setAttribute("aria-checked", "true");
+    btn.tabIndex = 0;
 
-    // Confirmar depósito e salvar dentro do usuário
-    function confirmDeposit() {
-      const metodo = document.getElementById('pix').value;
-      const chave = pixKeys[selectedValue] || "chave_indefinida";
-      const data = new Date().toISOString();
+    valorSelecionado = valor;
 
-      const deposito = {
-        valor: Number(selectedValue),
-        metodoPagamento: metodo,
-        chavePix: chave,
-        data: data,
-        status: "pendente",
-        telefone: telefone
-      };
+    pixKeyEl.textContent = pixKeys[valor];
+    pixBox.classList.remove("hidden");
+    confirmarBtn.classList.remove("hidden");
+    cancelarBtn.classList.remove("hidden");
+    timerEl.classList.remove("hidden");
+    avisoPagamento.classList.remove("hidden");
 
-      // Salvar dentro de usuarios/{telefone}/extratosDepositos
-      database.ref(`usuarios/${telefone}/extratosDepositos`).push(deposito)
-        .then(() => {
-          document.getElementById('alert-message').style.display = 'block';
-          document.getElementById('alert-message').textContent = 'Depósito registrado com sucesso. Aguarde confirmação.';
-        })
-        .catch((error) => {
-          alert("Erro ao registrar depósito: " + error.message);
+    iniciarCronometro();
+  }
+
+  copyPixBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText(pixKeyEl.textContent).then(() => {
+      alerta.textContent = "Chave Pix copiada com sucesso!";
+      alerta.classList.remove("hidden");
+    }).catch(() => {
+      alerta.textContent = "Erro ao copiar chave Pix.";
+      alerta.classList.remove("hidden");
+    });
+  });
+
+  function iniciarCronometro() {
+    clearInterval(timerInterval);
+    tempoRestante = 300;
+    atualizarTimer();
+
+    timerInterval = setInterval(() => {
+      tempoRestante--;
+      atualizarTimer();
+      if(tempoRestante <= 0) {
+        clearInterval(timerInterval);
+        alerta.textContent = "Tempo esgotado. Gere o código novamente.";
+        alerta.classList.remove("hidden");
+        pixBox.classList.add("hidden");
+        confirmarBtn.classList.add("hidden");
+        cancelarBtn.classList.add("hidden");
+        timerEl.classList.add("hidden");
+        avisoPagamento.classList.add("hidden");
+        valorSelecionado = null;
+        amountDiv.querySelectorAll("button").forEach(b => {
+          b.classList.remove("selected");
+          b.setAttribute("aria-checked", "false");
+          b.tabIndex = -1;
         });
+      }
+    }, 1000);
+  }
+
+  function atualizarTimer() {
+    const min = Math.floor(tempoRestante / 60);
+    const seg = tempoRestante % 60;
+    timerEl.textContent = `${min.toString().padStart(2,"0")}:${seg.toString().padStart(2,"0")}`;
+  }
+
+  function registrarDeposito(status) {
+    if(!valorSelecionado) {
+      alerta.textContent = "Nenhum valor selecionado.";
+      alerta.classList.remove("hidden");
+      return;
+    }
+    if(!validarFormulario()) {
+      alerta.textContent = "Preencha nome, telefone e CPF corretamente.";
+      alerta.classList.remove("hidden");
+      return;
     }
 
-    // Adicionar o ouvinte de evento ao botão de confirmação
-    document.getElementById('confirmDepositBtn').addEventListener('click', () => {
-      confirmDeposit(); // Chama a função de confirmação do depósito
+    const dataAtual = new Date().toISOString();
+
+    const deposito = {
+      nome: nomeInput.value.trim(),
+      telefone: telefoneInput.value.trim(),
+      cpf: cpfInput.value.trim(),
+      valor: valorSelecionado,
+      chavePix: pixKeys[valorSelecionado],
+      metodoPagamento: metodoInput.value,
+      status: status,
+      data: dataAtual,
+      telefoneLogado: telefoneLogado
+    };
+
+    db.ref(`usuarios/${telefoneLogado}/extratosDepositos`).push(deposito)
+    .then(() => {
+      alerta.textContent = `Depósito ${status} com sucesso.`;
+      alerta.classList.remove("hidden");
+      resetarFormulario();
+    })
+    .catch(erro => {
+      alerta.textContent = `Erro ao registrar depósito: ${erro.message}`;
+      alerta.classList.remove("hidden");
     });
-  </script>
+  }
+
+  function resetarFormulario() {
+    valorSelecionado = null;
+    clearInterval(timerInterval);
+    timerEl.classList.add("hidden");
+    pixBox.classList.add("hidden");
+    confirmarBtn.classList.add("hidden");
+    cancelarBtn.classList.add("hidden");
+    alerta.classList.add("hidden");
+    avisoPagamento.classList.add("hidden");
+    timerEl.textContent = "05:00";
+    amountDiv.querySelectorAll("button").forEach(b => {
+      b.classList.remove("selected");
+      b.setAttribute("aria-checked", "false");
+      b.tabIndex = -1;
+    });
+    depositForm.reset();
+  }
+
+  confirmarBtn.addEventListener("click", () => registrarDeposito("pendente"));
+  cancelarBtn.addEventListener("click", () => registrarDeposito("cancelado"));
+
+  // Máscara para telefone
+  telefoneInput.addEventListener("input", e => {
+    let v = e.target.value.replace(/\D/g,"");
+    if(v.length > 11) v = v.slice(0,11);
+    if(v.length > 10) {
+      // (00) 00000-0000
+      v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
+    } else if(v.length > 5) {
+      // (00) 0000-0000
+      v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+    } else if(v.length > 2) {
+      v = v.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
+    } else if(v.length > 0) {
+      v = v.replace(/^(\d*)/, "($1");
+    }
+    e.target.value = v;
+  });
+
+  // Máscara para CPF
+  cpfInput.addEventListener("input", e => {
+    let v = e.target.value.replace(/\D/g,"");
+    if(v.length > 11) v = v.slice(0,11);
+    if(v.length > 9) {
+      v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, "$1.$2.$3-$4");
+    } else if(v.length > 6) {
+      v = v.replace(/^(\d{3})(\d{3})(\d{0,3}).*/, "$1.$2.$3");
+    } else if(v.length > 3) {
+      v = v.replace(/^(\d{3})(\d{0,3}).*/, "$1.$2");
+    }
+    e.target.value = v;
+  });
+
+  criarBotoesValores();
+</script>
 </body>
 </html>
