@@ -1,66 +1,177 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Serviço ao Cliente - H Investe</title>
-    <style>
-        body {
-            background-color: #121212;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        .title {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .help-box {
-            background-color: #1e1e1e;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .help-box:hover {
-            background-color: #333333;
-        }
-        .help-box img {
-            width: 40px;
-            height: 40px;
-            flex-shrink: 0;
-        }
-        .help-box a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            padding-left: 15px;
-            flex-grow: 1;
-            text-align: left;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Grupo H Invest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #ece5dd; }
+    .header { background: #075E54; color: #fff; padding: 12px; display: flex; align-items: center; justify-content: space-between; }
+    .header-title { font-size: 18px; font-weight: bold; }
+    .header-online { font-size: 13px; }
+    .messages { height: 450px; overflow-y: scroll; padding: 10px; background: #d2dbdc; }
+    .msg { max-width: 70%; padding: 8px 12px; margin: 8px 0; border-radius: 8px; word-wrap: break-word; position: relative; }
+    .mine { background: #dcf8c6; margin-left: auto; text-align: right; }
+    .other { background: #fff; margin-right: auto; text-align: left; }
+    .msg img { max-width: 100%; border-radius: 5px; margin-top: 5px; }
+    audio { margin-top: 5px; width: 100%; }
+    .delete-btn { position: absolute; top: 5px; right: 5px; background: transparent; border: none; color: red; cursor: pointer; font-size: 16px; }
+    .msg-time { font-size: 11px; color: #555; display: block; margin-top: 4px; }
+    .input-area { display: flex; align-items: center; padding: 10px; background: #f0f0f0; position: fixed; bottom: 0; width: 100%; }
+    input[type="text"] { flex: 1; padding: 10px; border: none; border-radius: 30px; margin-right: 5px; }
+    button, input[type="file"]::file-selector-button { background: #075E54; color: #fff; border: none; border-radius: 50%; padding: 10px; margin: 0 5px; cursor: pointer; }
+    input[type="file"] { display: none; }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="title">Serviço ao Cliente</div>
+<div class="header">
+  <div>
+    <div class="header-title">Grupo H Invest</div>
+    <div class="header-online" id="onlineUsers">0 online</div>
+  </div>
+  <div id="msgCount" style="font-size: 13px;">0 mensagens</div>
+</div>
 
-        <!-- Grupo H Investe -->
-        <div class="help-box">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-            <a href="https://chatgrupohinvest.netlify.app/" target="_blank" rel="noopener noreferrer">Entrar no Grupo H Investe</a>
-        </div>
-    </div>
+<div class="messages" id="messages"></div>
+
+<div class="input-area">
+  <input type="text" id="messageInput" placeholder="Mensagem">
+  <input type="file" id="imageInput" accept="image/*">
+  <button onclick="document.getElementById('imageInput').click()">📎</button>
+  <button id="audioBtn">🎙️</button>
+  <button onclick="sendMessage()">➤</button>
+</div>
+
+<audio id="newMsgSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAUPLelJ5YJ4KVP_78mCxbg00VnFvsNlp4",
+  authDomain: "chat-grupo-online.firebaseapp.com",
+  databaseURL: "https://chat-grupo-online-default-rtdb.firebaseio.com",
+  projectId: "chat-grupo-online",
+  storageBucket: "chat-grupo-online.appspot.com",
+  messagingSenderId: "14780677234",
+  appId: "1:14780677234:web:693437d1c67195057516eb"
+};
+firebase.initializeApp(firebaseConfig);
+
+const database = firebase.database();
+const storage = firebase.storage();
+const sound = document.getElementById("newMsgSound");
+
+let userName = prompt("Seu nome:");
+if (!userName) userName = "Anônimo";
+
+const onlineRef = database.ref("online/" + userName);
+onlineRef.set(true);
+onlineRef.onDisconnect().remove();
+
+function updateOnlineUsers() {
+  database.ref("online").once("value", (snapshot) => {
+    const users = snapshot.val();
+    const count = users ? Object.keys(users).length : 0;
+    document.getElementById("onlineUsers").textContent = `${count} online`;
+  });
+}
+setInterval(updateOnlineUsers, 3000);
+
+let msgCount = 0;
+database.ref("messages").on("child_added", (snapshot) => {
+  const msg = snapshot.val();
+  const key = snapshot.key;
+  const msgDiv = document.createElement("div");
+  msgDiv.classList.add("msg");
+  msgDiv.classList.add(msg.sender === userName ? "mine" : "other");
+
+  if (msg.text) msgDiv.innerHTML += `<strong>${msg.sender}:</strong> ${msg.text}<br>`;
+  if (msg.image) {
+    const imgTag = document.createElement("img");
+    imgTag.src = msg.image;
+    msgDiv.appendChild(imgTag);
+  }
+  if (msg.audio) {
+    const audioTag = document.createElement("audio");
+    audioTag.controls = true;
+    audioTag.src = msg.audio;
+    msgDiv.appendChild(audioTag);
+  }
+
+  if (msg.sender === userName) {
+    const delBtn = document.createElement("button");
+    delBtn.className = "delete-btn";
+    delBtn.textContent = "🗑️";
+    delBtn.onclick = () => {
+      if (confirm("Apagar esta mensagem?")) {
+        database.ref("messages/" + key).remove();
+        msgDiv.remove();
+        msgCount--;
+        document.getElementById("msgCount").textContent = `${msgCount} mensagens`;
+      }
+    };
+    msgDiv.appendChild(delBtn);
+  }
+
+  document.getElementById("messages").appendChild(msgDiv);
+  document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+
+  msgCount++;
+  document.getElementById("msgCount").textContent = `${msgCount} mensagens`;
+
+  if (msg.sender !== userName) sound.play().catch(() => {});
+});
+
+function sendMessage() {
+  const text = document.getElementById("messageInput").value;
+  const now = new Date();
+  const time = now.toLocaleTimeString("pt-BR", {hour:'2-digit',minute:'2-digit'});
+  if (text.trim() !== "") {
+    database.ref("messages").push({ sender: userName, text: text, time: time });
+  }
+  document.getElementById("messageInput").value = "";
+}
+
+let mediaRecorder;
+let audioChunks = [];
+
+const audioBtn = document.getElementById("audioBtn");
+
+audioBtn.addEventListener("mousedown", () => {
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.start();
+    audioBtn.textContent = "⏹️";
+    mediaRecorder.addEventListener("dataavailable", event => {
+      audioChunks.push(event.data);
+    });
+  }).catch(err => {
+    alert("Permissão de microfone negada ou indisponível.");
+  });
+});
+
+audioBtn.addEventListener("mouseup", () => {
+  if (mediaRecorder && mediaRecorder.state === "recording") {
+    mediaRecorder.stop();
+    audioBtn.textContent = "🎙️";
+    mediaRecorder.addEventListener("stop", () => {
+      const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+      const fileName = 'audio_' + Date.now() + '.webm';
+      const storageRef = storage.ref('chat_audios/' + fileName);
+      storageRef.put(audioBlob).then(snapshot => snapshot.ref.getDownloadURL()).then(url => {
+        const now = new Date();
+        const time = now.toLocaleTimeString("pt-BR", {hour:'2-digit',minute:'2-digit'});
+        database.ref("messages").push({ sender: userName, audio: url, time: time });
+      });
+    });
+  }
+});
+</script>
 
 </body>
 </html>
