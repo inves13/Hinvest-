@@ -137,6 +137,19 @@
   let timerInterval = null;
   let tempoRestante = 300;
 
+  // Função para bloquear depósito antes de 01/07/2025
+  function verificarDisponibilidadeDeposito() {
+    const hoje = new Date();
+    const liberadoEm = new Date("2025-07-01");
+
+    if (hoje < liberadoEm) {
+      alerta.textContent = "⚠️ Depósito indisponível no momento. Liberado a partir de 01/07/2025.";
+      alerta.classList.remove("hidden");
+      return false;
+    }
+    return true;
+  }
+
   function criarBotoesValores() {
     valores.forEach((v, i) => {
       const btn = document.createElement("button");
@@ -170,6 +183,8 @@
   }
 
   function selecionarValor(btn, valor) {
+    if(!verificarDisponibilidadeDeposito()) return;
+
     if(!validarFormulario()) {
       alerta.textContent = "Preencha nome, telefone e CPF corretamente antes de escolher o valor.";
       alerta.classList.remove("hidden");
@@ -298,7 +313,10 @@
     depositForm.reset();
   }
 
-  confirmarBtn.addEventListener("click", () => registrarDeposito("pendente"));
+  confirmarBtn.addEventListener("click", () => {
+    if(!verificarDisponibilidadeDeposito()) return;
+    registrarDeposito("pendente");
+  });
   cancelarBtn.addEventListener("click", () => registrarDeposito("cancelado"));
 
   // Máscara para telefone
