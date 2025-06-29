@@ -92,7 +92,6 @@
   </style>
 </head>
 <body>
-
 <div class="logo"><img src="1004.png" alt="Logo" /></div>
 
 <section class="usuario-info">
@@ -177,6 +176,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const userRef = db.ref("usuarios/" + userId);
   userRef.once("value").then(snapshot => {
     const data = snapshot.val() || {};
+
+    // Dá bônus de R$ 20 apenas uma vez
+    if (!data.bonusRecebido) {
+      const novoSaldo = (parseFloat(data.saldoCarteira) || 0) + 20;
+      userRef.update({
+        saldoCarteira: novoSaldo,
+        bonusRecebido: true
+      });
+      data.saldoCarteira = novoSaldo;
+    }
+
     document.getElementById("usuario-nome").innerText = data.nome || "Usuário";
     document.getElementById("usuario-telefone").innerText = userId.replace(/^(\d{5})(\d{2})(\d{4})$/, "$1**$3");
     document.getElementById("saldo-carteira").innerText = `R$ ${(data.saldoCarteira || 0).toFixed(2)}`;
