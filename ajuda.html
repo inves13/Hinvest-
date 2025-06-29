@@ -1,57 +1,71 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Grupo H Invest</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Chat Grupo + Suporte Simples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; background: #ece5dd; }
-    .header { background: #075E54; color: #fff; padding: 12px; display: flex; align-items: center; justify-content: space-between; }
-    .header-title { font-size: 18px; font-weight: bold; }
-    .header-online { font-size: 13px; }
-    .messages { height: 450px; overflow-y: scroll; padding: 10px; background: #d2dbdc; }
-    .msg { max-width: 70%; padding: 8px 12px; margin: 8px 0; border-radius: 8px; word-wrap: break-word; position: relative; }
+    body { font-family: Arial, sans-serif; margin: 0; background: #ece5dd; }
+    #loginDiv, #chatDiv, #suporteDiv { max-width: 480px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; height: 100vh; box-sizing: border-box; display: flex; flex-direction: column; }
+    #chatDiv, #suporteDiv { display: none; }
+    .header { background: #075E54; color: #fff; padding: 10px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center; }
+    #messages, #messagesSuporte { flex: 1; overflow-y: auto; background: #d2dbdc; padding: 10px; border-radius: 0 0 8px 8px; margin-top: 10px; }
+    .msg { margin-bottom: 10px; max-width: 70%; padding: 8px 12px; border-radius: 8px; background: #fff; word-wrap: break-word; }
     .mine { background: #dcf8c6; margin-left: auto; text-align: right; }
-    .other { background: #fff; margin-right: auto; text-align: left; }
-    .msg img { max-width: 100%; border-radius: 5px; margin-top: 5px; }
-    audio { margin-top: 5px; width: 100%; }
-    .delete-btn { position: absolute; top: 5px; right: 5px; background: transparent; border: none; color: red; cursor: pointer; font-size: 16px; }
-    .msg-time { font-size: 11px; color: #555; display: block; margin-top: 4px; }
-    .input-area { display: flex; align-items: center; padding: 10px; background: #f0f0f0; position: fixed; bottom: 0; width: 100%; }
-    input[type="text"] { flex: 1; padding: 10px; border: none; border-radius: 30px; margin-right: 5px; }
-    button, input[type="file"]::file-selector-button { background: #075E54; color: #fff; border: none; border-radius: 50%; padding: 10px; margin: 0 5px; cursor: pointer; }
-    input[type="file"] { display: none; }
-    #audioBtn { font-size: 24px; }
-    .input-area button { border-radius: 50%; padding: 10px; }
-    .input-area { background-color: #ffffff; }
-    .msg-time { font-size: 10px; color: #bbb; }
+    .msg-time { font-size: 10px; color: #555; display: block; margin-top: 4px; font-weight: normal; }
+    #inputArea, #inputAreaSuporte { display: flex; margin-top: 10px; }
+    input[type=text] { flex: 1; padding: 10px; border-radius: 30px; border: 1px solid #ccc; }
+    button { margin-left: 5px; background: #075E54; color: #fff; border: none; border-radius: 30px; padding: 10px 25px; cursor: pointer; font-weight: bold; font-size: 16px; }
+    button#enterBtn { background: #128C7E; border-radius: 30px; padding: 12px 30px; font-size: 18px; margin-top: 15px; }
+    #logoutBtn { background: #a00; border-radius: 5px; padding: 5px 10px; }
+    #backBtn { margin-left: 5px; background: #128C7E; border-radius: 5px; padding: 5px 10px; }
+    img.msg-image { max-width: 100%; border-radius: 5px; margin-top: 5px; }
+    #chatList { max-height: 200px; overflow-y: scroll; background: #eee; margin: 10px 0; padding: 10px; border-radius: 8px; flex-shrink: 0; }
+    #chatList div { padding: 8px; border-bottom: 1px solid #ccc; cursor: pointer; }
+    #chatList div:hover { background: #ddd; }
   </style>
 </head>
 <body>
 
-<div class="header">
-  <div>
-    <div class="header-title">Grupo H Invest</div>
-    <div class="header-online" id="onlineUsers">0 online</div>
+<div id="loginDiv">
+  <h2>Digite seu nome para entrar</h2>
+  <input type="text" id="nameInput" placeholder="Seu nome completo" />
+  <button id="enterBtn">Entrar</button>
+</div>
+
+<div id="chatDiv">
+  <div class="header">
+    <div><strong>Grupo H Invest</strong> <span id="onlineCount">0 online</span></div>
+    <div>
+      <button id="toSuporteBtn">Falar com Suporte</button>
+      <button id="logoutBtn">Sair</button>
+    </div>
   </div>
-  <div id="msgCount" style="font-size: 13px;">0 mensagens</div>
+  <div id="messages"></div>
+  <div id="inputArea">
+    <input type="text" id="messageInput" placeholder="Mensagem..." />
+    <button id="sendBtn">Enviar</button>
+  </div>
 </div>
 
-<div class="messages" id="messages"></div>
-
-<div class="input-area">
-  <input type="text" id="messageInput" placeholder="Mensagem">
-  <input type="file" id="imageInput" accept="image/*">
-  <button onclick="document.getElementById('imageInput').click()">📎</button>
-  <button id="audioBtn" onclick="startAudioRecording()">🎙️</button>
-  <button onclick="sendMessage()">➤</button>
+<div id="suporteDiv">
+  <div class="header">
+    <div><strong>Suporte Privado</strong> <span id="currentChatName">Usuário</span></div>
+    <div>
+      <button id="backToGroupBtn">Voltar ao Grupo</button>
+      <button id="logoutBtn2">Sair</button>
+    </div>
+  </div>
+  <div id="chatList"></div>
+  <div id="messagesSuporte"></div>
+  <div id="inputAreaSuporte" style="display:none;">
+    <input type="text" id="messageInputSuporte" placeholder="Mensagem..." />
+    <button id="sendBtnSuporte">Enviar</button>
+  </div>
 </div>
-
-<audio id="newMsgSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
 <script>
   const firebaseConfig = {
@@ -64,125 +78,174 @@
     appId: "1:14780677234:web:693437d1c67195057516eb"
   };
   firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-  const database = firebase.database();
-  const storage = firebase.storage();
-  const sound = document.getElementById("newMsgSound");
+  let userName = null;
+  let isSuporte = false;
+  let currentChatUser = null;
 
-  let userName = prompt("Seu nome:");
-  if (!userName) userName = "Anônimo";
+  const loginDiv = document.getElementById('loginDiv');
+  const chatDiv = document.getElementById('chatDiv');
+  const suporteDiv = document.getElementById('suporteDiv');
+  const nameInput = document.getElementById('nameInput');
+  const enterBtn = document.getElementById('enterBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const logoutBtn2 = document.getElementById('logoutBtn2');
+  const toSuporteBtn = document.getElementById('toSuporteBtn');
+  const backToGroupBtn = document.getElementById('backToGroupBtn');
+  const messagesDiv = document.getElementById('messages');
+  const messageInput = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const onlineCount = document.getElementById('onlineCount');
+  const chatList = document.getElementById('chatList');
+  const messagesSuporte = document.getElementById('messagesSuporte');
+  const inputAreaSuporte = document.getElementById('inputAreaSuporte');
+  const messageInputSuporte = document.getElementById('messageInputSuporte');
+  const sendBtnSuporte = document.getElementById('sendBtnSuporte');
+  const currentChatName = document.getElementById('currentChatName');
 
-  const onlineRef = database.ref("online/" + userName);
-  onlineRef.set(true);
-  onlineRef.onDisconnect().remove();
+  enterBtn.onclick = () => {
+    const val = nameInput.value.trim();
+    if (!val) {
+      alert('Digite seu nome!');
+      nameInput.focus();
+      return;
+    }
 
-  function updateOnlineUsers() {
-    database.ref("online").once("value", (snapshot) => {
-      const users = snapshot.val();
-      const count = users ? Object.keys(users).length : 0;
-      document.getElementById("onlineUsers").textContent = `${count} online`;
+    // Sem validação - aceita qualquer nome digitado
+    userName = val;
+    isSuporte = (userName.toLowerCase() === 'suporte');
+    loginDiv.style.display = 'none';
+    if (isSuporte) {
+      suporteDiv.style.display = 'flex';
+      carregarListaChatsSuporte();
+    } else {
+      chatDiv.style.display = 'flex';
+      entrarNoGrupo();
+    }
+    marcarOnline();
+  };
+
+  function marcarOnline() {
+    if (!userName) return;
+    const caminhoOnline = isSuporte ? 'online/suporte/' + userName : 'online/grupo/' + userName;
+    db.ref(caminhoOnline).set(true);
+    db.ref(caminhoOnline).onDisconnect().remove();
+    db.ref('online/grupo').on('value', snap => {
+      const users = snap.val() || {};
+      onlineCount.textContent = Object.keys(users).length + ' online';
     });
   }
-  setInterval(updateOnlineUsers, 3000);
 
-  let msgCount = 0;
-  database.ref("messages").on("child_added", (snapshot) => {
-    const msg = snapshot.val();
-    const key = snapshot.key;
-    const msgDiv = document.createElement("div");
-    msgDiv.classList.add("msg");
-    msgDiv.classList.add(msg.sender === userName ? "mine" : "other");
+  function entrarNoGrupo() {
+    loadMensagensGrupo();
+  }
 
-    if (msg.text) msgDiv.innerHTML += `<strong>${msg.sender}:</strong> ${msg.text}<br>`;
-    if (msg.image) {
-      const imgTag = document.createElement("img");
-      imgTag.src = msg.image;
-      msgDiv.appendChild(imgTag);
-    }
-    if (msg.audio) {
-      const audioTag = document.createElement("audio");
-      audioTag.controls = true;
-      audioTag.src = msg.audio;
-      msgDiv.appendChild(audioTag);
-    }
+  function loadMensagensGrupo() {
+    messagesDiv.innerHTML = '';
+    db.ref('messages/grupo').off();
+    db.ref('messages/grupo').on('child_added', snap => {
+      const msg = snap.val();
+      adicionarMsgNaTela(msg, messagesDiv, msg.sender === userName);
+    });
+  }
 
-    if (msg.time) {
-      const timeTag = document.createElement("span");
-      timeTag.className = "msg-time";
-      timeTag.textContent = msg.time;
-      msgDiv.appendChild(timeTag);
-    }
+  function adicionarMsgNaTela(msg, container, isMine) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (isMine ? 'mine' : 'other');
+    let timeStr = msg.time || '';
+    let content = `<strong>${msg.sender}:</strong> ${msg.text || ''}`;
+    div.innerHTML = content + `<span class="msg-time">${timeStr}</span>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
 
-    if (msg.sender === userName) {
-      const delBtn = document.createElement("button");
-      delBtn.className = "delete-btn";
-      delBtn.textContent = "🗑️";
-      delBtn.onclick = () => {
-        if (confirm("Apagar esta mensagem?")) {
-          database.ref("messages/" + key).remove();
-          msgDiv.remove();
-          msgCount--;
-          document.getElementById("msgCount").textContent = `${msgCount} mensagens`;
-        }
-      };
-      msgDiv.appendChild(delBtn);
-    }
+  sendBtn.onclick = () => {
+    const text = messageInput.value.trim();
+    if (!text) return alert('Digite uma mensagem');
+    enviarMensagemGrupo(text);
+    messageInput.value = '';
+  };
 
-    document.getElementById("messages").appendChild(msgDiv);
-    document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
-
-    msgCount++;
-    document.getElementById("msgCount").textContent = `${msgCount} mensagens`;
-
-    if (msg.sender !== userName) sound.play().catch(() => {});
-  });
-
-  function sendMessage() {
-    const text = document.getElementById("messageInput").value;
+  function enviarMensagemGrupo(text) {
     const now = new Date();
-    const time = now.toLocaleTimeString("pt-BR", {hour:'2-digit',minute:'2-digit'});
-    if (text.trim() !== "") {
-      database.ref("messages").push({ sender: userName, text: text, time: time });
-    }
-    document.getElementById("messageInput").value = "";
+    const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const messageData = { sender: userName, text, time };
+    db.ref('messages/grupo').push(messageData);
   }
 
-  let mediaRecorder;
-  let audioChunks = [];
+  toSuporteBtn.onclick = () => {
+    chatDiv.style.display = 'none';
+    suporteDiv.style.display = 'flex';
+    currentChatUser = userName;
+    currentChatName.textContent = 'Suporte - Chat Privado';
+    carregarMensagensSuporteUsuario(currentChatUser);
+    inputAreaSuporte.style.display = 'flex';
+  };
 
-  const audioBtn = document.getElementById("audioBtn");
+  backToGroupBtn.onclick = () => {
+    suporteDiv.style.display = 'none';
+    chatDiv.style.display = 'flex';
+    carregarListaChatsSuporte();
+  };
 
-  audioBtn.addEventListener("mousedown", () => {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      mediaRecorder = new MediaRecorder(stream);
-      audioChunks = [];
-      mediaRecorder.start();
-      audioBtn.textContent = "⏹️";
-      mediaRecorder.addEventListener("dataavailable", event => {
-        audioChunks.push(event.data);
-      });
-    }).catch(err => {
-      alert("Permissão de microfone negada ou não disponível.");
-    });
-  });
-
-  audioBtn.addEventListener("mouseup", () => {
-    if (mediaRecorder && mediaRecorder.state === "recording") {
-      mediaRecorder.stop();
-      audioBtn.textContent = "🎙️";
-      mediaRecorder.addEventListener("stop", () => {
-        const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
-        const fileName = 'audio_' + Date.now() + '.webm';
-        const storageRef = storage.ref('chat_audios/' + fileName);
-        storageRef.put(audioBlob).then(snapshot => snapshot.ref.getDownloadURL()).then(url => {
-          const now = new Date();
-          const time = now.toLocaleTimeString("pt-BR", {hour:'2-digit',minute:'2-digit'});
-          database.ref("messages").push({ sender: userName, audio: url, time: time });
-        });
-      });
+  logoutBtn.onclick = logout;
+  logoutBtn2.onclick = logout;
+  function logout() {
+    if (userName) {
+      const caminhoOnline = isSuporte ? 'online/suporte/' + userName : 'online/grupo/' + userName;
+      db.ref(caminhoOnline).remove();
     }
-  });
-</script>
+    location.reload();
+  }
 
+  function carregarListaChatsSuporte() {
+    chatList.innerHTML = 'Carregando...';
+    db.ref('messages/suporte').on('value', snap => {
+      const chats = snap.val() || {};
+      chatList.innerHTML = '';
+      const nomes = Object.keys(chats).sort();
+      if (nomes.length === 0) chatList.innerHTML = 'Nenhuma conversa ainda.';
+      nomes.forEach(nomeUser => {
+        const div = document.createElement('div');
+        div.textContent = nomeUser;
+        div.onclick = () => abrirChatSuporte(nomeUser);
+        chatList.appendChild(div);
+      });
+    });
+  }
+
+  function abrirChatSuporte(nomeUser) {
+    currentChatUser = nomeUser;
+    currentChatName.textContent = 'Suporte com: ' + nomeUser;
+    messagesSuporte.innerHTML = '';
+    inputAreaSuporte.style.display = 'flex';
+    carregarMensagensSuporteUsuario(nomeUser);
+  }
+
+  function carregarMensagensSuporteUsuario(nomeUser) {
+    messagesSuporte.innerHTML = '';
+    db.ref('messages/suporte/' + nomeUser).off();
+    db.ref('messages/suporte/' + nomeUser).on('child_added', snap => {
+      const msg = snap.val();
+      const isMine = (msg.sender === userName);
+      adicionarMsgNaTela(msg, messagesSuporte, isMine);
+    });
+  }
+
+  sendBtnSuporte.onclick = () => {
+    const text = messageInputSuporte.value.trim();
+    if (!text) return alert('Digite uma mensagem');
+    enviarMensagemSuporte(text);
+    messageInputSuporte.value = '';
+  };
+
+  function enviarMensagemSuporte(text) {
+    const now = new Date();
+    const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const messageData = { sender: userName, text, time };
+    db.ref('messages/suporte/' + currentChatUser).push(messageData);
+  }
+</script>
 </body>
 </html>
