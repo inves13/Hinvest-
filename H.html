@@ -10,21 +10,31 @@
     body { margin: 0; background-color: #000; font-family: Arial, sans-serif; color: #fff; }
     .usuario-info { text-align: center; margin-top: 20px; }
     .usuario-info p { font-size: 18px; margin: 5px 0; }
-    .carteira { padding: 20px 15px; background-color: #000; margin: 20px; border-radius: 10px; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+    .carteira { padding: 20px 15px; background-color: #000; margin: 20px auto; border-radius: 10px; max-width: 600px; }
     .carteira h2 { text-align: center; margin-bottom: 20px; font-weight: 700; font-size: 26px; color: #00bfff; }
-    .saldos { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-    .saldo { flex: 1; background: #111; border-radius: 10px; padding: 15px 10px; box-shadow: 0 0 8px rgba(0,0,0,0.3); text-align: center; min-width: 100px; }
-    .saldo img { max-width: 45px; margin-bottom: 10px; }
+
+    .saldos { display: flex; justify-content: space-between; gap: 10px; }
+    .saldo {
+      flex: 1;
+      background: #111;
+      border-radius: 10px;
+      padding: 15px 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .saldo img { max-width: 35px; margin-bottom: 8px; }
     .saldo p {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       margin: 5px 0;
       background: linear-gradient(135deg, #00ffcc, #00bfff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 5px #00fff0, 0 0 10px #00bfff, 0 0 20px #00bfff;
+      text-shadow: 0 0 5px #00fff0, 0 0 10px #00bfff;
     }
-    .saldo span { display: block; font-size: 14px; color: #ccc; font-weight: 500; }
+    .saldo span { display: block; font-size: 13px; color: #ccc; font-weight: 500; }
+
     .botao {
       display: flex;
       align-items: center;
@@ -40,24 +50,24 @@
       border: none;
       font-size: 16px;
       max-width: 220px;
-      user-select: none;
       box-shadow: 0 0 8px #00fff0, 0 0 15px #00bfff;
     }
-    .botao:hover {
-      background: linear-gradient(135deg, #00d9b3, #0099ff);
-      box-shadow: 0 0 10px #00fff0, 0 0 20px #00bfff;
-    }
     .botao img { max-width: 24px; }
-    .botao:disabled { background-color: #555; cursor: not-allowed; box-shadow: none; }
-    .notificacao { background-color: yellow; color: #000; padding: 10px; font-weight: bold; margin: 10px 20px; border-radius: 8px; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+    .notificacao {
+      background-color: yellow; color: #000;
+      padding: 10px; font-weight: bold;
+      margin: 10px 20px; border-radius: 8px;
+      max-width: 600px; margin-left: auto; margin-right: auto;
+    }
     .logo img { max-width: 400px; width: 100%; height: auto; display: block; margin: 0 auto; }
+
     .acoes { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding: 0 15px; }
     .acoes .botao { flex: 1; max-width: 48%; }
+
     .menu-inferior {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
       background: #000;
       display: flex;
       justify-content: space-around;
@@ -76,8 +86,7 @@
       font-weight: 600;
     }
     .menu-inferior a img {
-      width: 28px;
-      height: 28px;
+      width: 28px; height: 28px;
       margin-bottom: 3px;
       filter: drop-shadow(0 0 3px #00ffcc);
     }
@@ -89,9 +98,16 @@
     .menu-inferior a.ativo img {
       filter: drop-shadow(0 0 8px #00ffcc) brightness(1.5);
     }
+
+    @media(max-width:480px){
+      .saldo p { font-size: 16px; }
+      .saldo img { max-width: 28px; }
+    }
   </style>
 </head>
+
 <body>
+
 <div class="logo"><img src="1004.png" alt="Logo" /></div>
 
 <section class="usuario-info">
@@ -100,18 +116,15 @@
 </section>
 
 <section class="acoes">
-  <a href="deposito.html" class="botao"><img src="10003.png" alt="Depósito"> Depósito</a>
-  <a href="saque.html" class="botao"><img src="10004.png" alt="Retirada"> Retirada</a>
-  <button class="botao" id="checkin-diario" onclick="realizarCheckin()"><img src="10005.png" alt="Check-in"> Check-in Diário</button>
-  <a href="download.html" class="botao"><img src="10011.png" alt="Baixar App"> Baixar App</a>
-  <a href="ajuda.html" class="botao"><img src="10011.png" alt="Ajuda"> Ajuda</a>
+  <a href="deposito.html" class="botao"><img src="10003.png"> Depósito</a>
+  <a href="saque.html" class="botao"><img src="10004.png"> Retirada</a>
+  <button class="botao" id="checkin-diario" onclick="realizarCheckin()"><img src="10005.png"> Check-in</button>
+  <a href="download.html" class="botao"><img src="10011.png"> Baixar App</a>
+  <a href="ajuda.html" class="botao"><img src="10011.png"> Ajuda</a>
 </section>
 
 <div class="notificacao">
-  <span>🔔</span>
-  <marquee behavior="scroll" direction="left" scrollamount="5">
-    💰 vem aí o pré-lançamento da plataforma HINVEST 
-  </marquee>
+  <marquee behavior="scroll" direction="left" scrollamount="5">💰 vem aí o pré-lançamento da plataforma HINVEST</marquee>
 </div>
 
 <section class="carteira">
@@ -119,7 +132,7 @@
   <div class="saldos">
     <div class="saldo"><img src="10004.png"><p id="saldo-carteira">R$ 0.00</p><span>Carteira</span></div>
     <div class="saldo"><img src="10004.png"><p id="valor-recebido">R$ 0.00</p><span>Recebido</span></div>
-    <div class="saldo"><img src="10004.png"><p id="valor-recebimento">R$ 0.00</p><span>Recebimento</span></div>
+    <div class="saldo"><img src="10004.png"><p id="valor-recebimento">R$ 0.00</p><span>Retirado</span></div>
   </div>
 </section>
 
@@ -131,78 +144,59 @@
 </nav>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-  authDomain: "hinvest-f4354.firebaseapp.com",
-  databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-  projectId: "hinvest-f4354",
-  storageBucket: "hinvest-f4354.appspot.com",
-  messagingSenderId: "646397677016",
-  appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.appspot.com",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-function realizarCheckin() {
-  const userId = localStorage.getItem("telefoneLogado");
-  if (!userId) return;
-  const userRef = db.ref("usuarios/" + userId);
-  const agora = Date.now();
-  userRef.once("value").then(snapshot => {
-    const data = snapshot.val() || {};
-    const ultimo = data.ultimoCheckin ? new Date(data.ultimoCheckin).getTime() : 0;
-    if (agora - ultimo < 86400000) {
-      const restante = Math.ceil((86400000 - (agora - ultimo)) / 3600000);
-      alert(`Check-in disponível em ${restante}h`);
+  function realizarCheckin() {
+    const userId = localStorage.getItem("telefoneLogado");
+    if (!userId) return;
+    const userRef = db.ref("usuarios/" + userId);
+    const agora = Date.now();
+    userRef.once("value").then(snapshot => {
+      const data = snapshot.val() || {};
+      const ultimo = data.ultimoCheckin ? new Date(data.ultimoCheckin).getTime() : 0;
+      if (agora - ultimo < 86400000) {
+        const restante = Math.ceil((86400000 - (agora - ultimo)) / 3600000);
+        alert(`Check-in disponível em ${restante}h`);
+        return;
+      }
+      userRef.update({
+        saldoCarteira: (parseFloat(data.saldoCarteira) || 0) + 1,
+        ultimoCheckin: new Date().toISOString()
+      }).then(() => {
+        alert("Check-in realizado! +R$1,00");
+        location.reload();
+      });
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const userId = localStorage.getItem("telefoneLogado");
+    if (!userId) {
+      alert("Usuário não logado.");
+      location.href = "index.html";
       return;
     }
-    userRef.update({
-      saldoCarteira: (parseFloat(data.saldoCarteira) || 0) + 1,
-      ultimoCheckin: new Date().toISOString()
-    }).then(() => {
-      alert("Check-in realizado! +R$1,00");
-      location.reload();
+    const userRef = db.ref("usuarios/" + userId);
+    userRef.once("value").then(snapshot => {
+      const data = snapshot.val() || {};
+      document.getElementById("usuario-nome").innerText = data.nome || "Usuário";
+      document.getElementById("usuario-telefone").innerText = userId.replace(/^(\d{5})(\d{2})(\d{4})$/, "$1**$3");
+      document.getElementById("saldo-carteira").innerText = `R$ ${(data.saldoCarteira || 0).toFixed(2)}`;
+      const retirada = (data.retirada || 0).toFixed(2);
+      document.getElementById("valor-recebido").innerText = `R$ ${retirada}`;
+      document.getElementById("valor-recebimento").innerText = `R$ ${retirada}`;
     });
   });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const userId = localStorage.getItem("telefoneLogado");
-  if (!userId) {
-    alert("Usuário não logado.");
-    location.href = "index.html";
-    return;
-  }
-  const userRef = db.ref("usuarios/" + userId);
-  userRef.once("value").then(snapshot => {
-    const data = snapshot.val() || {};
-
-    // Dá bônus de R$ 20 apenas uma vez
-    if (!data.bonusRecebido) {
-      const novoSaldo = (parseFloat(data.saldoCarteira) || 0) + 20;
-      userRef.update({
-        saldoCarteira: novoSaldo,
-        bonusRecebido: true
-      });
-      data.saldoCarteira = novoSaldo;
-    }
-
-    document.getElementById("usuario-nome").innerText = data.nome || "Usuário";
-    document.getElementById("usuario-telefone").innerText = userId.replace(/^(\d{5})(\d{2})(\d{4})$/, "$1**$3");
-    document.getElementById("saldo-carteira").innerText = `R$ ${(data.saldoCarteira || 0).toFixed(2)}`;
-    document.getElementById("valor-recebido").innerText = `R$ ${(data.recebimento || 0).toFixed(2)}`;
-    document.getElementById("valor-recebimento").innerText = `R$ ${(data.retirada || 0).toFixed(2)}`;
-
-    const checkinButton = document.getElementById('checkin-diario');
-    const ultimo = data.ultimoCheckin ? new Date(data.ultimoCheckin).getTime() : 0;
-    const agora = Date.now();
-    if (agora - ultimo < 86400000) {
-      const restante = Math.ceil((86400000 - (agora - ultimo)) / 3600000);
-      checkinButton.disabled = true;
-      checkinButton.innerText = `Check-in em ${restante}h`;
-    }
-  });
-});
 </script>
 
 </body>
