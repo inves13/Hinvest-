@@ -88,9 +88,28 @@
       color: #ccc;
       cursor: not-allowed;
     }
+
+    /* 🔔 Notificação */
+    #notificacao {
+      position: fixed;
+      top: -60px;
+      left: 0;
+      right: 0;
+      background: #00c3ff;
+      color: #000;
+      text-align: center;
+      font-weight: bold;
+      padding: 15px;
+      z-index: 9999;
+      transition: top 0.5s ease;
+      border-bottom: 3px solid #00ff88;
+    }
   </style>
 </head>
 <body>
+
+<!-- 🔔 Notificação -->
+<div id="notificacao"></div>
 
 <header>📈 H Invest</header>
 <h2>💰 Saldo: R$ <span id="saldo">0.00</span></h2>
@@ -184,11 +203,14 @@ function carregarPlanos(saldo) {
 function comprarPlano(nome, valor, retorno, dias) {
   userRef.once("value").then(snap => {
     let d = snap.val() || {}, s = parseFloat(d.saldoCarteira || 0);
-    if (s < valor) return alert("Saldo insuficiente!");
+    if (s < valor) return mostrarNotificacao("❌ Saldo insuficiente!");
     const inv = d.investimentos || [];
     inv.push({ nome, valor, retorno, dias, inicio: Date.now() });
     userRef.update({ saldoCarteira: s - valor, investimentos: inv }, () => {
-      alert("✅ Investimento realizado com sucesso!");
+      mostrarNotificacao("✅ Investimento realizado com sucesso!");
+      setTimeout(() => {
+        mostrarNotificacao("✅ Produto comprado com sucesso!");
+      }, 3000);
       atualizarSaldo();
     });
   });
@@ -239,10 +261,19 @@ function coletar(idx) {
     d.saldoCarteira = (parseFloat(d.saldoCarteira || 0)) + ganho;
     inv.splice(idx, 1);
     userRef.update({ saldoCarteira: d.saldoCarteira, investimentos: inv }, () => {
-      alert("✅ Rendimento coletado com sucesso!");
+      mostrarNotificacao("✅ Rendimento coletado com sucesso!");
       mostrarMeusProdutos();
     });
   });
+}
+
+function mostrarNotificacao(mensagem) {
+  const box = document.getElementById("notificacao");
+  box.textContent = mensagem;
+  box.style.top = "0";
+  setTimeout(() => {
+    box.style.top = "-60px";
+  }, 3000);
 }
 
 atualizarSaldo();
