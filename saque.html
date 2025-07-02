@@ -71,9 +71,31 @@
       margin-bottom: 10px;
       font-weight: bold;
     }
+
+    /* Notificação visual */
+    #notificacao {
+      position: fixed;
+      top: -100px;
+      left: 0;
+      right: 0;
+      background: #00ffcc;
+      color: #000;
+      font-weight: bold;
+      text-align: center;
+      padding: 15px;
+      z-index: 9999;
+      transition: top 0.5s ease;
+      box-shadow: 0 2px 10px #00ffcc;
+    }
   </style>
 </head>
 <body>
+
+<!-- Notificação -->
+<div id="notificacao"></div>
+<!-- Sons -->
+<audio id="somSaque" src="https://cdn.pixabay.com/audio/2022/03/15/audio_e2251bac06.mp3" preload="auto"></audio>
+<audio id="somConta" src="https://cdn.pixabay.com/audio/2022/03/15/audio_49f0eb9b26.mp3" preload="auto"></audio>
 
 <h2>Carteira - HInvest</h2>
 
@@ -149,6 +171,17 @@
     document.getElementById("confirmarSaque").disabled = !temPlanoAtivo;
   }
 
+  function mostrarNotificacao(mensagem, tipo) {
+    const notificacao = document.getElementById('notificacao');
+    const som = tipo === 'saque' ? document.getElementById('somSaque') : document.getElementById('somConta');
+    notificacao.innerHTML = `🔔 ${mensagem}`;
+    notificacao.style.top = "0";
+    som.play();
+    setTimeout(() => {
+      notificacao.style.top = "-100px";
+    }, 3500);
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     if (!userId) {
       alert("Usuário não logado.");
@@ -181,7 +214,7 @@
       contaBancaria: { nomeTitular: nome, tipoChave: tipo, chavePix: chave }
     });
 
-    alert("Conta bancária salva com sucesso!");
+    mostrarNotificacao("Conta bancária salva com sucesso!", 'conta');
     document.getElementById("salvarConta").disabled = true;
   });
 
@@ -222,7 +255,7 @@
         extrato: (data.extrato || []).concat([{ valor, valorLiquido, dataSolicitacao: dataSaque }])
       });
 
-      alert("Saque solicitado com sucesso!");
+      mostrarNotificacao("Saque solicitado com sucesso!", 'saque');
       atualizarTela(data);
     });
   });
