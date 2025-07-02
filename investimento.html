@@ -1,281 +1,252 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📈 H Invest — Planos de Investimento</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📈 H Invest — Planos</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
     body {
       font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+      background: #000;
       color: #fff;
       margin: 0;
+      padding: 0;
+    }
+    header {
+      background: linear-gradient(to right, #005be3, #00c6ff);
+      color: white;
       padding: 20px;
       text-align: center;
-    }
-    h1 {
-      font-size: 32px;
-      color: #00ff88;
-      margin-bottom: 5px;
+      font-size: 24px;
+      font-weight: bold;
     }
     h2 {
-      font-size: 20px;
-      color: #fff;
-      margin-bottom: 20px;
+      text-align: center;
+      margin: 10px 0;
+      font-size: 18px;
+    }
+    #saldo {
+      color: #00ff88;
+      font-weight: bold;
+    }
+    .planos-container {
+      padding: 10px;
     }
     .card {
       background: #121212;
-      border: 2px solid #00ff88;
-      border-radius: 15px;
-      padding: 20px;
-      margin: 20px auto;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 10px auto;
       width: 90%;
-      max-width: 380px;
-      box-shadow: 0 0 20px #00ff8866;
-      transition: 0.3s;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 0 30px #00ff88aa;
-    }
-    .card h3 {
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: #00ff88;
+      max-width: 400px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
     }
     .card img {
       width: 100%;
       border-radius: 10px;
-      margin-bottom: 15px;
+    }
+    .card h3 {
+      margin: 10px 0 5px;
     }
     .card p {
-      margin: 5px 0;
-      font-size: 16px;
+      margin: 4px 0;
+      color: #ccc;
     }
-    .buy-button, .meus-produtos-button, .coletar-button {
-      background: linear-gradient(45deg, #00ff88, #00c3ff);
-      color: #000;
-      padding: 12px;
-      margin-top: 15px;
-      border: none;
+    .progress {
       width: 100%;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 0 10px #00ff88;
-      transition: 0.3s;
-    }
-    .buy-button:hover, .meus-produtos-button:hover, .coletar-button:hover {
-      background: linear-gradient(45deg, #00c3ff, #00ff88);
-      box-shadow: 0 0 20px #00ff88;
-      transform: scale(1.03);
-    }
-    .buy-button.disabled {
       background: #444;
-      color: #999;
-      cursor: not-allowed;
-      box-shadow: none;
+      height: 8px;
+      border-radius: 5px;
+      margin-top: 5px;
+      overflow: hidden;
     }
-    .contador {
-      font-size: 16px;
-      color: #ffcc00;
-      font-weight: bold;
+    .progress-bar {
+      height: 8px;
+      background: linear-gradient(90deg, #00ff88, #00c3ff);
+      width: 0%;
+      transition: width 0.5s;
     }
-    .comprado {
-      color: #00ff88;
-      font-weight: bold;
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #aaa;
       margin-top: 5px;
     }
-    #planos, #meus-produtos {
-      margin-top: 30px;
+    button {
+      margin-top: 10px;
+      width: 100%;
+      font-weight: bold;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #777;
+      color: #ccc;
+      cursor: not-allowed;
     }
   </style>
 </head>
 <body>
 
-  <h1>📈 H Invest</h1>
-  <h2>💰 Saldo: R$ <span id="saldo">0.00</span></h2>
-
-  <button class="meus-produtos-button" onclick="mostrarMeusProdutos()">🎒 Meus Produtos</button>
-
+<header>📈 H Invest</header>
+<h2>💰 Saldo: R$ <span id="saldo">0.00</span></h2>
+<div class="planos-container">
+  <button onclick="mostrarMeusProdutos()">🎒 Meus Produtos</button>
   <div id="planos"></div>
   <div id="meus-produtos" style="display:none;"></div>
+</div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<audio id="coinSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_e2251bac06.mp3?filename=coin-collect-retro-lose-199148.mp3"></audio>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-      authDomain: "hinvest-f4354.firebaseapp.com",
-      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-      projectId: "hinvest-f4354",
-      storageBucket: "hinvest-f4354.appspot.com",
-      messagingSenderId: "646397677016",
-      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-    };
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const userId = localStorage.getItem("telefoneLogado");
-    const userRef = db.ref("usuarios/" + userId);
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+  authDomain: "hinvest-f4354.firebaseapp.com",
+  databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+  projectId: "hinvest-f4354",
+  storageBucket: "hinvest-f4354.appspot.com",
+  messagingSenderId: "646397677016",
+  appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const userId = localStorage.getItem("telefoneLogado");
+const userRef = db.ref("usuarios/" + userId);
 
-    const planos = [
-      { nome: "Plano Bronze", valor: 60 },
-      { nome: "Plano Prata", valor: 160 },
-      { nome: "Plano Ouro", valor: 300 },
-      { nome: "Plano Platina", valor: 450 },
-      { nome: "Plano Diamante", valor: 500 },
-      { nome: "Plano Master", valor: 650 },
-      { nome: "Plano VIP", valor: 700 },
-      { nome: "Plano Supremo", valor: 850 },
-      { nome: "Plano Elite", valor: 900 },
-      { nome: "Plano Imperador", valor: 1050 }
-    ];
+const cores = {
+  "Plano Bronze": "#CD7F32",
+  "Plano Prata": "#C0C0C0",
+  "Plano Ouro": "#FFD700",
+  "Plano Platina": "#00BFFF",
+  "Plano Diamante": "#00FFFF",
+  "Plano Master": "#00FF88",
+  "Plano VIP": "#C71585",
+  "Plano Supremo": "#FF6347",
+  "Plano Elite": "#FFA500",
+  "Plano Imperador": "#8B4513"
+};
 
-    function calcularRetornoDiario(valorPlano) {
-      return (valorPlano * 3) / 100;
-    }
+const planos = [
+  { nome: "Plano Bronze", valor: 60, dias: 60 },
+  { nome: "Plano Prata", valor: 160, dias: 60 },
+  { nome: "Plano Ouro", valor: 300, dias: 60 },
+  { nome: "Plano Platina", valor: 450, dias: 90 },
+  { nome: "Plano Diamante", valor: 500, dias: 90 },
+  { nome: "Plano Master", valor: 650, dias: 128 },
+  { nome: "Plano VIP", valor: 700, dias: 128 },
+  { nome: "Plano Supremo", valor: 850, dias: 128 },
+  { nome: "Plano Elite", valor: 900, dias: 128 },
+  { nome: "Plano Imperador", valor: 1050, dias: 128 }
+];
 
-    function carregarPlanos(saldo) {
-      const container = document.getElementById("planos");
-      container.innerHTML = "";
-      document.getElementById("meus-produtos").style.display = "none";
-      container.style.display = "block";
+function calcularRetornoDiario(valor) {
+  return (valor * 3) / 100;
+}
 
-      planos.forEach((plano, index) => {
-        const retornoDiario = calcularRetornoDiario(plano.valor);
-        const lucroTotal = retornoDiario * 50;
-        const isDisabled = saldo < plano.valor;
-        const buttonClass = isDisabled ? "buy-button disabled" : "buy-button";
+function atualizarSaldo() {
+  userRef.once("value").then(snap => {
+    const saldo = parseFloat(snap.val()?.saldoCarteira || 0);
+    document.getElementById("saldo").textContent = saldo.toFixed(2);
+    carregarPlanos(saldo);
+  });
+}
 
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <h3>📊 ${plano.nome}</h3>
-          <img src="1004.png" alt="Plano ${plano.valor}">
-          <p>💸 Valor: <strong>R$${plano.valor}</strong></p>
-          <p>📈 Retorno diário: R$${retornoDiario.toFixed(2)} (3% ao dia)</p>
-          <p>💰 Lucro total em 50 dias: R$${lucroTotal.toFixed(2)}</p>
-          <p>📅 Duração: 50 dias de rendimento</p>
-          <button class="${buttonClass}" onclick="comprarPlano('${plano.nome}', ${plano.valor}, ${retornoDiario})" ${isDisabled ? 'disabled' : ''}>🛒 Comprar</button>
-        `;
-        container.appendChild(card);
-      });
-    }
+function carregarPlanos(saldo) {
+  const c = document.getElementById("planos");
+  c.innerHTML = "";
+  document.getElementById("meus-produtos").style.display = "none";
+  c.style.display = "block";
+  planos.forEach(p => {
+    const retorno = calcularRetornoDiario(p.valor).toFixed(2);
+    const total = (retorno * p.dias).toFixed(2);
+    const btn = saldo < p.valor ? 'disabled' : '';
+    const cor = cores[p.nome] || "#00c3ff";
 
-    function atualizarSaldo() {
-      userRef.once("value").then(snapshot => {
-        const data = snapshot.val() || {};
-        const saldo = parseFloat(data.saldoCarteira || 0);
-        document.getElementById("saldo").textContent = saldo.toFixed(2);
-        carregarPlanos(saldo);
-      });
-    }
+    c.innerHTML += `
+    <div class="card" style="border: 2px solid ${cor}; box-shadow: 0 0 10px ${cor};">
+      <img src="1000256783.jpg" />
+      <h3 style="color:${cor}">${p.nome}</h3>
+      <p>💰 Valor: R$${p.valor}</p>
+      <p>📅 ${p.dias} dias | 📈 R$${retorno}/dia</p>
+      <p>💵 Retorno total: R$${total}</p>
+      <button ${btn} style="background:${cor}; color:black;" onclick="comprarPlano('${p.nome}',${p.valor},${retorno},${p.dias})">💼 Comprar</button>
+    </div>`;
+  });
+}
 
-    function comprarPlano(nome, valor, retornoDiario) {
-      userRef.once("value").then(snapshot => {
-        const data = snapshot.val() || {};
-        const saldoAtual = parseFloat(data.saldoCarteira || 0);
+function comprarPlano(nome, valor, retorno, dias) {
+  userRef.once("value").then(snap => {
+    let d = snap.val() || {}, s = parseFloat(d.saldoCarteira || 0);
+    if (s < valor) return alert("Saldo insuficiente!");
+    const inv = d.investimentos || [];
+    inv.push({ nome, valor, retorno, dias, inicio: Date.now() });
+    userRef.update({ saldoCarteira: s - valor, investimentos: inv }, () => {
+      alert("✅ Investimento realizado com sucesso!");
+      atualizarSaldo();
+    });
+  });
+}
 
-        if (saldoAtual < valor) {
-          alert("Saldo insuficiente!");
-          return;
-        }
+function mostrarMeusProdutos() {
+  userRef.once("value").then(snap => {
+    const inv = snap.val()?.investimentos || [];
+    const c = document.getElementById("meus-produtos");
+    c.innerHTML = `<h2>🎒 Meus Produtos (${inv.length})</h2>`;
+    document.getElementById("planos").style.display = "none";
+    c.style.display = "block";
+    inv.forEach((i, idx) => {
+      const elapsed = Date.now() - i.inicio;
+      const percent = Math.min((elapsed / 86400000), 1) * 100;
+      const disabled = percent < 100 ? 'disabled' : '';
+      const cor = cores[i.nome] || "#00c3ff";
+      const lucroTotal = (parseFloat(i.retorno) * i.dias).toFixed(2);
 
-        const novoSaldo = saldoAtual - valor;
-        const investimentos = data.investimentos || [];
-        const novoInvestimento = {
-          nome: nome,
-          valor: valor,
-          data: new Date().toLocaleDateString(),
-          retornoDiario: retornoDiario.toFixed(2),
-          diasRestantes: 50,
-          imagem: `imagens/PLANO_${valor}.png`,
-          status: "comprado",
-          tempoCompra: new Date().getTime(),
-          ultimoRetorno: new Date().getTime()
-        };
+      c.innerHTML += `<div class="card" style="border: 2px solid ${cor}; box-shadow: 0 0 10px ${cor};">
+        <img src="1000256783.jpg" />
+        <h3 style="color:${cor}">${i.nome}</h3>
+        <p>📅 ${i.dias} dias</p>
+        <p>💵 R$${i.retorno} / dia</p>
+        <p>📈 Lucro total: R$${lucroTotal}</p>
+        <div class="progress-labels"><span>0%</span><span>100%</span></div>
+        <div class="progress"><div class="progress-bar" id="bar${idx}" style="width:${percent}%"></div></div>
+        <button id="btn${idx}" style="background:${cor}; color:black;" ${disabled} onclick="coletar(${idx})">📥 Coletar R$${i.retorno}</button>
+      </div>`;
+      if (percent < 100) setInterval(() => atualizaBarra(idx, i.inicio), 60000);
+    });
+  });
+}
 
-        investimentos.push(novoInvestimento);
+function atualizaBarra(idx, inicio){
+  const elapsed = Date.now() - inicio;
+  const percent = Math.min((elapsed / 86400000), 1) * 100;
+  document.getElementById("bar"+idx).style.width = percent + "%";
+  if (percent >= 100) document.getElementById("btn"+idx).disabled = false;
+}
 
-        userRef.update({
-          saldoCarteira: novoSaldo,
-          saldo: novoSaldo,
-          investimentos: investimentos
-        }).then(() => {
-          alert("Plano adquirido com sucesso!");
-          atualizarSaldo();
-        });
-      });
-    }
+function coletar(idx) {
+  const sound = document.getElementById("coinSound");
+  sound.play();
+  userRef.once("value").then(snap => {
+    let d = snap.val(), inv = d.investimentos;
+    const ganho = parseFloat(inv[idx].retorno);
+    d.saldoCarteira = (parseFloat(d.saldoCarteira || 0)) + ganho;
+    inv.splice(idx, 1);
+    userRef.update({ saldoCarteira: d.saldoCarteira, investimentos: inv }, () => {
+      alert("✅ Rendimento coletado com sucesso!");
+      mostrarMeusProdutos();
+    });
+  });
+}
 
-    function mostrarMeusProdutos() {
-      userRef.once("value").then(snapshot => {
-        const data = snapshot.val() || {};
-        const investimentos = data.investimentos || [];
-        const container = document.getElementById("meus-produtos");
-        container.innerHTML = "<h2>🎒 Meus Produtos</h2>";
-        document.getElementById("planos").style.display = "none";
-        container.style.display = "block";
+atualizarSaldo();
+</script>
 
-        if (investimentos.length === 0) {
-          container.innerHTML += "<p>Você ainda não comprou nenhum plano.</p>";
-        } else {
-          investimentos.forEach((inv, index) => {
-            const tempoCompra = inv.tempoCompra;
-            const agora = new Date().getTime();
-            const horasRestantes = Math.max(24 - (agora - inv.ultimoRetorno) / (1000 * 60 * 60), 0);
-            const lucroTotal = inv.retornoDiario * 50;
-
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `
-              <h3>${inv.nome}</h3>
-              <img src="1004.png">
-              <p>📅 Compra: ${inv.data}</p>
-              <p>📈 Retorno diário: R$${inv.retornoDiario}</p>
-              <p>💰 Lucro total: R$${lucroTotal.toFixed(2)}</p>
-              <p>📆 Dias restantes: ${inv.diasRestantes}</p>
-              <p class="contador">⏰ ${Math.ceil(horasRestantes)}h para próximo retorno</p>
-              <p class="comprado">✅ Plano Ativo</p>
-              ${horasRestantes <= 0 && inv.status === "comprado"
-                ? `<button class="coletar-button" onclick="coletarRendimento('${inv.nome}', ${inv.retornoDiario}, ${index})">📥 Coletar R$${inv.retornoDiario}</button>` 
-                : ""}
-            `;
-            container.appendChild(card);
-          });
-        }
-      });
-    }
-
-    function coletarRendimento(nome, retornoDiario, index) {
-      userRef.once("value").then(snapshot => {
-        const data = snapshot.val() || {};
-        const investimentos = data.investimentos || [];
-        const investimento = investimentos[index];
-        const saldoAtual = parseFloat(data.saldoCarteira || 0);
-
-        investimento.ultimoRetorno = new Date().getTime();
-        investimento.diasRestantes -= 1;
-        const novoSaldo = saldoAtual + retornoDiario;
-
-        investimentos[index] = investimento;
-
-        userRef.update({
-          saldoCarteira: novoSaldo,
-          investimentos: investimentos
-        }).then(() => {
-          alert(`Você coletou R$${retornoDiario.toFixed(2)} do plano ${nome}`);
-          mostrarMeusProdutos();
-        });
-      });
-    }
-
-    atualizarSaldo();
-  </script>
 </body>
 </html>
