@@ -1,251 +1,115 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Chat Grupo + Suporte Simples</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Página de Ajuda</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #ece5dd; }
-    #loginDiv, #chatDiv, #suporteDiv { max-width: 480px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; height: 100vh; box-sizing: border-box; display: flex; flex-direction: column; }
-    #chatDiv, #suporteDiv { display: none; }
-    .header { background: #075E54; color: #fff; padding: 10px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center; }
-    #messages, #messagesSuporte { flex: 1; overflow-y: auto; background: #d2dbdc; padding: 10px; border-radius: 0 0 8px 8px; margin-top: 10px; }
-    .msg { margin-bottom: 10px; max-width: 70%; padding: 8px 12px; border-radius: 8px; background: #fff; word-wrap: break-word; }
-    .mine { background: #dcf8c6; margin-left: auto; text-align: right; }
-    .msg-time { font-size: 10px; color: #555; display: block; margin-top: 4px; font-weight: normal; }
-    #inputArea, #inputAreaSuporte { display: flex; margin-top: 10px; }
-    input[type=text] { flex: 1; padding: 10px; border-radius: 30px; border: 1px solid #ccc; }
-    button { margin-left: 5px; background: #075E54; color: #fff; border: none; border-radius: 30px; padding: 10px 25px; cursor: pointer; font-weight: bold; font-size: 16px; }
-    button#enterBtn { background: #128C7E; border-radius: 30px; padding: 12px 30px; font-size: 18px; margin-top: 15px; }
-    #logoutBtn { background: #a00; border-radius: 5px; padding: 5px 10px; }
-    #backBtn { margin-left: 5px; background: #128C7E; border-radius: 5px; padding: 5px 10px; }
-    img.msg-image { max-width: 100%; border-radius: 5px; margin-top: 5px; }
-    #chatList { max-height: 200px; overflow-y: scroll; background: #eee; margin: 10px 0; padding: 10px; border-radius: 8px; flex-shrink: 0; }
-    #chatList div { padding: 8px; border-bottom: 1px solid #ccc; cursor: pointer; }
-    #chatList div:hover { background: #ddd; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #000;
+      text-align: center;
+      padding: 20px;
+      color: #fff;
+    }
+
+    h1 {
+      color: #fff;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+
+    .card {
+      background: #111;
+      padding: 20px;
+      margin: 15px auto;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,255,255,0.1);
+      max-width: 400px;
+    }
+
+    .card h2 {
+      margin-top: 10px;
+      color: #fff;
+      font-size: 22px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(45deg, #00ff90, #00c3ff);
+      color: #000;
+      font-weight: bold;
+      font-size: 16px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 10px #00c3ff;
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+      transform: scale(1.03);
+    }
+
+    .btn img {
+      width: 24px;
+      height: 24px;
+      margin-right: 10px;
+    }
+
+    footer {
+      margin-top: 40px;
+      color: #888;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
 
-<div id="loginDiv">
-  <h2>Digite seu nome para entrar</h2>
-  <input type="text" id="nameInput" placeholder="Seu nome completo" />
-  <button id="enterBtn">Entrar</button>
-</div>
+  <h1>Central de Ajuda</h1>
 
-<div id="chatDiv">
-  <div class="header">
-    <div><strong>Grupo H Invest</strong> <span id="onlineCount">0 online</span></div>
-    <div>
-      <button id="toSuporteBtn">Falar com Suporte</button>
-      <button id="logoutBtn">Sair</button>
-    </div>
+  <div class="card">
+    <img src="https://cdn-icons-png.flaticon.com/512/220/220236.png" alt="WhatsApp" width="60">
+    <h2>Grupo do WhatsApp</h2>
+    <button class="btn" onclick="abrirLink('https://chat.whatsapp.com/SEU_LINK_AQUI')">
+      <img src="https://cdn-icons-png.flaticon.com/512/220/220236.png" alt="WhatsApp"> Acessar Grupo
+    </button>
   </div>
-  <div id="messages"></div>
-  <div id="inputArea">
-    <input type="text" id="messageInput" placeholder="Mensagem..." />
-    <button id="sendBtn">Enviar</button>
+
+  <div class="card">
+    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram" width="60">
+    <h2>Grupo do Telegram</h2>
+    <button class="btn" onclick="abrirLink('https://t.me/SEU_LINK_AQUI')">
+      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram"> Acessar Grupo
+    </button>
   </div>
-</div>
 
-<div id="suporteDiv">
-  <div class="header">
-    <div><strong>Suporte Privado</strong> <span id="currentChatName">Usuário</span></div>
-    <div>
-      <button id="backToGroupBtn">Voltar ao Grupo</button>
-      <button id="logoutBtn2">Sair</button>
-    </div>
+  <div class="card">
+    <img src="https://cdn-icons-png.flaticon.com/512/9068/9068739.png" alt="Suporte" width="60">
+    <h2>Suporte</h2>
+    <button class="btn" onclick="abrirLink('https://api.whatsapp.com/send?phone=SEU_NUMERO_AQUI')">
+      <img src="https://cdn-icons-png.flaticon.com/512/9068/9068739.png" alt="Suporte"> Falar com o Suporte
+    </button>
   </div>
-  <div id="chatList"></div>
-  <div id="messagesSuporte"></div>
-  <div id="inputAreaSuporte" style="display:none;">
-    <input type="text" id="messageInputSuporte" placeholder="Mensagem..." />
-    <button id="sendBtnSuporte">Enviar</button>
-  </div>
-</div>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <footer>
+    © 2025 - Todos os direitos reservados
+  </footer>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAUPLelJ5YJ4KVP_78mCxbg00VnFvsNlp4",
-    authDomain: "chat-grupo-online.firebaseapp.com",
-    databaseURL: "https://chat-grupo-online-default-rtdb.firebaseio.com",
-    projectId: "chat-grupo-online",
-    storageBucket: "chat-grupo-online.appspot.com",
-    messagingSenderId: "14780677234",
-    appId: "1:14780677234:web:693437d1c67195057516eb"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  let userName = null;
-  let isSuporte = false;
-  let currentChatUser = null;
-
-  const loginDiv = document.getElementById('loginDiv');
-  const chatDiv = document.getElementById('chatDiv');
-  const suporteDiv = document.getElementById('suporteDiv');
-  const nameInput = document.getElementById('nameInput');
-  const enterBtn = document.getElementById('enterBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const logoutBtn2 = document.getElementById('logoutBtn2');
-  const toSuporteBtn = document.getElementById('toSuporteBtn');
-  const backToGroupBtn = document.getElementById('backToGroupBtn');
-  const messagesDiv = document.getElementById('messages');
-  const messageInput = document.getElementById('messageInput');
-  const sendBtn = document.getElementById('sendBtn');
-  const onlineCount = document.getElementById('onlineCount');
-  const chatList = document.getElementById('chatList');
-  const messagesSuporte = document.getElementById('messagesSuporte');
-  const inputAreaSuporte = document.getElementById('inputAreaSuporte');
-  const messageInputSuporte = document.getElementById('messageInputSuporte');
-  const sendBtnSuporte = document.getElementById('sendBtnSuporte');
-  const currentChatName = document.getElementById('currentChatName');
-
-  enterBtn.onclick = () => {
-    const val = nameInput.value.trim();
-    if (!val) {
-      alert('Digite seu nome!');
-      nameInput.focus();
-      return;
+  <script>
+    function abrirLink(url) {
+      if(confirm("Você deseja realmente acessar esse link?")) {
+        window.open(url, '_blank');
+      }
     }
+  </script>
 
-    // Sem validação - aceita qualquer nome digitado
-    userName = val;
-    isSuporte = (userName.toLowerCase() === 'suporte');
-    loginDiv.style.display = 'none';
-    if (isSuporte) {
-      suporteDiv.style.display = 'flex';
-      carregarListaChatsSuporte();
-    } else {
-      chatDiv.style.display = 'flex';
-      entrarNoGrupo();
-    }
-    marcarOnline();
-  };
-
-  function marcarOnline() {
-    if (!userName) return;
-    const caminhoOnline = isSuporte ? 'online/suporte/' + userName : 'online/grupo/' + userName;
-    db.ref(caminhoOnline).set(true);
-    db.ref(caminhoOnline).onDisconnect().remove();
-    db.ref('online/grupo').on('value', snap => {
-      const users = snap.val() || {};
-      onlineCount.textContent = Object.keys(users).length + ' online';
-    });
-  }
-
-  function entrarNoGrupo() {
-    loadMensagensGrupo();
-  }
-
-  function loadMensagensGrupo() {
-    messagesDiv.innerHTML = '';
-    db.ref('messages/grupo').off();
-    db.ref('messages/grupo').on('child_added', snap => {
-      const msg = snap.val();
-      adicionarMsgNaTela(msg, messagesDiv, msg.sender === userName);
-    });
-  }
-
-  function adicionarMsgNaTela(msg, container, isMine) {
-    const div = document.createElement('div');
-    div.className = 'msg ' + (isMine ? 'mine' : 'other');
-    let timeStr = msg.time || '';
-    let content = `<strong>${msg.sender}:</strong> ${msg.text || ''}`;
-    div.innerHTML = content + `<span class="msg-time">${timeStr}</span>`;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-  }
-
-  sendBtn.onclick = () => {
-    const text = messageInput.value.trim();
-    if (!text) return alert('Digite uma mensagem');
-    enviarMensagemGrupo(text);
-    messageInput.value = '';
-  };
-
-  function enviarMensagemGrupo(text) {
-    const now = new Date();
-    const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const messageData = { sender: userName, text, time };
-    db.ref('messages/grupo').push(messageData);
-  }
-
-  toSuporteBtn.onclick = () => {
-    chatDiv.style.display = 'none';
-    suporteDiv.style.display = 'flex';
-    currentChatUser = userName;
-    currentChatName.textContent = 'Suporte - Chat Privado';
-    carregarMensagensSuporteUsuario(currentChatUser);
-    inputAreaSuporte.style.display = 'flex';
-  };
-
-  backToGroupBtn.onclick = () => {
-    suporteDiv.style.display = 'none';
-    chatDiv.style.display = 'flex';
-    carregarListaChatsSuporte();
-  };
-
-  logoutBtn.onclick = logout;
-  logoutBtn2.onclick = logout;
-  function logout() {
-    if (userName) {
-      const caminhoOnline = isSuporte ? 'online/suporte/' + userName : 'online/grupo/' + userName;
-      db.ref(caminhoOnline).remove();
-    }
-    location.reload();
-  }
-
-  function carregarListaChatsSuporte() {
-    chatList.innerHTML = 'Carregando...';
-    db.ref('messages/suporte').on('value', snap => {
-      const chats = snap.val() || {};
-      chatList.innerHTML = '';
-      const nomes = Object.keys(chats).sort();
-      if (nomes.length === 0) chatList.innerHTML = 'Nenhuma conversa ainda.';
-      nomes.forEach(nomeUser => {
-        const div = document.createElement('div');
-        div.textContent = nomeUser;
-        div.onclick = () => abrirChatSuporte(nomeUser);
-        chatList.appendChild(div);
-      });
-    });
-  }
-
-  function abrirChatSuporte(nomeUser) {
-    currentChatUser = nomeUser;
-    currentChatName.textContent = 'Suporte com: ' + nomeUser;
-    messagesSuporte.innerHTML = '';
-    inputAreaSuporte.style.display = 'flex';
-    carregarMensagensSuporteUsuario(nomeUser);
-  }
-
-  function carregarMensagensSuporteUsuario(nomeUser) {
-    messagesSuporte.innerHTML = '';
-    db.ref('messages/suporte/' + nomeUser).off();
-    db.ref('messages/suporte/' + nomeUser).on('child_added', snap => {
-      const msg = snap.val();
-      const isMine = (msg.sender === userName);
-      adicionarMsgNaTela(msg, messagesSuporte, isMine);
-    });
-  }
-
-  sendBtnSuporte.onclick = () => {
-    const text = messageInputSuporte.value.trim();
-    if (!text) return alert('Digite uma mensagem');
-    enviarMensagemSuporte(text);
-    messageInputSuporte.value = '';
-  };
-
-  function enviarMensagemSuporte(text) {
-    const now = new Date();
-    const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const messageData = { sender: userName, text, time };
-    db.ref('messages/suporte/' + currentChatUser).push(messageData);
-  }
-</script>
 </body>
 </html>
