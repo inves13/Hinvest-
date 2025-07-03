@@ -27,6 +27,28 @@
       font-weight: bold;
       font-size: 0.95rem;
     }
+    /* Toast notification */
+    #toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #00ff88;
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: bold;
+      z-index: 9999;
+      box-shadow: 0 0 12px #00ff88aa;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease, top 0.4s ease;
+    }
+    #toast.show {
+      opacity: 1;
+      pointer-events: auto;
+      top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -83,6 +105,8 @@
     <div class="alerta hidden" id="alerta" role="alert" aria-live="assertive" style="margin-top:15px;"></div>
   </form>
 </div>
+
+<div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -151,28 +175,63 @@
     });
   }
 
+  // Função para validar CPF com cálculo oficial
+  function validarCPF(cpf) {
+    cpf = cpf.replace(/[^\d]+/g, "");
+    if(cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+    let soma = 0;
+    for(let i=0; i<9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
+    let resto = (soma * 10) % 11;
+    if(resto === 10 || resto === 11) resto = 0;
+    if(resto !== parseInt(cpf.charAt(9))) return false;
+    soma = 0;
+    for(let i=0; i<10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
+    resto = (soma * 10) % 11;
+    if(resto === 10 || resto === 11) resto = 0;
+    if(resto !== parseInt(cpf.charAt(10))) return false;
+    return true;
+  }
+
   function validarFormulario() {
     const nomeVal = nomeInput.value.trim();
     const telefoneVal = telefoneInput.value.trim();
     const cpfVal = cpfInput.value.trim();
 
-    if(nomeVal.length < 3) return false;
+    if(nomeVal.length < 3) {
+      alerta.textContent = "Por favor, preencha o nome completo.";
+      alerta.classList.remove("hidden");
+      return false;
+    }
 
-    // Telefone regex (com máscara, já formatado)
+    // Telefone regex (com máscara)
     const telRegex = /^\(\d{2}\)\s?\d{4,5}-\d{4}$/;
-    if(!telRegex.test(telefoneVal)) return false;
+    if(!telRegex.test(telefoneVal)) {
+      alerta.textContent = "Telefone inválido. Use o formato (00) 00000-0000.";
+      alerta.classList.remove("hidden");
+      return false;
+    }
 
-    // CPF formatado: 000.000.000-00
+    // CPF regex formatado
     const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-    if(!cpfRegex.test(cpfVal)) return false;
+    if(!cpfRegex.test(cpfVal)) {
+      alerta.textContent = "CPF inválido. Use o formato 000.000.000-00.";
+      alerta.classList.remove("hidden");
+      return false;
+    }
 
+    // Valida o CPF com cálculo
+    if(!validarCPF(cpfVal)) {
+      alerta.textContent = "CPF inválido.";
+      alerta.classList.remove("hidden");
+      return false;
+    }
+
+    alerta.classList.add("hidden");
     return true;
   }
 
   function selecionarValor(btn, valor) {
     if(!validarFormulario()) {
-      alerta.textContent = "Preencha nome, telefone e CPF corretamente antes de escolher o valor.";
-      alerta.classList.remove("hidden");
       avisoPagamento.classList.add("hidden");
       return;
     }
@@ -201,8 +260,7 @@
 
   copyPixBtn.addEventListener("click", () => {
     navigator.clipboard.writeText(pixKeyEl.textContent).then(() => {
-      alerta.textContent = "Chave Pix copiada com sucesso!";
-      alerta.classList.remove("hidden");
+      showToast("Chave Pix copiada com sucesso!");
     }).catch(() => {
       alerta.textContent = "Erro ao copiar chave Pix.";
       alerta.classList.remove("hidden");
@@ -221,17 +279,7 @@
         clearInterval(timerInterval);
         alerta.textContent = "Tempo esgotado. Gere o código novamente.";
         alerta.classList.remove("hidden");
-        pixBox.classList.add("hidden");
-        confirmarBtn.classList.add("hidden");
-        cancelarBtn.classList.add("hidden");
-        timerEl.classList.add("hidden");
-        avisoPagamento.classList.add("hidden");
-        valorSelecionado = null;
-        amountDiv.querySelectorAll("button").forEach(b => {
-          b.classList.remove("selected");
-          b.setAttribute("aria-checked", "false");
-          b.tabIndex = -1;
-        });
+        resetarFormulario();
       }
     }, 1000);
   }
@@ -249,8 +297,6 @@
       return;
     }
     if(!validarFormulario()) {
-      alerta.textContent = "Preencha nome, telefone e CPF corretamente.";
-      alerta.classList.remove("hidden");
       return;
     }
 
@@ -270,8 +316,7 @@
 
     db.ref(`usuarios/${telefoneLogado}/extratosDepositos`).push(deposito)
     .then(() => {
-      alerta.textContent = `Depósito ${status} com sucesso.`;
-      alerta.classList.remove("hidden");
+      showToast(`Depósito ${status === 'pendente' ? 'confirmado' : 'cancelado'} com sucesso.`);
       resetarFormulario();
     })
     .catch(erro => {
@@ -295,7 +340,6 @@
       b.setAttribute("aria-checked", "false");
       b.tabIndex = -1;
     });
-    depositForm.reset();
   }
 
   confirmarBtn.addEventListener("click", () => registrarDeposito("pendente"));
@@ -332,6 +376,19 @@
     }
     e.target.value = v;
   });
+
+  // Função toast para notificações no topo
+  const toastEl = document.getElementById("toast");
+  let toastTimeout = null;
+
+  function showToast(msg) {
+    clearTimeout(toastTimeout);
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    toastTimeout = setTimeout(() => {
+      toastEl.classList.remove("show");
+    }, 3000);
+  }
 
   criarBotoesValores();
 </script>
