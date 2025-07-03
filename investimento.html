@@ -88,8 +88,6 @@
       color: #ccc;
       cursor: not-allowed;
     }
-
-    /* 🔔 Notificação */
     #notificacao {
       position: fixed;
       top: -60px;
@@ -108,7 +106,6 @@
 </head>
 <body>
 
-<!-- 🔔 Notificação -->
 <div id="notificacao"></div>
 
 <header>📈 H Invest</header>
@@ -187,7 +184,6 @@ function carregarPlanos(saldo) {
     const total = (retorno * p.dias).toFixed(2);
     const btn = saldo < p.valor ? 'disabled' : '';
     const cor = cores[p.nome] || "#00c3ff";
-
     c.innerHTML += `
     <div class="card" style="border: 2px solid ${cor}; box-shadow: 0 0 10px ${cor};">
       <img src="1004.png" />
@@ -208,9 +204,6 @@ function comprarPlano(nome, valor, retorno, dias) {
     inv.push({ nome, valor, retorno, dias, inicio: Date.now() });
     userRef.update({ saldoCarteira: s - valor, investimentos: inv }, () => {
       mostrarNotificacao("✅ Investimento realizado com sucesso!");
-      setTimeout(() => {
-        mostrarNotificacao("✅ Produto comprado com sucesso!");
-      }, 3000);
       atualizarSaldo();
     });
   });
@@ -229,7 +222,6 @@ function mostrarMeusProdutos() {
       const disabled = percent < 100 ? 'disabled' : '';
       const cor = cores[i.nome] || "#00c3ff";
       const lucroTotal = (parseFloat(i.retorno) * i.dias).toFixed(2);
-
       c.innerHTML += `<div class="card" style="border: 2px solid ${cor}; box-shadow: 0 0 10px ${cor};">
         <img src="1004.png" />
         <h3 style="color:${cor}">${i.nome}</h3>
@@ -259,9 +251,9 @@ function coletar(idx) {
     let d = snap.val(), inv = d.investimentos;
     const ganho = parseFloat(inv[idx].retorno);
     d.saldoCarteira = (parseFloat(d.saldoCarteira || 0)) + ganho;
-    inv.splice(idx, 1);
+    inv[idx].inicio = Date.now();
     userRef.update({ saldoCarteira: d.saldoCarteira, investimentos: inv }, () => {
-      mostrarNotificacao("✅ Rendimento coletado com sucesso!");
+      mostrarNotificacao("✅ Rendimento coletado!");
       mostrarMeusProdutos();
     });
   });
@@ -278,6 +270,5 @@ function mostrarNotificacao(mensagem) {
 
 atualizarSaldo();
 </script>
-
 </body>
 </html>
