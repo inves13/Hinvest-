@@ -3,134 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <title>Extrato de Depósitos</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-
   <style>
-    body {
-      background-color: #111;
-      color: #ddd;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    h2 {
-      text-align: center;
-      color: #00ff88;
-      padding: 20px;
-    }
-
-    #depositosContainer {
-      max-width: 600px;
+    body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:20px; }
+    h1 { color:#00ff88; text-align:center; }
+    .extrato-item { background:#222; border-radius:10px; padding:15px; margin:10px 0; box-shadow:0 0 10px #00ff8866; }
+    .extrato-item strong { color:#00ff88; }
+    .vazio { text-align:center; color:#888; margin-top:30px; }
+    .btn-voltar {
+      display: block;
       margin: 20px auto;
-      padding: 10px;
-      background: #222;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-    }
-
-    .extrato-card {
-      background-color: #333;
-      padding: 15px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      border: 1px solid #00ff88;
-      color: #fff;
-    }
-
-    .extrato-card b {
-      color: #00ff88;
-    }
-
-    .status {
-      font-weight: bold;
-      padding: 5px;
-      margin-top: 10px;
-      display: inline-block;
-      border-radius: 5px;
-    }
-
-    .aprovado {
-      background-color: #00ff88;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #00ff88, #0088ff);
       color: #000;
-    }
-
-    .aguardando {
-      background-color: #ff4444;
-      color: #fff;
+      text-decoration: none;
+      border-radius: 10px;
+      text-align: center;
+      width: 200px;
     }
   </style>
 </head>
 <body>
+  <h1>Extrato de Depósitos</h1>
+  <div id="extratos"></div>
+  <a href="index.html" class="btn-voltar">Voltar</a>
 
-  <h2>Extrato de Depósitos</h2>
-  <div id="depositosContainer"></div>
-
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
   <script>
-    // Inicializando o Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
       authDomain: "hinvest-f4354.firebaseapp.com",
       databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
       projectId: "hinvest-f4354",
-      storageBucket: "hinvest-f4354.firebasestorage.app",
+      storageBucket: "hinvest-f4354.appspot.com",
       messagingSenderId: "646397677016",
       appId: "1:646397677016:web:f05ca27a38439568bff6ad"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    const auth = firebase.auth();
 
-    // Função para carregar os depósitos do usuário logado
-    function carregarDepositos() {
-      const telefone = localStorage.getItem("telefoneLogado"); // Acesso ao telefone armazenado
-      if (!telefone) {
-        // Se o usuário não estiver logado, redireciona para o login
-        window.location.href = 'index.html'; // Substitua 'index.html' pelo seu arquivo de login
-        return;
-      }
+    const telefoneLogado = localStorage.getItem("telefoneLogado");
+    const extratosDiv = document.getElementById("extratos");
 
-      const container = document.getElementById("depositosContainer");
-      db.ref(`usuarios/${telefone}/extratosDepositos`).on("value", snapshot => {
-        container.innerHTML = "";
+    if (!telefoneLogado) {
+      extratosDiv.innerHTML = "<p class='vazio'>Você precisa estar logado para ver seus extratos.</p>";
+    } else {
+      db.ref(`usuarios/${telefoneLogado}/extratosDepositos`).once("value", snapshot => {
         if (snapshot.exists()) {
-          snapshot.forEach(child => {
-            const dep = child.val();
-            const statusClass = dep.status === "Aprovado" ? "aprovado" : "aguardando";
-            container.innerHTML += `
-              <div class="extrato-card">
-                <b>ID:</b> ${child.key}<br>
-                <b>Valor:</b> R$${parseFloat(dep.valor).toFixed(2)}<br>
-                <b>Método de Pagamento:</b> ${dep.metodoPagamento}<br>
-                <b>Chave Pix:</b> ${dep.chavePix}<br>
-                <b>Data:</b> ${new Date(dep.data).toLocaleString()}<br>
-                <span class="status ${statusClass}">${dep.status || "Aguardando"}</span>
+          let html = "";
+          snapshot.forEach(item => {
+            const dado = item.val();
+            html += `
+              <div class="extrato-item">
+                <p><strong>Nome:</strong> ${dado.nome}</p>
+                <p><strong>CPF:</strong> ${dado.cpf}</p>
+                <p><strong>Telefone:</strong> ${dado.telefone}</p>
+                <p><strong>Valor:</strong> R$ ${dado.valor}</p>
+                <p><strong>Método:</strong> ${dado.metodoPagamento}</p>
+                <p><strong>Status:</strong> ${dado.status}</p>
+                <p><strong>Data:</strong> ${new Date(dado.data).toLocaleString()}</p>
               </div>
             `;
           });
+          extratosDiv.innerHTML = html;
         } else {
-          container.innerHTML = "<p>Nenhum depósito encontrado.</p>";
+          extratosDiv.innerHTML = "<p class='vazio'>Nenhum depósito registrado ainda.</p>";
         }
       });
     }
-
-    // Verifica se o usuário está logado e chama a função de carregar depósitos
-    window.onload = function() {
-      const telefone = localStorage.getItem("telefoneLogado");
-      if (telefone) {
-        carregarDepositos();
-      } else {
-        // Se o usuário não estiver logado, redireciona para o login
-        window.location.href = 'index.html'; // Substitua 'index.html' pelo seu arquivo de login
-      }
-    }
   </script>
-
 </body>
 </html>
