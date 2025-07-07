@@ -69,7 +69,8 @@
     <div class="linha"><strong>LV 3</strong> <span id="lv3-qtd">0</span></div>
     <div class="linha"><strong>Total de Membros</strong> <span id="total-users">0</span></div>
     <div class="linha"><strong>Bônus Acumulado</strong> <span id="total-bonus">R$ 0,00</span></div>
-    <button onclick="resgatarBonus()">Resgatar Bônus</button>
+    <!-- Botão removido conforme solicitado -->
+    <!-- <button onclick="resgatarBonus()">Resgatar Bônus</button> -->
   </div>
 
   <div class="card">
@@ -199,21 +200,7 @@
     window.open("https://wa.me/?text="+msg,"_blank");
   }
 
-  function resgatarBonus(){
-    db.ref("usuarios/"+telefoneLogado).once("value").then(snap=>{
-      const user=snap.val();
-      const saldoAtual=user.saldoCarteira||0;
-      const bonusAtual=user.saldoBonus||0;
-      if(bonusAtual<30)return alert("Mínimo para resgatar: R$30,00.");
-      db.ref("usuarios/"+telefoneLogado).update({
-        saldoCarteira:saldoAtual+bonusAtual,
-        saldoBonus:0
-      }).then(()=>{
-        alert("Bônus resgatado!");
-        document.getElementById("total-bonus").innerText="R$ 0,00";
-      });
-    });
-  }
+  // Função resgatarBonus removida conforme solicitado
 </script>
 </body>
 </html>
