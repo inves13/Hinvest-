@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>H Invest - Minha Equipe</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
-      background: #000;
-      color: #fff;
+      background: #0d0d0d;
+      color: #f2f2f2;
       font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 20px;
@@ -17,85 +17,48 @@
       margin: auto;
     }
     .card {
-      background: rgba(26, 26, 26, 0.9);
+      background: #1a1a1a;
       padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
       margin-bottom: 20px;
-      border: 1px solid #00bfff;
     }
     .card h2 {
       margin-top: 0;
       margin-bottom: 10px;
-      font-size: 22px;
-      color: #00ffcc;
-      text-align: center;
+      font-size: 20px;
     }
     .linha {
       display: flex;
       justify-content: space-between;
       padding: 12px;
-      background: rgba(43, 43, 43, 0.8);
-      border-radius: 10px;
+      background: #2b2b2b;
+      border-radius: 8px;
       margin-bottom: 10px;
       align-items: center;
-      box-shadow: 0 0 8px rgba(0, 255, 200, 0.3);
     }
     button {
-      background: linear-gradient(135deg, #00ff99, #00ccff);
-      color: #000;
+      background: #28a745;
+      color: white;
       border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: bold;
+      padding: 8px 14px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 12px rgba(0, 255, 200, 0.6);
-      margin-top: 10px;
-    }
-    button:hover {
-      background: linear-gradient(135deg, #00e68a, #00bfff);
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(0, 255, 200, 0.8);
+      font-weight: bold;
     }
     #membros-lista {
-      max-height: 300px;
+      max-height: 250px;
       overflow-y: auto;
       margin-top: 12px;
     }
     .membro {
       padding: 10px;
-      background: rgba(51, 51, 51, 0.7);
-      border-radius: 10px;
-      margin-bottom: 10px;
-      box-shadow: 0 0 10px rgba(0, 255, 200, 0.2);
-      color: #00ffcc;
-    }
-    .membro strong {
-      color: #00ccff;
+      background: #333;
+      border-radius: 6px;
+      margin-bottom: 8px;
     }
     .center {
       text-align: center;
-      color: #ccc;
-    }
-    .copy-btn {
-      background: #00bfff;
-      border: none;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      padding: 6px 10px;
-      border-radius: 6px;
-      margin-left: 10px;
-      transition: background 0.3s ease;
-    }
-    .copy-btn:hover {
-      background: #0099cc;
-    }
-    .codigo-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
   </style>
 
@@ -103,32 +66,33 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <h2>🔗 Código de Convite</h2>
-      <div class="linha codigo-container">
-        <span id="codigo-link">Carregando...</span>
-        <button class="copy-btn" onclick="copiarTexto('codigo-link')">Copiar</button>
-      </div>
-      <button onclick="compartilharWhatsApp()">Compartilhar no WhatsApp</button>
-    </div>
 
-    <div class="card">
-      <h2>👥 Minha Equipe</h2>
-      <div class="linha"><strong>LV 1</strong> <span id="lv1-qtd">0</span></div>
-      <div class="linha"><strong>LV 2</strong> <span id="lv2-qtd">0</span></div>
-      <div class="linha"><strong>LV 3</strong> <span id="lv3-qtd">0</span></div>
-      <div class="linha"><strong>Total de Membros</strong> <span id="total-users">0</span></div>
-      <div class="linha"><strong>Bônus Acumulado</strong> <span id="total-bonus">R$ 0,00</span></div>
-      <button onclick="resgatarBonus()">Resgatar Bônus</button>
+<div class="container">
+  <div class="card">
+    <h2>Código de Convite</h2>
+    <div class="linha">
+      <span id="codigo-link">Carregando...</span>
+      <button onclick="copiarTexto('codigo-link')">Copiar</button>
     </div>
-
-    <div class="card">
-      <h2>📄 Membros</h2>
-      <button onclick="mostrarMembros()">Ver Lista de Membros</button>
-      <div id="membros-lista"></div>
-    </div>
+    <button onclick="compartilharWhatsApp()">Compartilhar no WhatsApp</button>
   </div>
+
+  <div class="card">
+    <h2>Minha Equipe</h2>
+    <div class="linha"><strong>LV 1</strong> <span id="lv1-qtd">0</span></div>
+    <div class="linha"><strong>LV 2</strong> <span id="lv2-qtd">0</span></div>
+    <div class="linha"><strong>LV 3</strong> <span id="lv3-qtd">0</span></div>
+    <div class="linha"><strong>Total de Membros</strong> <span id="total-users">0</span></div>
+    <div class="linha"><strong>Bônus Acumulado</strong> <span id="total-bonus">R$ 0,00</span></div>
+    <button id="btn-resgatar" onclick="resgatarBonus()">Resgatar Bônus</button>
+  </div>
+
+  <div class="card">
+    <h2>Membros</h2>
+    <button onclick="mostrarMembros()">Ver Lista de Membros</button>
+    <div id="membros-lista"></div>
+  </div>
+</div>
 
 <script>
   const firebaseConfig = {
@@ -140,11 +104,13 @@
     messagingSenderId: "646397677016",
     appId: "1:646397677016:web:f05ca27a38439568bff6ad"
   };
-
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
+
   const telefoneLogado = localStorage.getItem("telefoneLogado");
-  if (!telefoneLogado) window.location.href = "index.html";
+  if (!telefoneLogado) {
+    window.location.href = "index.html";
+  }
 
   let meuCodigo = "";
   let membros = [];
@@ -153,9 +119,11 @@
     const user = snapshot.val();
     if (user) {
       meuCodigo = user.codigo || gerarCodigo();
-      const dataHoje = new Date().toLocaleDateString("pt-BR");
-      db.ref("usuarios/" + telefoneLogado).update({ codigo: meuCodigo, dataCadastro: user.dataCadastro || dataHoje });
-      document.getElementById("codigo-link").innerText = "https://inves13.github.io/Hinvest-/?codigo=" + meuCodigo;
+      db.ref("usuarios/" + telefoneLogado).update({ codigo: meuCodigo });
+
+      const codigoLink = "https://inves13.github.io/Hinvest-/?codigo=" + meuCodigo;
+      document.getElementById("codigo-link").innerText = codigoLink;
+
       carregarEquipe();
     }
   });
@@ -164,122 +132,82 @@
     return Math.random().toString(36).substr(2, 8).toUpperCase();
   }
 
-  async function carregarEquipe() {
-    const snapshot = await db.ref("usuarios").once("value");
-    const usuarios = snapshot.val();
-    let lv1 = 0, lv2 = 0, lv3 = 0;
-    membros = [];
-    let bonusTotal = 0;
-    let bonusCalculado = {};
+  function carregarEquipe() {
+    db.ref("usuarios").once("value").then(snapshot => {
+      const usuarios = snapshot.val();
+      let lv1 = 0, lv2 = 0, lv3 = 0;
+      let bonus = 0;
+      membros = [];
 
-    const snapshotUser = await db.ref("usuarios/" + telefoneLogado).once("value");
-    bonusCalculado = snapshotUser.val().bonusCalculado || {};
-    const updatesBonus = {};
+      for (let tel in usuarios) {
+        const u = usuarios[tel];
+        if (u.codigoIndicacao === meuCodigo) {
+          lv1++; bonus += 5;
+          membros.push(u.telefone);
 
-    for (let tel in usuarios) {
-      const u = usuarios[tel];
-      if (u.codigoIndicacao === meuCodigo) {
-        lv1++;
-        membros.push({ tel: u.telefone, nivel: 1, data: u.dataCadastro });
-        bonusTotal += await verificarInvestimento(tel, 35, updatesBonus, bonusCalculado);
+          for (let tel2 in usuarios) {
+            const u2 = usuarios[tel2];
+            if (u2.codigoIndicacao === u.codigo) {
+              lv2++; bonus += 3;
+              membros.push(u2.telefone);
 
-        for (let tel2 in usuarios) {
-          const u2 = usuarios[tel2];
-          if (u2.codigoIndicacao === u.codigo) {
-            lv2++;
-            membros.push({ tel: u2.telefone, nivel: 2, data: u2.dataCadastro });
-            bonusTotal += await verificarInvestimento(tel2, 2, updatesBonus, bonusCalculado);
-
-            for (let tel3 in usuarios) {
-              const u3 = usuarios[tel3];
-              if (u3.codigoIndicacao === u2.codigo) {
-                lv3++;
-                membros.push({ tel: u3.telefone, nivel: 3, data: u3.dataCadastro });
-                bonusTotal += await verificarInvestimento(tel3, 1, updatesBonus, bonusCalculado);
+              for (let tel3 in usuarios) {
+                const u3 = usuarios[tel3];
+                if (u3.codigoIndicacao === u2.codigo) {
+                  lv3++; bonus += 1;
+                  membros.push(u3.telefone);
+                }
               }
             }
           }
         }
       }
-    }
 
-    await db.ref("usuarios/" + telefoneLogado).update({
-      saldoBonus: bonusTotal,
-      bonusCalculado: updatesBonus
+      document.getElementById("lv1-qtd").innerText = lv1;
+      document.getElementById("lv2-qtd").innerText = lv2;
+      document.getElementById("lv3-qtd").innerText = lv3;
+      document.getElementById("total-users").innerText = lv1 + lv2 + lv3;
+
+      // Atualiza saldoBonus no banco
+      db.ref("usuarios/" + telefoneLogado).update({ saldoBonus: bonus });
+
+      document.getElementById("total-bonus").innerText = "R$ " + bonus.toFixed(2).replace(".", ",");
     });
-
-    document.getElementById("lv1-qtd").innerText = lv1;
-    document.getElementById("lv2-qtd").innerText = lv2;
-    document.getElementById("lv3-qtd").innerText = lv3;
-    document.getElementById("total-users").innerText = lv1 + lv2 + lv3;
-    atualizarBonusNaTela(bonusTotal);
-  }
-
-  async function verificarInvestimento(telefone, percentual, updatesBonus, bonusCalculado) {
-    const snap = await db.ref("usuarios/" + telefone + "/investimentos").once("value");
-    const investimentos = snap.val();
-    let totalBonus = 0;
-    if (investimentos) {
-      for (let k in investimentos) {
-        const investimento = investimentos[k];
-        if (investimento.valor) {
-          const chave = telefone + "_" + k;
-          if (!bonusCalculado[chave]) {
-            const bonus = investimento.valor * (percentual / 100);
-            updatesBonus[chave] = true;
-            totalBonus += bonus;
-          }
-        }
-      }
-    }
-    return totalBonus;
-  }
-
-  function atualizarBonusNaTela(valor) {
-    document.getElementById("total-bonus").innerText = "R$ " + valor.toFixed(2).replace(".", ",");
   }
 
   function mostrarMembros() {
     const lista = document.getElementById("membros-lista");
     lista.innerHTML = "";
+
     if (membros.length === 0) {
       lista.innerHTML = "<p class='center'>Nenhum membro encontrado.</p>";
       return;
     }
+
     membros.forEach(m => {
       const div = document.createElement("div");
       div.className = "membro";
-      db.ref("usuarios/" + m.tel + "/investimentos").once("value").then(snapshot => {
-        const investimentos = snapshot.val();
-        let totalInvestido = 0;
-        if (investimentos) {
-          for (let k in investimentos) if (investimentos[k].valor) totalInvestido += investimentos[k].valor;
-        }
-        let percentual = m.nivel === 1 ? 35 : m.nivel === 2 ? 2 : 1;
-        let bonusGanho = totalInvestido * (percentual / 100);
-        div.innerHTML = `<strong>Telefone:</strong> ${mascararTelefone(m.tel)}<br>
-        <strong>Nível:</strong> LV ${m.nivel}<br>
-        <strong>Data Cadastro:</strong> ${m.data || "--"}<br>
-        <strong>Investido:</strong> R$ ${totalInvestido.toFixed(2).replace(".", ",")}<br>
-        <strong>Bônus Gerado:</strong> R$ ${bonusGanho.toFixed(2).replace(".", ",")}`;
-        lista.appendChild(div);
-      });
+      div.innerText = "Telefone: " + mascararTelefone(m);
+      lista.appendChild(div);
     });
   }
 
   function mascararTelefone(tel) {
+    // Exibindo os dois últimos números com asterisco
     return tel.substr(0, 5) + "**" + tel.substr(tel.length - 4);
   }
 
   function copiarTexto(id) {
     const texto = document.getElementById(id).innerText;
-    navigator.clipboard.writeText(texto).then(() => alert("Copiado com sucesso!"));
+    navigator.clipboard.writeText(texto).then(() => {
+      alert("Copiado com sucesso!");
+    });
   }
 
   function compartilharWhatsApp() {
     const link = document.getElementById("codigo-link").innerText;
-    const msg = encodeURIComponent("Cadastre-se na H Invest com meu convite: " + link);
-    window.open("https://wa.me/?text=" + msg, "_blank");
+    const mensagem = encodeURIComponent("Cadastre-se na H Invest com meu convite: " + link);
+    window.open("https://wa.me/?text=" + mensagem, "_blank");
   }
 
   function resgatarBonus() {
@@ -288,20 +216,23 @@
       const saldoAtual = user.saldoCarteira || 0;
       const bonusAtual = user.saldoBonus || 0;
 
-      if (bonusAtual < 250) {
-        alert("O valor mínimo para resgatar é R$250,00.");
+      if (bonusAtual < 30) {
+        alert("O valor mínimo para resgatar é R$30,00.");
         return;
       }
 
+      const novoSaldo = saldoAtual + bonusAtual;
+
       db.ref("usuarios/" + telefoneLogado).update({
-        saldoCarteira: saldoAtual + bonusAtual,
+        saldoCarteira: novoSaldo,
         saldoBonus: 0
       }).then(() => {
         alert("Bônus resgatado com sucesso!");
-        document.getElementById("total-bonus").innerText = "R$ 0,00";
+        carregarEquipe();
       });
     });
   }
 </script>
+
 </body>
 </html>
