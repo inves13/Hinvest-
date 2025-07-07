@@ -69,8 +69,7 @@
     <div class="linha"><strong>LV 3</strong> <span id="lv3-qtd">0</span></div>
     <div class="linha"><strong>Total de Membros</strong> <span id="total-users">0</span></div>
     <div class="linha"><strong>Bônus Acumulado</strong> <span id="total-bonus">R$ 0,00</span></div>
-    <!-- Botão removido conforme solicitado -->
-    <!-- <button onclick="resgatarBonus()">Resgatar Bônus</button> -->
+    <!-- Botão de resgatar bônus removido -->
   </div>
 
   <div class="card">
@@ -150,15 +149,20 @@
     });
   }
 
-  function verificarInvestimento(tel,percentual){
-    return db.ref("usuarios/"+tel+"/investimentos").once("value").then(snap=>{
-      const inv=snap.val(); let total=0;
-      if(inv){ for(let k in inv) if(inv[k].valor) total+=inv[k].valor; }
-      if(total>0){
-        const bonus=total*(percentual/100);
-        return db.ref("usuarios/"+telefoneLogado).once("value").then(s=>{
-          let atual=s.val().saldoBonus||0;
-          return db.ref("usuarios/"+telefoneLogado).update({saldoBonus:atual+bonus}).then(()=>bonus);
+  // Função corrigida para mandar comissão direto para saldoCarteira
+  function verificarInvestimento(tel, percentual) {
+    return db.ref("usuarios/" + tel + "/investimentos").once("value").then(snap => {
+      const inv = snap.val();
+      let total = 0;
+      if (inv) {
+        for (let k in inv)
+          if (inv[k].valor) total += inv[k].valor;
+      }
+      if (total > 0) {
+        const bonus = total * (percentual / 100);
+        return db.ref("usuarios/" + telefoneLogado).once("value").then(s => {
+          let saldoAtual = s.val().saldoCarteira || 0;
+          return db.ref("usuarios/" + telefoneLogado).update({ saldoCarteira: saldoAtual + bonus }).then(() => bonus);
         });
       }
       return 0;
@@ -199,8 +203,6 @@
     const msg=encodeURIComponent("Cadastre-se com meu convite: "+link);
     window.open("https://wa.me/?text="+msg,"_blank");
   }
-
-  // Função resgatarBonus removida conforme solicitado
 </script>
 </body>
 </html>
