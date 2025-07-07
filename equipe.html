@@ -99,208 +99,190 @@
     }
   </style>
 
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <h2>🔗 Código de Convite</h2>
-      <div class="linha codigo-container">
-        <span id="codigo-link">Carregando...</span>
-        <button class="copy-btn" onclick="copiarTexto('codigo-link')">Copiar</button>
-      </div>
-      <button onclick="compartilharWhatsApp()">Compartilhar no WhatsApp</button>
+<div class="container">
+  <div class="card">
+    <h2>🔗 Código de Convite</h2>
+    <div class="linha codigo-container">
+      <span id="codigo-link">Carregando...</span>
+      <button class="copy-btn" onclick="copiarTexto('codigo-link')">Copiar</button>
     </div>
-
-    <div class="card">
-      <h2>👥 Minha Equipe</h2>
-      <div class="linha"><strong>LV 1</strong> <span id="lv1-qtd">0</span></div>
-      <div class="linha"><strong>LV 2</strong> <span id="lv2-qtd">0</span></div>
-      <div class="linha"><strong>LV 3</strong> <span id="lv3-qtd">0</span></div>
-      <div class="linha"><strong>Total de Membros</strong> <span id="total-users">0</span></div>
-      <div class="linha"><strong>Bônus Acumulado</strong> <span id="total-bonus">R$ 0,00</span></div>
-      <button onclick="resgatarBonus()">Resgatar Bônus</button>
-    </div>
-
-    <div class="card">
-      <h2>📄 Membros</h2>
-      <button onclick="mostrarMembros()">Ver Lista de Membros</button>
-      <div id="membros-lista"></div>
-    </div>
+    <button onclick="compartilharWhatsApp()">Compartilhar no WhatsApp</button>
   </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-      authDomain: "hinvest-f4354.firebaseapp.com",
-      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-      projectId: "hinvest-f4354",
-      storageBucket: "hinvest-f4354.appspot.com",
-      messagingSenderId: "646397677016",
-      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-    };
+  <div class="card">
+    <h2>👥 Minha Equipe</h2>
+    <div class="linha"><strong>LV 1</strong> <span id="lv1-qtd">0</span></div>
+    <div class="linha"><strong>LV 2</strong> <span id="lv2-qtd">0</span></div>
+    <div class="linha"><strong>LV 3</strong> <span id="lv3-qtd">0</span></div>
+    <div class="linha"><strong>Total de Membros</strong> <span id="total-users">0</span></div>
+    <div class="linha"><strong>Bônus Acumulado</strong> <span id="total-bonus">R$ 0,00</span></div>
+    <button onclick="resgatarBonus()">Resgatar Bônus</button>
+  </div>
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const telefoneLogado = localStorage.getItem("telefoneLogado");
-    if (!telefoneLogado) window.location.href = "index.html";
+  <div class="card">
+    <h2>📄 Membros</h2>
+    <button onclick="mostrarMembros()">Ver Lista de Membros</button>
+    <div id="membros-lista"></div>
+  </div>
+</div>
 
-    let meuCodigo = "";
-    let membros = [];
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.appspot.com",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
 
-    // Carrega código do usuário e equipe
-    db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
-      const user = snapshot.val();
-      if (user) {
-        meuCodigo = user.codigo || gerarCodigo();
-        const dataHoje = new Date().toLocaleDateString("pt-BR");
-        db.ref("usuarios/" + telefoneLogado).update({ codigo: meuCodigo, dataCadastro: user.dataCadastro || dataHoje });
-        document.getElementById("codigo-link").innerText = "https://inves13.github.io/Hinvest-/?codigo=" + meuCodigo;
-        carregarEquipe();
-      }
-    });
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const telefoneLogado = localStorage.getItem("telefoneLogado");
+  if (!telefoneLogado) window.location.href = "index.html";
 
-    function gerarCodigo() {
-      return Math.random().toString(36).substr(2, 8).toUpperCase();
+  let meuCodigo = "";
+  let membros = [];
+
+  db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
+    const user = snapshot.val();
+    if (user) {
+      meuCodigo = user.codigo || gerarCodigo();
+      const dataHoje = new Date().toLocaleDateString("pt-BR");
+      db.ref("usuarios/" + telefoneLogado).update({ codigo: meuCodigo, dataCadastro: user.dataCadastro || dataHoje });
+      document.getElementById("codigo-link").innerText = "https://inves13.github.io/Hinvest-/?codigo=" + meuCodigo;
+      carregarEquipe();
     }
+  });
 
-    // Carrega equipe e calcula bônus, disparando verificação dos investimentos
-    function carregarEquipe() {
-      db.ref("usuarios").once("value").then(snapshot => {
-        const usuarios = snapshot.val();
-        let lv1 = 0, lv2 = 0, lv3 = 0;
-        membros = [];
+  function gerarCodigo() {
+    return Math.random().toString(36).substr(2, 8).toUpperCase();
+  }
 
-        // Resetar bônus antes do cálculo
-        let bonusTotal = 0;
+  function carregarEquipe() {
+    db.ref("usuarios").once("value").then(snapshot => {
+      const usuarios = snapshot.val();
+      let lv1 = 0, lv2 = 0, lv3 = 0;
+      membros = [];
+      let bonusTotal = 0;
 
-        for (let tel in usuarios) {
-          const u = usuarios[tel];
-          if (u.codigoIndicacao === meuCodigo) {
-            lv1++;
-            membros.push({ tel: u.telefone, nivel: 1, data: u.dataCadastro });
-            // Verifica se indicou e investiu para ganhar 35%
-            verificarInvestimento(tel, 35).then(bonus => {
-              if (bonus) bonusTotal += bonus;
-              atualizarBonusNaTela(bonusTotal);
-            });
+      for (let tel in usuarios) {
+        const u = usuarios[tel];
+        if (u.codigoIndicacao === meuCodigo) {
+          lv1++;
+          membros.push({ tel: u.telefone, nivel: 1, data: u.dataCadastro });
+          verificarInvestimento(tel, 35).then(b => { bonusTotal += b; atualizarBonusNaTela(bonusTotal); });
 
-            for (let tel2 in usuarios) {
-              const u2 = usuarios[tel2];
-              if (u2.codigoIndicacao === u.codigo) {
-                lv2++;
-                membros.push({ tel: u2.telefone, nivel: 2, data: u2.dataCadastro });
-                // Verifica 2% no segundo nível
-                verificarInvestimento(tel2, 2).then(bonus => {
-                  if (bonus) bonusTotal += bonus;
-                  atualizarBonusNaTela(bonusTotal);
-                });
+          for (let tel2 in usuarios) {
+            const u2 = usuarios[tel2];
+            if (u2.codigoIndicacao === u.codigo) {
+              lv2++;
+              membros.push({ tel: u2.telefone, nivel: 2, data: u2.dataCadastro });
+              verificarInvestimento(tel2, 2).then(b => { bonusTotal += b; atualizarBonusNaTela(bonusTotal); });
 
-                for (let tel3 in usuarios) {
-                  const u3 = usuarios[tel3];
-                  if (u3.codigoIndicacao === u2.codigo) {
-                    lv3++;
-                    membros.push({ tel: u3.telefone, nivel: 3, data: u3.dataCadastro });
-                    // Verifica 1% no terceiro nível
-                    verificarInvestimento(tel3, 1).then(bonus => {
-                      if (bonus) bonusTotal += bonus;
-                      atualizarBonusNaTela(bonusTotal);
-                    });
-                  }
+              for (let tel3 in usuarios) {
+                const u3 = usuarios[tel3];
+                if (u3.codigoIndicacao === u2.codigo) {
+                  lv3++;
+                  membros.push({ tel: u3.telefone, nivel: 3, data: u3.dataCadastro });
+                  verificarInvestimento(tel3, 1).then(b => { bonusTotal += b; atualizarBonusNaTela(bonusTotal); });
                 }
               }
             }
           }
         }
-
-        document.getElementById("lv1-qtd").innerText = lv1;
-        document.getElementById("lv2-qtd").innerText = lv2;
-        document.getElementById("lv3-qtd").innerText = lv3;
-        document.getElementById("total-users").innerText = lv1 + lv2 + lv3;
-        // Não atualiza bonus total aqui, será atualizado após promises
-        membros = membros.filter((v,i,a)=>a.findIndex(t=>(t.tel===v.tel))===i); // evitar duplicados
-      });
-    }
-
-    // Função que verifica se o usuário tem investimento e retorna o valor da comissão
-    function verificarInvestimento(telefone, percentual) {
-      return db.ref("usuarios/" + telefone + "/investimentos").once("value").then(snapshot => {
-        const investimentos = snapshot.val();
-        if (investimentos) {
-          let valorTotal = 0;
-          for (let key in investimentos) {
-            if (investimentos[key].valor) {
-              valorTotal += investimentos[key].valor;
-            }
-          }
-          if (valorTotal > 0) {
-            const valorBonus = valorTotal * (percentual / 100);
-            // Atualiza o saldoBonus do usuário logado
-            return db.ref("usuarios/" + telefoneLogado).once("value").then(snap => {
-              let bonusAtual = snap.val().saldoBonus || 0;
-              bonusAtual += valorBonus;
-              return db.ref("usuarios/" + telefoneLogado).update({ saldoBonus: bonusAtual }).then(() => {
-                return valorBonus;
-              });
-            });
-          }
-        }
-        return 0;
-      });
-    }
-
-    // Atualiza o bônus acumulado na tela
-    function atualizarBonusNaTela(valor) {
-      document.getElementById("total-bonus").innerText = "R$ " + valor.toFixed(2).replace(".", ",");
-    }
-
-    function mostrarMembros() {
-      const lista = document.getElementById("membros-lista");
-      lista.innerHTML = "";
-      if (membros.length === 0) {
-        lista.innerHTML = "<p class='center'>Nenhum membro encontrado.</p>";
-        return;
       }
-      membros.forEach(m => {
-        const div = document.createElement("div");
-        div.className = "membro";
+
+      document.getElementById("lv1-qtd").innerText = lv1;
+      document.getElementById("lv2-qtd").innerText = lv2;
+      document.getElementById("lv3-qtd").innerText = lv3;
+      document.getElementById("total-users").innerText = lv1 + lv2 + lv3;
+      membros = membros.filter((v,i,a)=>a.findIndex(t=>(t.tel===v.tel))===i);
+    });
+  }
+
+  function verificarInvestimento(telefone, percentual) {
+    return db.ref("usuarios/" + telefone + "/investimentos").once("value").then(snapshot => {
+      const investimentos = snapshot.val();
+      let total = 0;
+      if (investimentos) {
+        for (let k in investimentos) if (investimentos[k].valor) total += investimentos[k].valor;
+      }
+      if (total > 0) {
+        const bonus = total * (percentual / 100);
+        return db.ref("usuarios/" + telefoneLogado).once("value").then(snap => {
+          let atual = snap.val().saldoBonus || 0;
+          return db.ref("usuarios/" + telefoneLogado).update({ saldoBonus: atual + bonus }).then(() => bonus);
+        });
+      }
+      return 0;
+    });
+  }
+
+  function atualizarBonusNaTela(valor) {
+    document.getElementById("total-bonus").innerText = "R$ " + valor.toFixed(2).replace(".", ",");
+  }
+
+  function mostrarMembros() {
+    const lista = document.getElementById("membros-lista");
+    lista.innerHTML = "";
+    if (membros.length === 0) {
+      lista.innerHTML = "<p class='center'>Nenhum membro encontrado.</p>";
+      return;
+    }
+    membros.forEach(m => {
+      const div = document.createElement("div");
+      div.className = "membro";
+      db.ref("usuarios/" + m.tel + "/investimentos").once("value").then(snapshot => {
+        const investimentos = snapshot.val();
+        let totalInvestido = 0;
+        if (investimentos) {
+          for (let k in investimentos) if (investimentos[k].valor) totalInvestido += investimentos[k].valor;
+        }
+        let percentual = m.nivel === 1 ? 35 : m.nivel === 2 ? 2 : 1;
+        let bonusGanho = totalInvestido * (percentual / 100);
         div.innerHTML = `<strong>Telefone:</strong> ${mascararTelefone(m.tel)}<br>
-                         <strong>Nível:</strong> LV ${m.nivel}<br>
-                         <strong>Data do Cadastro:</strong> ${m.data || "--"}`;
+        <strong>Nível:</strong> LV ${m.nivel}<br>
+        <strong>Data Cadastro:</strong> ${m.data || "--"}<br>
+        <strong>Investido:</strong> R$ ${totalInvestido.toFixed(2).replace(".", ",")}<br>
+        <strong>Bônus Gerado:</strong> R$ ${bonusGanho.toFixed(2).replace(".", ",")}`;
         lista.appendChild(div);
       });
-    }
+    });
+  }
 
-    function mascararTelefone(tel) {
-      return tel.substr(0, 5) + "**" + tel.substr(tel.length - 4);
-    }
+  function mascararTelefone(tel) {
+    return tel.substr(0, 5) + "**" + tel.substr(tel.length - 4);
+  }
 
-    function copiarTexto(id) {
-      const texto = document.getElementById(id).innerText;
-      navigator.clipboard.writeText(texto).then(() => alert("Copiado com sucesso!"));
-    }
+  function copiarTexto(id) {
+    const texto = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(texto).then(() => alert("Copiado com sucesso!"));
+  }
 
-    function compartilharWhatsApp() {
-      const link = document.getElementById("codigo-link").innerText;
-      const mensagem = encodeURIComponent("Cadastre-se na H Invest com meu convite: " + link);
-      window.open("https://wa.me/?text=" + mensagem, "_blank");
-    }
+  function compartilharWhatsApp() {
+    const link = document.getElementById("codigo-link").innerText;
+    const msg = encodeURIComponent("Cadastre-se na H Invest com meu convite: " + link);
+    window.open("https://wa.me/?text=" + msg, "_blank");
+  }
 
-    function resgatarBonus() {
-      db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
-        const user = snapshot.val();
-        const saldoAtual = user.saldoCarteira || 0;
-        const bonusAtual = user.saldoBonus || 0;
-        if (bonusAtual < 30) return alert("O valor mínimo para resgatar é R$30,00.");
-        const novoSaldo = saldoAtual + bonusAtual;
-        db.ref("usuarios/" + telefoneLogado).update({ saldoCarteira: novoSaldo, saldoBonus: 0 }).then(() => {
-          alert("Bônus resgatado com sucesso!");
-          carregarEquipe();
-        });
+  function resgatarBonus() {
+    db.ref("usuarios/" + telefoneLogado).once("value").then(snapshot => {
+      const user = snapshot.val();
+      const saldoAtual = user.saldoCarteira || 0;
+      const bonusAtual = user.saldoBonus || 0;
+      if (bonusAtual < 30) return alert("O valor mínimo para resgatar é R$30,00.");
+      db.ref("usuarios/" + telefoneLogado).update({ saldoCarteira: saldoAtual + bonusAtual, saldoBonus: 0 }).then(() => {
+        alert("Bônus resgatado com sucesso!");
+        carregarEquipe();
       });
-    }
-  </script>
+    });
+  }
+</script>
 </body>
 </html>
