@@ -1,1 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Confirmar Depósito</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      background: #111; color: #eee; font-family: sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; margin: 0;
+    }
+    .container {
+      background: #222; padding: 20px 30px; border-radius: 12px;
+      box-shadow: 0 0 20px #00ff88aa; text-align: center; max-width: 500px;
+    }
+    h2 { color: #00ff88; }
+    p { color: #aaffaa; }
+    #countdown { font-size: 2.5rem; font-weight: bold; color: #00ff88; margin: 20px 0; }
+    #confirmBtn {
+      background: linear-gradient(135deg,#00ff88,#0088ff);
+      border: none; padding: 15px 30px; font-weight: bold; font-size: 1rem;
+      color: #000; border-radius: 10px; cursor: pointer;
+    }
+    #confirmBtn:disabled { background: #555; color: #aaa; cursor: not-allowed; }
+    #message { margin-top: 20px; color: #00ff88; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h2>Confirmar Depósito</h2>
+    <p>Após o pagamento, clique em confirmar abaixo.</p>
+    <div id="countdown">01:00</div>
+    <button id="confirmBtn" disabled>Confirmar Depósito</button>
+    <div id="message"></div>
+  </main>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+      authDomain: "hinvest-f4354.firebaseapp.com",
+      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+      projectId: "hinvest-f4354",
+      storageBucket: "hinvest-f4354.appspot.com",
+      messagingSenderId: "646397677016",
+      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const countdownEl = document.getElementById("countdown");
+    const confirmBtn = document.getElementById("confirmBtn");
+    const messageEl = document.getElementById("message");
+
+    const depositoDados = JSON.parse(localStorage.getItem("depositoDados"));
+    const telefoneLogado = localStorage.getItem("telefoneLogado");
+
+    if (!depositoDados || !telefoneLogado) {
+      alert("Dados de depósito ou telefone não encontrados. Você precisa estar logado e ter feito um depósito.");
+      window.location.href = "index.html";
+    }
+
+    let tempo = 60; // 1 minuto
+    const timer = setInterval(() => {
+      const min = String(Math.floor(tempo / 60)).padStart(2, '0');
+      const seg = String(tempo % 60).padStart(2, '0');
+      countdownEl.textContent = `${min}:${seg}`;
+      tempo--;
+      if (tempo < 0) {
+        clearInterval(timer);
+        confirmBtn.disabled = false;
+        messageEl.textContent = "Você pode confirmar agora.";
+      }
+    }, 1000);
+
+    confirmBtn.addEventListener("click", () => {
+      confirmBtn.disabled = true;
+      messageEl.textContent = "Processando...";
+
+      const userRef = db.ref("usuarios/" + telefoneLogado);
+
+      userRef.once("value").then(snapshot => {
+        let saldoAtual = parseFloat(snapshot.val()?.saldoCarteira || 0);
+        const novoSaldo = saldoAtual + parseFloat(depositoDados.valor);
+
+        userRef.update({ saldoCarteira: novoSaldo }).then(() => {
+          // Atualiza o status do depósito para "confirmado"
+          const depositoRef = db.ref("depositos").push();
+          depositoRef.set({
+            nome: depositoDados.nome,
+            telefone: telefoneLogado,
+            cpf: depositoDados.cpf,
+            metodo: depositoDados.metodo,
+            valor: depositoDados.valor,
+            status: "confirmado",
+            data: new Date().toISOString()
+          });
+
+          messageEl.textContent = `Depósito confirmado! Novo saldo: R$ ${novoSaldo.toFixed(2)}`;
+          localStorage.removeItem("depositoDados");
+
+          setTimeout(() => {
+            window.location.href = "H.html";
+          }, 2500);
+        }).catch(() => {
+          messageEl.textContent = "Erro ao atualizar saldo.";
+        });
+      }).catch(() => {
+        messageEl.textContent = "Erro ao acessar o banco de dados.";
+      });
+    });
+
+    window.onbeforeunload = function () {
+      return "Se sair agora, a confirmação será perdida.";
+    };
+  </script>
+</body>
+</html>
