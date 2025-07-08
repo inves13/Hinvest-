@@ -1,1 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Copiar Chave PIX - Plataforma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script type="module">
+    // Importações do Firebase (versão modular v9+)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
+    const firebaseConfig = {
+      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+      authDomain: "hinvest-f4354.firebaseapp.com",
+      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+      projectId: "hinvest-f4354",
+      storageBucket: "hinvest-f4354.appspot.com",
+      messagingSenderId: "646397677016",
+      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // PIX Keys
+    const pixKeys = {
+      60: "000201...138",
+      160: "000201...178",
+      300: "000201...276",
+      450: "000201...EE94",
+      500: "000201...54F1",
+      650: "pix650@hfinvest.com",
+      700: "pix700@hfinvest.com",
+      850: "pix850@hfinvest.com",
+      900: "pix900@hfinvest.com",
+      1050: "pix1050@hfinvest.com"
+    };
+
+    // Espera o DOM carregar
+    window.addEventListener("DOMContentLoaded", () => {
+      const pixKeyEl = document.getElementById("pixKey");
+      const copyBtn = document.getElementById("copyBtn");
+      const btnConfirmar = document.getElementById("btnConfirmar");
+      const toastEl = document.getElementById("toast");
+
+      const depositoDados = JSON.parse(localStorage.getItem("depositoDados"));
+
+      if (!depositoDados || !depositoDados.valor) {
+        pixKeyEl.textContent = "Erro: dados não encontrados.";
+        btnConfirmar.disabled = true;
+      } else {
+        pixKeyEl.textContent = pixKeys[depositoDados.valor] || "Chave não encontrada.";
+      }
+
+      copyBtn.addEventListener("click", () => {
+        navigator.clipboard.writeText(pixKeyEl.textContent).then(() => {
+          showToast("Chave PIX copiada com sucesso!");
+        }).catch(() => {
+          alert("Erro ao copiar.");
+        });
+      });
+
+      btnConfirmar.addEventListener("click", () => {
+        window.location.href = "confirmar.html";
+      });
+
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("show");
+        setTimeout(() => toastEl.classList.remove("show"), 3000);
+      }
+    });
+  </script>
+
+  <style>
+    body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:0; }
+    .container { max-width:500px; margin:20px auto; background:#222; border-radius:12px; padding:20px; box-shadow:0 0 20px #00ff88aa; }
+    h2 { color:#00ff88; }
+    .pix-key-box {
+      background:#333;
+      padding:15px;
+      border-radius:10px;
+      font-weight:bold;
+      font-size:1.2rem;
+      color:#00ff88;
+      word-break: break-all;
+      user-select: text;
+      margin: 20px 0;
+      display:flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    button.copy-btn {
+      background: linear-gradient(135deg,#00ff88,#0088ff);
+      border:none;
+      color:#000;
+      font-weight:bold;
+      padding:8px 14px;
+      border-radius:8px;
+      cursor:pointer;
+    }
+    .btn-next {
+      margin-top: 25px;
+      background: linear-gradient(135deg,#00ff88,#0088ff);
+      border:none;
+      padding:12px;
+      border-radius:8px;
+      font-weight:bold;
+      color:#000;
+      cursor:pointer;
+      width:100%;
+    }
+    .info-text {
+      font-size: 0.95rem;
+      margin-top: 12px;
+      color:#00ff88;
+    }
+    #toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #00ff88;
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: bold;
+      z-index: 9999;
+      box-shadow: 0 0 12px #00ff88aa;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease, top 0.4s ease;
+    }
+    #toast.show {
+      opacity: 1;
+      pointer-events: auto;
+      top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h2>Copiar Chave PIX</h2>
+    <p class="info-text">Copie a chave PIX abaixo e faça o pagamento no seu banco. Depois clique em "Confirmar Depósito".</p>
+    <div class="pix-key-box" id="pixKeyBox">
+      <span id="pixKey">...</span>
+      <button class="copy-btn" id="copyBtn">Copiar</button>
+    </div>
+    <button class="btn-next" id="btnConfirmar">Confirmar Depósito</button>
+  </main>
+
+  <div id="toast"></div>
+</body>
+</html>
