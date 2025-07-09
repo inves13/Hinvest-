@@ -1,3 +1,4 @@
+<!-- deposito.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -64,14 +65,6 @@
       text-decoration: underline;
       color: #00cc66;
     }
-    /* Estilo para aviso de funcionalidade bloqueada */
-    .bloqueado {
-      color: #ff4444;
-      font-weight: bold;
-      text-align: center;
-      margin-top: 20px;
-      font-size: 1.2rem;
-    }
   </style>
 </head>
 <body>
@@ -80,22 +73,18 @@
     <a href="extrato-deposito.html" class="extrato-link">Ver Extrato de Depósito</a>
 
     <h2>Fazer Depósito</h2>
-
-    <!-- Aviso de funcionalidade bloqueada -->
-    <div class="bloqueado">O depósito ainda não está disponível. Tente novamente mais tarde.</div>
-
     <form id="depositForm" novalidate>
       <label for="nomeCompleto">Nome Completo</label>
-      <input type="text" id="nomeCompleto" name="nomeCompleto" required autocomplete="name" disabled />
+      <input type="text" id="nomeCompleto" name="nomeCompleto" required autocomplete="name" />
 
       <label for="telefone">Telefone</label>
-      <input type="tel" id="telefone" name="telefone" required placeholder="(00) 00000-0000" disabled />
+      <input type="tel" id="telefone" name="telefone" required placeholder="(00) 00000-0000" />
 
       <label for="cpf">CPF</label>
-      <input type="text" id="cpf" name="cpf" required placeholder="000.000.000-00" maxlength="14" disabled />
+      <input type="text" id="cpf" name="cpf" required placeholder="000.000.000-00" maxlength="14" />
 
       <label for="pixMetodo">Método de Depósito</label>
-      <select id="pixMetodo" name="pixMetodo" disabled>
+      <select id="pixMetodo" name="pixMetodo">
         <option value="pix">PIX</option>
         <option value="transferencia">Transferência Bancária</option>
       </select>
@@ -105,8 +94,7 @@
 
       <div id="errorMsg" class="error-msg" style="display:none;"></div>
 
-      <!-- Botão desabilitado -->
-      <button type="submit" class="btn-next" disabled>Próximo</button>
+      <button type="submit" class="btn-next">Próximo</button>
     </form>
   </main>
 
@@ -244,7 +232,26 @@
         return;
       }
 
-      // Não registrar o depósito enquanto estiver bloqueado
+      const deposito = {
+        nome,
+        telefone,
+        cpf,
+        metodo: form.pixMetodo.value,
+        valor: valorSelecionado,
+        status: "pendente",
+        data: new Date().toISOString()
+      };
+
+      const telefoneId = telefone.replace(/\D/g, "");
+      db.ref(`usuarios/${telefoneId}/depositos`).push(deposito)
+        .then(() => {
+          localStorage.setItem("depositoDados", JSON.stringify({ ...deposito, telefoneId }));
+          window.location.href = "copiar.html";
+        })
+        .catch(error => {
+          errorMsg.textContent = "Erro ao registrar depósito: " + error.message;
+          errorMsg.style.display = "block";
+        });
     });
 
     criarBotoesValores();
