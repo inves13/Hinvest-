@@ -2,252 +2,338 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Depósito - Plataforma</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Depósito Online - Plataforma</title>
   <style>
     body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:0; }
     .container { max-width:500px; margin:20px auto; background:#222; border-radius:12px; padding:20px; box-shadow:0 0 20px #00ff88aa; }
-    h2 { color:#00ff88; }
-    label { display:block; margin-top:15px; color:#00ff88; font-weight:bold; }
+    .header { display:flex; justify-content:space-between; align-items:center; color:#00ff88; }
+    .header h2 { margin:0; }
+    .btn { background:linear-gradient(135deg,#00ff88,#0088ff); border:none; padding:10px 16px; border-radius:8px; color:#000; font-weight:bold; cursor:pointer; text-decoration:none; }
+    .btn:hover { background:linear-gradient(135deg,#00cc66,#0055cc); color:#fff; }
+    .form-group { margin:15px 0; }
+    label { color:#00ff88; font-weight:bold; display:block; margin-bottom:6px; }
     input, select { width:100%; padding:10px; border:2px solid #00ff88; border-radius:8px; background:#111; color:#eee; }
-    .amounts { margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; }
-    .amount-btn {
-      flex: 1 1 45%;
-      background:#333;
-      border:2px solid #555;
-      border-radius:10px;
-      padding:12px 0;
-      text-align:center;
-      color:#eee;
-      font-weight:bold;
-      cursor:pointer;
-      user-select:none;
-      transition: all 0.2s ease;
-    }
-    .amount-btn.selected {
-      background: linear-gradient(135deg, #00ff88, #0088ff);
-      color:#000;
-      border-color:#00ff88;
-    }
-    .btn-next {
-      margin-top: 25px;
-      background: linear-gradient(135deg,#00ff88,#0088ff);
-      border:none;
-      padding:12px;
-      border-radius:8px;
-      font-weight:bold;
-      color:#000;
-      cursor:pointer;
-      width:100%;
-      transition: background-color 0.3s ease;
-    }
-    .btn-next:hover {
-      background: linear-gradient(135deg,#00cc66,#0055cc);
-      color:#fff;
-    }
-    .error-msg {
-      margin-top:10px;
-      color:#ff4444;
-      font-weight:bold;
-    }
-    /* Estilo para o link de extrato */
-    .extrato-link {
-      display: block;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 1.2rem;
+    .amounts { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+    .amount-btn { flex:1 1 45%; text-align:center; padding:12px 0; background:#333; border:2px solid #555; border-radius:10px; cursor:pointer; color:#eee; font-weight:bold; user-select:none; }
+    .amount-btn.selected { background:linear-gradient(135deg,#00ff88,#0088ff); color:#000; border-color:#00ff88; }
+    .pix-box, .cronometro, .alerta { margin-top:15px; padding:10px; background:#111; border-radius:8px; }
+    .pix-box strong { color:#00ff88; }
+    .cronometro { color:#ff4444; font-size:18px; font-weight:bold; text-align:center; }
+    .hidden { display:none !important; }
+    #avisoPagamento {
+      margin-top: 12px;
       color: #00ff88;
-      text-decoration: none;
       font-weight: bold;
-    }
-    .extrato-link:hover {
-      text-decoration: underline;
-      color: #00cc66;
-    }
-    /* Estilo para aviso de funcionalidade bloqueada */
-    .bloqueado {
-      color: #ff4444;
-      font-weight: bold;
-      text-align: center;
-      margin-top: 20px;
-      font-size: 1.2rem;
+      font-size: 0.95rem;
     }
   </style>
 </head>
 <body>
-  <main class="container">
-    <!-- Link para acessar o extrato -->
-    <a href="extrato-deposito.html" class="extrato-link">Ver Extrato de Depósito</a>
+<div class="container" role="main" aria-label="Formulário de depósito online">
+  <div class="header">
+    <h2>Depósito</h2>
+    <div>
+      <a class="btn" href="extrato-deposito.html" target="_blank" rel="noopener noreferrer" aria-label="Abrir extrato de depósitos">Extrato</a>
+      <a class="btn" href="https://chatgrupohinvest.netlify.app/" target="_blank" rel="noopener noreferrer" aria-label="Contato de suporte via WhatsApp">Suporte</a>
+    </div>
+  </div>
+  
+  <form id="depositForm" novalidate>
+    <div class="form-group">
+      <label for="nomeTitular">Nome Completo</label>
+      <input type="text" id="nomeTitular" name="nomeTitular" required aria-required="true" autocomplete="name" />
+    </div>
+    <div class="form-group">
+      <label for="telefoneTitular">Telefone</label>
+      <input type="tel" id="telefoneTitular" name="telefoneTitular" required aria-required="true" autocomplete="tel" placeholder="(00) 00000-0000"/>
+    </div>
+    <div class="form-group">
+      <label for="cpfTitular">CPF</label>
+      <input type="text" id="cpfTitular" name="cpfTitular" required aria-required="true" maxlength="14" placeholder="000.000.000-00" />
+    </div>
 
-    <h2>Fazer Depósito</h2>
-
-    <!-- Aviso de funcionalidade bloqueada -->
-    <div class="bloqueado">O depósito ainda não está disponível. Tente novamente mais tarde.</div>
-
-    <form id="depositForm" novalidate>
-      <label for="nomeCompleto">Nome Completo</label>
-      <input type="text" id="nomeCompleto" name="nomeCompleto" required autocomplete="name" disabled />
-
-      <label for="telefone">Telefone</label>
-      <input type="tel" id="telefone" name="telefone" required placeholder="(00) 00000-0000" disabled />
-
-      <label for="cpf">CPF</label>
-      <input type="text" id="cpf" name="cpf" required placeholder="000.000.000-00" maxlength="14" disabled />
-
-      <label for="pixMetodo">Método de Depósito</label>
-      <select id="pixMetodo" name="pixMetodo" disabled>
+    <div class="form-group">
+      <label for="pix">Método de Depósito</label>
+      <select id="pix" name="pix" aria-label="Método de depósito">
         <option value="pix">PIX</option>
-        <option value="transferencia">Transferência Bancária</option>
+        <option value="bank">Transferência Bancária</option>
       </select>
+    </div>
 
-      <label>Escolha o valor para depósito</label>
-      <div class="amounts" id="amountBtns"></div>
+    <div class="form-group">
+      <label>Escolha o valor</label>
+      <div class="amounts" id="amountBtns" role="radiogroup" aria-label="Valores para depósito"></div>
+      <div id="avisoPagamento" class="hidden" aria-live="polite" aria-atomic="true">
+        ⚠️ Copie a chave PIX acima, vá até o banco e faça o pagamento. Depois volte aqui para confirmar o depósito.
+      </div>
+    </div>
 
-      <div id="errorMsg" class="error-msg" style="display:none;"></div>
+    <div class="pix-box hidden" id="pixBox" aria-live="polite" aria-atomic="true">
+      Chave Pix: <strong id="pixKey"></strong>
+      <button type="button" id="copyPixBtn" class="btn" aria-label="Copiar chave Pix para área de transferência" style="margin-top:10px;">Copiar chave Pix</button>
+    </div>
+    <div class="cronometro hidden" id="timer" aria-live="polite" aria-atomic="true" role="timer">05:00</div>
 
-      <!-- Botão desabilitado -->
-      <button type="submit" class="btn-next" disabled>Próximo</button>
-    </form>
-  </main>
+    <div class="form-group" id="actionButtons" style="margin-top:20px;">
+      <button type="button" class="btn hidden" id="confirmar" aria-label="Confirmar depósito">Confirmar Depósito</button>
+      <button type="button" class="btn hidden" id="cancelar" aria-label="Cancelar depósito" style="background: linear-gradient(135deg, #ff4444, #aa0000); margin-left:10px;">Cancelar</button>
+    </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-      authDomain: "hinvest-f4354.firebaseapp.com",
-      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-      projectId: "hinvest-f4354",
-      storageBucket: "hinvest-f4354.firebasestorage.app",
-      messagingSenderId: "646397677016",
-      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+    <div class="alerta hidden" id="alerta" role="alert" aria-live="assertive" style="margin-top:15px;"></div>
+  </form>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+<script>
+  // Firebase config e init
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.appspot.com",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Valores e chaves PIX
+  const valores = [60,160,300,450,500,650,700,850,900,1050];
+  const pixKeys = {
+    "60": "00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/53d5fabc-b030-4257-a53c-003e7cd1f17e5204000053039865802BR5925TRANSACAO_VERIFICADA_LTDA6012PORTO_ALEGRE62070503***63045FC9",
+    "160": "00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/d887ade8-540b-4596-b30d-c4feeb9aa1535204000053039865802BR5925TRANSACAO_VERIFICADA_LTDA6012PORTO_ALEGRE62070503***630409A0",
+    "300": "00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/f5602d83-bc1b-40d9-ae88-7ed6f89680155204000053039865802BR5925TRANSACAO_VERIFICADA_LTDA6012PORTO_ALEGRE62070503***6304CF94",
+    "450": "00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/2cdb20c2-33bf-43a1-947e-7911939a4b0c5204000053039865802BR5925TRANSACAO_VERIFICADA_LTDA6012PORTO_ALEGRE62070503***63048163",
+    "500": "00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/67833ad4-74b4-4282-a530-c09dc6a97c585204000053039865802BR5925TRANSACAO_VERIFICADA_LTDA6012PORTO_ALEGRE62070503***63044F06",
+    "650": "00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/8611c45b-f273-4e15-9f19-73a2c7c11c405204000053039865802BR5925TRANSACAO_VERIFICADA_LTDA6012PORTO_ALEGRE62070503***63040173",
+    "700": "00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/8bb253cc-c00b-40fb-9128-4deca945b50e5204000053039865802BR5925TRANSACAO_VERIFICADA_LTDA6012PORTO_ALEGRE62070503***6304D5A8",
+    "850": "00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/009d282c-cc1b-4c1a-b7ee-876791d2ab065204000053039865802BR5925TRANSACAO_VERIFICADA_LTDA6012PORTO_ALEGRE62070503***6304DAC2",
+    "900": "pix900@hfinvest.com",
+    "1050": "pix1050@hfinvest.com"
+  };
+
+  const telefoneLogado = localStorage.getItem("telefoneLogado") || "desconhecido";
+
+  const amountDiv = document.getElementById("amountBtns");
+  const pixBox = document.getElementById("pixBox");
+  const pixKeyEl = document.getElementById("pixKey");
+  const timerEl = document.getElementById("timer");
+  const confirmarBtn = document.getElementById("confirmar");
+  const cancelarBtn = document.getElementById("cancelar");
+  const alerta = document.getElementById("alerta");
+  const copyPixBtn = document.getElementById("copyPixBtn");
+  const avisoPagamento = document.getElementById("avisoPagamento");
+  const depositForm = document.getElementById("depositForm");
+
+  const nomeInput = document.getElementById("nomeTitular");
+  const telefoneInput = document.getElementById("telefoneTitular");
+  const cpfInput = document.getElementById("cpfTitular");
+  const metodoInput = document.getElementById("pix");
+
+  let valorSelecionado = null;
+  let timerInterval = null;
+  let tempoRestante = 300;
+
+  function criarBotoesValores() {
+    valores.forEach((v, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "amount-btn";
+      btn.textContent = `R$ ${v}`;
+      btn.setAttribute("role", "radio");
+      btn.setAttribute("aria-checked", "false");
+      btn.tabIndex = i === 0 ? 0 : -1;
+      btn.addEventListener("click", () => selecionarValor(btn, v));
+      amountDiv.appendChild(btn);
+    });
+  }
+
+  function validarFormulario() {
+    const nomeVal = nomeInput.value.trim();
+    const telefoneVal = telefoneInput.value.trim();
+    const cpfVal = cpfInput.value.trim();
+
+    if(nomeVal.length < 3) return false;
+
+    // Telefone regex (com máscara, já formatado)
+    const telRegex = /^\(\d{2}\)\s?\d{4,5}-\d{4}$/;
+    if(!telRegex.test(telefoneVal)) return false;
+
+    // CPF formatado: 000.000.000-00
+    const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+    if(!cpfRegex.test(cpfVal)) return false;
+
+    return true;
+  }
+
+  function selecionarValor(btn, valor) {
+    if(!validarFormulario()) {
+      alerta.textContent = "Preencha nome, telefone e CPF corretamente antes de escolher o valor.";
+      alerta.classList.remove("hidden");
+      avisoPagamento.classList.add("hidden");
+      return;
+    }
+    alerta.classList.add("hidden");
+
+    amountDiv.querySelectorAll("button").forEach(b => {
+      b.classList.remove("selected");
+      b.setAttribute("aria-checked", "false");
+      b.tabIndex = -1;
+    });
+    btn.classList.add("selected");
+    btn.setAttribute("aria-checked", "true");
+    btn.tabIndex = 0;
+
+    valorSelecionado = valor;
+
+    pixKeyEl.textContent = pixKeys[valor];
+    pixBox.classList.remove("hidden");
+    confirmarBtn.classList.remove("hidden");
+    cancelarBtn.classList.remove("hidden");
+    timerEl.classList.remove("hidden");
+    avisoPagamento.classList.remove("hidden");
+
+    iniciarCronometro();
+  }
+
+  copyPixBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText(pixKeyEl.textContent).then(() => {
+      alerta.textContent = "Chave Pix copiada com sucesso!";
+      alerta.classList.remove("hidden");
+    }).catch(() => {
+      alerta.textContent = "Erro ao copiar chave Pix.";
+      alerta.classList.remove("hidden");
+    });
+  });
+
+  function iniciarCronometro() {
+    clearInterval(timerInterval);
+    tempoRestante = 300;
+    atualizarTimer();
+
+    timerInterval = setInterval(() => {
+      tempoRestante--;
+      atualizarTimer();
+      if(tempoRestante <= 0) {
+        clearInterval(timerInterval);
+        alerta.textContent = "Tempo esgotado. Gere o código novamente.";
+        alerta.classList.remove("hidden");
+        pixBox.classList.add("hidden");
+        confirmarBtn.classList.add("hidden");
+        cancelarBtn.classList.add("hidden");
+        timerEl.classList.add("hidden");
+        avisoPagamento.classList.add("hidden");
+        valorSelecionado = null;
+        amountDiv.querySelectorAll("button").forEach(b => {
+          b.classList.remove("selected");
+          b.setAttribute("aria-checked", "false");
+          b.tabIndex = -1;
+        });
+      }
+    }, 1000);
+  }
+
+  function atualizarTimer() {
+    const min = Math.floor(tempoRestante / 60);
+    const seg = tempoRestante % 60;
+    timerEl.textContent = `${min.toString().padStart(2,"0")}:${seg.toString().padStart(2,"0")}`;
+  }
+
+  function registrarDeposito(status) {
+    if(!valorSelecionado) {
+      alerta.textContent = "Nenhum valor selecionado.";
+      alerta.classList.remove("hidden");
+      return;
+    }
+    if(!validarFormulario()) {
+      alerta.textContent = "Preencha nome, telefone e CPF corretamente.";
+      alerta.classList.remove("hidden");
+      return;
+    }
+
+    const dataAtual = new Date().toISOString();
+
+    const deposito = {
+      nome: nomeInput.value.trim(),
+      telefone: telefoneInput.value.trim(),
+      cpf: cpfInput.value.trim(),
+      valor: valorSelecionado,
+      chavePix: pixKeys[valorSelecionado],
+      metodoPagamento: metodoInput.value,
+      status: status,
+      data: dataAtual,
+      telefoneLogado: telefoneLogado
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
 
-    const valores = [60,160,300,450,500,650,700,850,900,1050];
-    const amountDiv = document.getElementById("amountBtns");
-    const form = document.getElementById("depositForm");
-    const errorMsg = document.getElementById("errorMsg");
-    let valorSelecionado = null;
-
-    function criarBotoesValores() {
-      valores.forEach((valor, i) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "amount-btn";
-        btn.textContent = `R$ ${valor}`;
-        btn.setAttribute("role", "radio");
-        btn.setAttribute("aria-checked", "false");
-        btn.tabIndex = i === 0 ? 0 : -1;
-        btn.addEventListener("click", () => selecionarValor(btn, valor));
-        amountDiv.appendChild(btn);
-      });
-    }
-
-    function selecionarValor(btn, valor) {
-      valorSelecionado = valor;
-      errorMsg.style.display = "none";
-      amountDiv.querySelectorAll("button").forEach(b => {
-        b.classList.remove("selected");
-        b.setAttribute("aria-checked", "false");
-        b.tabIndex = -1;
-      });
-      btn.classList.add("selected");
-      btn.setAttribute("aria-checked", "true");
-      btn.tabIndex = 0;
-    }
-
-    function mascaraTelefone(valor) {
-      valor = valor.replace(/\D/g, "");
-      if(valor.length > 11) valor = valor.slice(0,11);
-      if(valor.length > 10) {
-        return valor.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
-      } else if(valor.length > 5) {
-        return valor.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
-      } else if(valor.length > 2) {
-        return valor.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
-      } else if(valor.length > 0) {
-        return valor.replace(/^(\d*)/, "($1");
-      }
-      return valor;
-    }
-
-    function mascaraCPF(valor) {
-      valor = valor.replace(/\D/g, "");
-      if(valor.length > 11) valor = valor.slice(0,11);
-      if(valor.length > 9) {
-        return valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, "$1.$2.$3-$4");
-      } else if(valor.length > 6) {
-        return valor.replace(/^(\d{3})(\d{3})(\d{0,3}).*/, "$1.$2.$3");
-      } else if(valor.length > 3) {
-        return valor.replace(/^(\d{3})(\d{0,3}).*/, "$1.$2");
-      }
-      return valor;
-    }
-
-    function validarCPF(cpf) {
-      cpf = cpf.replace(/[^\d]+/g,'');
-      if(cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
-      let soma = 0;
-      for(let i=0; i<9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
-      let resto = (soma * 10) % 11;
-      if(resto === 10 || resto === 11) resto = 0;
-      if(resto !== parseInt(cpf.charAt(9))) return false;
-      soma = 0;
-      for(let i=0; i<10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
-      resto = (soma * 10) % 11;
-      if(resto === 10 || resto === 11) resto = 0;
-      if(resto !== parseInt(cpf.charAt(10))) return false;
-      return true;
-    }
-
-    form.telefone.addEventListener("input", e => {
-      e.target.value = mascaraTelefone(e.target.value);
+    db.ref(`usuarios/${telefoneLogado}/extratosDepositos`).push(deposito)
+    .then(() => {
+      alerta.textContent = `Depósito ${status} com sucesso.`;
+      alerta.classList.remove("hidden");
+      resetarFormulario();
+    })
+    .catch(erro => {
+      alerta.textContent = `Erro ao registrar depósito: ${erro.message}`;
+      alerta.classList.remove("hidden");
     });
+  }
 
-    form.cpf.addEventListener("input", e => {
-      e.target.value = mascaraCPF(e.target.value);
+  function resetarFormulario() {
+    valorSelecionado = null;
+    clearInterval(timerInterval);
+    timerEl.classList.add("hidden");
+    pixBox.classList.add("hidden");
+    confirmarBtn.classList.add("hidden");
+    cancelarBtn.classList.add("hidden");
+    alerta.classList.add("hidden");
+    avisoPagamento.classList.add("hidden");
+    timerEl.textContent = "05:00";
+    amountDiv.querySelectorAll("button").forEach(b => {
+      b.classList.remove("selected");
+      b.setAttribute("aria-checked", "false");
+      b.tabIndex = -1;
     });
+    depositForm.reset();
+  }
 
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      errorMsg.style.display = "none";
+  confirmarBtn.addEventListener("click", () => registrarDeposito("pendente"));
+  cancelarBtn.addEventListener("click", () => registrarDeposito("cancelado"));
 
-      const nome = form.nomeCompleto.value.trim();
-      const telefone = form.telefone.value.trim();
-      const cpf = form.cpf.value.trim();
+  // Máscara para telefone
+  telefoneInput.addEventListener("input", e => {
+    let v = e.target.value.replace(/\D/g,"");
+    if(v.length > 11) v = v.slice(0,11);
+    if(v.length > 10) {
+      // (00) 00000-0000
+      v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
+    } else if(v.length > 5) {
+      // (00) 0000-0000
+      v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+    } else if(v.length > 2) {
+      v = v.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
+    } else if(v.length > 0) {
+      v = v.replace(/^(\d*)/, "($1");
+    }
+    e.target.value = v;
+  });
 
-      if(nome.length < 3) {
-        errorMsg.textContent = "Por favor, preencha o nome completo.";
-        errorMsg.style.display = "block";
-        return;
-      }
+  // Máscara para CPF
+  cpfInput.addEventListener("input", e => {
+    let v = e.target.value.replace(/\D/g,"");
+    if(v.length > 11) v = v.slice(0,11);
+    if(v.length > 9) {
+      v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, "$1.$2.$3-$4");
+    } else if(v.length > 6) {
+      v = v.replace(/^(\d{3})(\d{3})(\d{0,3}).*/, "$1.$2.$3");
+    } else if(v.length > 3) {
+      v = v.replace(/^(\d{3})(\d{0,3}).*/, "$1.$2");
+    }
+    e.target.value = v;
+  });
 
-      const telRegex = /^\(\d{2}\) \d{4,5}-\d{4}$/;
-      if(!telRegex.test(telefone)) {
-        errorMsg.textContent = "Telefone inválido. Use o formato (00) 00000-0000.";
-        errorMsg.style.display = "block";
-        return;
-      }
-
-      const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-      if(!cpfRegex.test(cpf) || !validarCPF(cpf)) {
-        errorMsg.textContent = "CPF inválido.";
-        errorMsg.style.display = "block";
-        return;
-      }
-
-      if(valorSelecionado === null) {
-        errorMsg.textContent = "Por favor, selecione um valor para depósito.";
-        errorMsg.style.display = "block";
-        return;
-      }
-
-      // Não registrar o depósito enquanto estiver bloqueado
-    });
-
-    criarBotoesValores();
-  </script>
+  criarBotoesValores();
+</script>
 </body>
 </html>
