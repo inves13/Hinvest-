@@ -33,6 +33,10 @@
     <div id="countdown">01:00</div>
     <button id="confirmBtn" disabled>Confirmar Depósito</button>
     <div id="message"></div>
+    <!-- Som de alerta -->
+    <audio id="alertSound">
+      <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+    </audio>
   </main>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -55,6 +59,7 @@
     const countdownEl = document.getElementById("countdown");
     const confirmBtn = document.getElementById("confirmBtn");
     const messageEl = document.getElementById("message");
+    const alertSound = document.getElementById("alertSound");
 
     const depositoDados = JSON.parse(localStorage.getItem("depositoDados"));
     const telefoneLogado = localStorage.getItem("telefoneLogado");
@@ -64,16 +69,18 @@
       window.location.href = "index.html";
     }
 
-    let tempo = 60; // 1 minuto
+    let tempo = 60; // segundos
     const timer = setInterval(() => {
       const min = String(Math.floor(tempo / 60)).padStart(2, '0');
       const seg = String(tempo % 60).padStart(2, '0');
       countdownEl.textContent = `${min}:${seg}`;
       tempo--;
+
       if (tempo < 0) {
         clearInterval(timer);
         confirmBtn.disabled = false;
         messageEl.textContent = "Você pode confirmar agora.";
+        alertSound.play(); // 🔔 toca alerta sonoro
       }
     }, 1000);
 
@@ -88,7 +95,7 @@
         const novoSaldo = saldoAtual + parseFloat(depositoDados.valor);
 
         userRef.update({ saldoCarteira: novoSaldo }).then(() => {
-          // Atualiza o status do depósito para "confirmado"
+          // Salva depósito no histórico
           const depositoRef = db.ref("depositos").push();
           depositoRef.set({
             nome: depositoDados.nome,
@@ -100,17 +107,18 @@
             data: new Date().toISOString()
           });
 
-          messageEl.textContent = `Depósito confirmado! Novo saldo: R$ ${novoSaldo.toFixed(2)}`;
+          messageEl.textContent = `✅ Depósito confirmado! Novo saldo: R$ ${novoSaldo.toFixed(2)}`;
           localStorage.removeItem("depositoDados");
 
+          // ⏩ Redireciona para H.html
           setTimeout(() => {
             window.location.href = "H.html";
           }, 2500);
         }).catch(() => {
-          messageEl.textContent = "Erro ao atualizar saldo.";
+          messageEl.textContent = "❌ Erro ao atualizar saldo.";
         });
       }).catch(() => {
-        messageEl.textContent = "Erro ao acessar o banco de dados.";
+        messageEl.textContent = "❌ Erro ao acessar o banco de dados.";
       });
     });
 
