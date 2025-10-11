@@ -6,24 +6,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      background: #111; color: #eee; font-family: sans-serif;
-      display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; margin: 0;
+      background: #111;
+      color: #eee;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
     }
     .container {
-      background: #222; padding: 20px 30px; border-radius: 12px;
-      box-shadow: 0 0 20px #00ff88aa; text-align: center; max-width: 500px;
+      background: #222;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00ff88aa;
+      text-align: center;
+      max-width: 500px;
     }
     h2 { color: #00ff88; }
     p { color: #aaffaa; }
-    #countdown { font-size: 2.5rem; font-weight: bold; color: #00ff88; margin: 20px 0; }
-    #confirmBtn {
-      background: linear-gradient(135deg,#00ff88,#0088ff);
-      border: none; padding: 15px 30px; font-weight: bold; font-size: 1rem;
-      color: #000; border-radius: 10px; cursor: pointer;
+    #countdown {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #00ff88;
+      margin: 20px 0;
     }
-    #confirmBtn:disabled { background: #555; color: #aaa; cursor: not-allowed; }
-    #message { margin-top: 20px; color: #00ff88; font-weight: bold; }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    button {
+      flex: 1;
+      padding: 15px 10px;
+      font-weight: bold;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #confirmBtn {
+      background: linear-gradient(135deg, #00ff88, #0088ff);
+      color: #000;
+    }
+    #confirmBtn:disabled {
+      background: #555;
+      color: #aaa;
+      cursor: not-allowed;
+    }
+    #cancelBtn {
+      background: #ff3333;
+      color: #fff;
+    }
+    #cancelBtn:hover { background: #cc0000; }
+    #message {
+      margin-top: 20px;
+      color: #00ff88;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -31,14 +73,21 @@
     <h2>Confirmar Depósito</h2>
     <p>Após o pagamento, clique em confirmar abaixo.</p>
     <div id="countdown">01:00</div>
-    <button id="confirmBtn" disabled>Confirmar Depósito</button>
+
+    <div class="buttons">
+      <button id="confirmBtn" disabled>Confirmar</button>
+      <button id="cancelBtn">Cancelar</button>
+    </div>
+
     <div id="message"></div>
+
     <!-- Som de alerta -->
     <audio id="alertSound">
       <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
     </audio>
   </main>
 
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
@@ -58,6 +107,7 @@
 
     const countdownEl = document.getElementById("countdown");
     const confirmBtn = document.getElementById("confirmBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
     const messageEl = document.getElementById("message");
     const alertSound = document.getElementById("alertSound");
 
@@ -69,7 +119,8 @@
       window.location.href = "index.html";
     }
 
-    let tempo = 60; // segundos
+    // ⏳ Contagem regressiva
+    let tempo = 60;
     const timer = setInterval(() => {
       const min = String(Math.floor(tempo / 60)).padStart(2, '0');
       const seg = String(tempo % 60).padStart(2, '0');
@@ -80,10 +131,11 @@
         clearInterval(timer);
         confirmBtn.disabled = false;
         messageEl.textContent = "Você pode confirmar agora.";
-        alertSound.play(); // 🔔 toca alerta sonoro
+        alertSound.play();
       }
     }, 1000);
 
+    // ✅ Confirmar depósito
     confirmBtn.addEventListener("click", () => {
       confirmBtn.disabled = true;
       messageEl.textContent = "Processando...";
@@ -95,7 +147,6 @@
         const novoSaldo = saldoAtual + parseFloat(depositoDados.valor);
 
         userRef.update({ saldoCarteira: novoSaldo }).then(() => {
-          // Salva depósito no histórico
           const depositoRef = db.ref("depositos").push();
           depositoRef.set({
             nome: depositoDados.nome,
@@ -110,7 +161,6 @@
           messageEl.textContent = `✅ Depósito confirmado! Novo saldo: R$ ${novoSaldo.toFixed(2)}`;
           localStorage.removeItem("depositoDados");
 
-          // ⏩ Redireciona para H.html
           setTimeout(() => {
             window.location.href = "H.html";
           }, 2500);
@@ -120,6 +170,15 @@
       }).catch(() => {
         messageEl.textContent = "❌ Erro ao acessar o banco de dados.";
       });
+    });
+
+    // ❌ Cancelar depósito
+    cancelBtn.addEventListener("click", () => {
+      const confirmar = confirm("Tem certeza que deseja cancelar este depósito?");
+      if (confirmar) {
+        localStorage.removeItem("depositoDados");
+        window.location.href = "H.html"; // ou use history.back() se quiser voltar à página anterior
+      }
     });
 
     window.onbeforeunload = function () {
