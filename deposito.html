@@ -99,7 +99,7 @@
   let valorSelecionado = null;
 
   function criarBotoesValores() {
-    valores.forEach((valor, i) => {
+    valores.forEach((valor) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "amount-btn";
@@ -168,11 +168,10 @@
     const depositoDados = { nome, telefone, cpf, metodo, valor: valorSelecionado, timestamp: Date.now() };
     localStorage.setItem("depositoDados", JSON.stringify(depositoDados));
 
-    // Redireciona para copiar.html
     window.location.href = "copiar.html";
   });
 
-  function showError(msg) {
+  function showError(msg){
     errorMsg.textContent = msg;
     errorMsg.style.display = "block";
   }
