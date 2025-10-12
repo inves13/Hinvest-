@@ -1,76 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Extrato de Depósitos</title>
-  <style>
-    body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:20px; }
-    h1 { color:#00ff88; text-align:center; }
-    .extrato-item { background:#222; border-radius:10px; padding:15px; margin:10px 0; box-shadow:0 0 10px #00ff8866; }
-    .extrato-item strong { color:#00ff88; }
-    .vazio { text-align:center; color:#888; margin-top:30px; }
-    .btn-voltar {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
-      background: linear-gradient(135deg, #00ff88, #0088ff);
-      color: #000;
-      text-decoration: none;
-      border-radius: 10px;
-      text-align: center;
-      width: 200px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Extrato de Depósitos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:0; }
+  .container { max-width:750px; margin:20px auto; background:#222; border-radius:12px; padding:20px; box-shadow:0 0 20px #00ff88aa; }
+  h2 { color:#00ff88; margin-bottom:20px; text-align:center; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { padding:12px; text-align:left; border-bottom:1px solid #444; font-size:0.95em; }
+  th { color:#00ff88; }
+  td { color:#eee; }
+  .back-btn {
+    display:inline-block;
+    margin-bottom:20px;
+    padding:10px 15px;
+    border-radius:8px;
+    background: linear-gradient(135deg,#00ff88,#0088ff);
+    color:#000;
+    font-weight:bold;
+    text-decoration:none;
+    transition: all 0.3s ease;
+  }
+  .back-btn:hover { background: linear-gradient(135deg,#00cc66,#0055cc); color:#fff; }
+  .no-depositos { text-align:center; margin-top:40px; color:#888; font-size:1.1em; }
+  .pix { background: #a6f0c6; color: #000; font-weight:bold; text-align:center; border-radius:6px; }
+  .transferencia { background: #a0c4ff; color: #000; font-weight:bold; text-align:center; border-radius:6px; }
+  tbody tr:nth-child(even) { background:#1a1a1a; }
+  tbody tr:nth-child(odd) { background:#222; }
+  .valor-grande { color:#fffb00; font-weight:bold; }
+</style>
 </head>
 <body>
-  <h1>Extrato de Depósitos</h1>
-  <div id="extratos"></div>
-  <a href="index.html" class="btn-voltar">Voltar</a>
 
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-      authDomain: "hinvest-f4354.firebaseapp.com",
-      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-      projectId: "hinvest-f4354",
-      storageBucket: "hinvest-f4354.appspot.com",
-      messagingSenderId: "646397677016",
-      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+<main class="container">
+  <a href="deposito.html" class="back-btn">⬅ Voltar</a>
+  <h2>Extrato de Depósitos</h2>
+  <div id="depositosList"></div>
+</main>
 
-    const telefoneLogado = localStorage.getItem("telefoneLogado");
-    const extratosDiv = document.getElementById("extratos");
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.firebasestorage.app",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    if (!telefoneLogado) {
-      extratosDiv.innerHTML = "<p class='vazio'>Você precisa estar logado para ver seus extratos.</p>";
-    } else {
-      db.ref(`usuarios/${telefoneLogado}/extratosDepositos`).once("value", snapshot => {
-        if (snapshot.exists()) {
-          let html = "";
-          snapshot.forEach(item => {
-            const dado = item.val();
-            html += `
-              <div class="extrato-item">
-                <p><strong>Nome:</strong> ${dado.nome}</p>
-                <p><strong>CPF:</strong> ${dado.cpf}</p>
-                <p><strong>Telefone:</strong> ${dado.telefone}</p>
-                <p><strong>Valor:</strong> R$ ${dado.valor}</p>
-                <p><strong>Método:</strong> ${dado.metodoPagamento}</p>
-                <p><strong>Status:</strong> ${dado.status}</p>
-                <p><strong>Data:</strong> ${new Date(dado.data).toLocaleString()}</p>
-              </div>
-            `;
-          });
-          extratosDiv.innerHTML = html;
-        } else {
-          extratosDiv.innerHTML = "<p class='vazio'>Nenhum depósito registrado ainda.</p>";
-        }
-      });
+  const depositosList = document.getElementById("depositosList");
+
+  function formatarData(dataString){
+    if(!dataString) return '-';
+    const d = new Date(dataString); // Criar Date a partir da string ISO
+    return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+  }
+
+  function exibirDepositos(depositos){
+    depositosList.innerHTML = '';
+    if(depositos.length === 0){
+      depositosList.innerHTML = '<div class="no-depositos">Nenhum depósito encontrado.</div>';
+      return;
     }
-  </script>
+
+    let tabela = '<table><thead><tr><th>Nome</th><th>Telefone</th><th>CPF</th><th>Método</th><th>Valor</th><th>Data</th></tr></thead><tbody>';
+    depositos.forEach(dep => {
+      const metodoClass = dep.metodo.toLowerCase() === 'pix' ? 'pix' : 'transferencia';
+      const valorClass = dep.valor > 500 ? 'valor-grande' : '';
+      tabela += `<tr>
+        <td>${dep.nome}</td>
+        <td>${dep.telefone}</td>
+        <td>${dep.cpf}</td>
+        <td class="${metodoClass}">${dep.metodo}</td>
+        <td class="${valorClass}">R$ ${dep.valor}</td>
+        <td>${formatarData(dep.data)}</td>
+      </tr>`;
+    });
+    tabela += '</tbody></table>';
+    depositosList.innerHTML = tabela;
+  }
+
+  // Buscar depósitos do localStorage
+  const localDeposito = JSON.parse(localStorage.getItem("depositoDados"));
+  const localDepositos = localDeposito ? [{ ...localDeposito, data: localDeposito.timestamp ? new Date(localDeposito.timestamp).toISOString() : new Date().toISOString() }] : [];
+
+  // Buscar depósitos do Firebase
+  db.ref('depositos').once('value', snapshot => {
+    const firebaseDepositos = [];
+    snapshot.forEach(child => {
+      const dep = child.val();
+      firebaseDepositos.push(dep); // Já contém dep.data
+    });
+
+    const todosDepositos = [...localDepositos, ...firebaseDepositos];
+    todosDepositos.sort((a,b) => new Date(b.data) - new Date(a.data));
+    exibirDepositos(todosDepositos);
+  });
+</script>
+
 </body>
 </html>
