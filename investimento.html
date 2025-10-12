@@ -150,21 +150,21 @@ const cores = {
 };
 
 const planos = [
-  { nome: "Plano Bronze", valor: 60, dias: 60 },
-  { nome: "Plano Prata", valor: 160, dias: 60 },
-  { nome: "Plano Ouro", valor: 300, dias: 60 },
-  { nome: "Plano Platina", valor: 450, dias: 90 },
-  { nome: "Plano Diamante", valor: 500, dias: 90 },
-  { nome: "Plano Master", valor: 650, dias: 128 },
-  { nome: "Plano VIP", valor: 700, dias: 128 },
-  { nome: "Plano Supremo", valor: 850, dias: 128 },
-  { nome: "Plano Elite", valor: 900, dias: 128 },
-  { nome: "Plano Imperador", valor: 1050, dias: 128 }
+  { nome: "Plano Bronze", valor: 60, dias: 50 },
+  { nome: "Plano Prata", valor: 160, dias: 50 },
+  { nome: "Plano Ouro", valor: 300, dias: 50 },
+  { nome: "Plano Platina", valor: 450, dias: 50 },
+  { nome: "Plano Diamante", valor: 500, dias: 50 },
+  { nome: "Plano Master", valor: 650, dias: 50 },
+  { nome: "Plano VIP", valor: 700, dias: 50 },
+  { nome: "Plano Supremo", valor: 850, dias: 50 },
+  { nome: "Plano Elite", valor: 900, dias: 50 },
+  { nome: "Plano Imperador", valor: 1050, dias: 50 }
 ];
 
-// Aplicando 25% de rendimento diário
+// ✅ Rendimento diário: 3%
 function calcularRetornoDiario(valor) {
-  return (valor * 25) / 100;  // Rendimento de 25% ao dia
+  return (valor * 3) / 100;  // 3% ao dia
 }
 
 function atualizarSaldo() {
@@ -202,7 +202,7 @@ function comprarPlano(nome, valor, retorno, dias) {
     let d = snap.val() || {}, s = parseFloat(d.saldoCarteira || 0);
     if (s < valor) return mostrarNotificacao("❌ Saldo insuficiente!");
     const inv = d.investimentos || [];
-    inv.push({ nome, valor, retorno, dias, inicio: Date.now() });
+    inv.push({ nome, valor, retorno, dias, inicio: Date.now(), recebido: 0 });
     userRef.update({ saldoCarteira: s - valor, investimentos: inv }, () => {
       mostrarNotificacao("✅ Investimento realizado com sucesso!");
       atualizarSaldo();
@@ -223,16 +223,22 @@ function mostrarMeusProdutos() {
       const disabled = percent < 100 ? 'disabled' : '';
       const cor = cores[i.nome] || "#00c3ff";
       const lucroTotal = (parseFloat(i.retorno) * i.dias).toFixed(2);
+      const recebido = parseFloat(i.recebido || 0);
+      const restante = (lucroTotal - recebido).toFixed(2);
+
       c.innerHTML += `<div class="card" style="border: 2px solid ${cor}; box-shadow: 0 0 10px ${cor};">
         <img src="1004.png" />
         <h3 style="color:${cor}">${i.nome}</h3>
         <p>📅 ${i.dias} dias</p>
         <p>💵 R$${i.retorno} / dia</p>
         <p>📈 Lucro total: R$${lucroTotal}</p>
+        <p>🪙 Recebido: R$${recebido.toFixed(2)}</p>
+        <p>⏳ Restante: R$${restante}</p>
         <div class="progress-labels"><span>0%</span><span>100%</span></div>
         <div class="progress"><div class="progress-bar" id="bar${idx}" style="width:${percent}%"></div></div>
         <button id="btn${idx}" style="background:${cor}; color:black;" ${disabled} onclick="coletar(${idx})">📥 Coletar R$${i.retorno}</button>
       </div>`;
+
       if (percent < 100) setInterval(() => atualizaBarra(idx, i.inicio), 60000);
     });
   });
@@ -253,6 +259,7 @@ function coletar(idx) {
     const ganho = parseFloat(inv[idx].retorno);
     d.saldoCarteira = (parseFloat(d.saldoCarteira || 0)) + ganho;
     inv[idx].inicio = Date.now();
+    inv[idx].recebido = (parseFloat(inv[idx].recebido || 0) + ganho).toFixed(2);
     userRef.update({ saldoCarteira: d.saldoCarteira, investimentos: inv }, () => {
       mostrarNotificacao("✅ Rendimento coletado!");
       mostrarMeusProdutos();
