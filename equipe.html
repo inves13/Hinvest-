@@ -1,133 +1,165 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>H Invest - Minha Equipe</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      background: #000;
-      color: #fff;
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 500px;
-      margin: auto;
-    }
-    .card {
-      background: rgba(26, 26, 26, 0.9);
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
-      margin-bottom: 20px;
-      border: 1px solid #00bfff;
-    }
-    .card h2 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-size: 22px;
-      color: #00ffcc;
-      text-align: center;
-    }
-    .linha {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px;
-      background: rgba(43, 43, 43, 0.8);
-      border-radius: 10px;
-      margin-bottom: 10px;
-      align-items: center;
-      box-shadow: 0 0 8px rgba(0, 255, 200, 0.3);
-    }
-    button {
-      background: linear-gradient(135deg, #00ff99, #00ccff);
-      color: #000;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 12px rgba(0, 255, 200, 0.6);
-      margin-top: 10px;
-    }
-    button:hover {
-      background: linear-gradient(135deg, #00e68a, #00bfff);
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(0, 255, 200, 0.8);
-    }
-    #membros-lista {
-      max-height: 300px;
-      overflow-y: auto;
-      margin-top: 12px;
-    }
-    .membro {
-      padding: 10px;
-      background: rgba(51, 51, 51, 0.7);
-      border-radius: 10px;
-      margin-bottom: 10px;
-      box-shadow: 0 0 10px rgba(0, 255, 200, 0.2);
-      color: #00ffcc;
-    }
-    .membro strong {
-      color: #00ccff;
-    }
-    .center {
-      text-align: center;
-      color: #ccc;
-    }
-    .copy-btn {
-      background: #00bfff;
-      border: none;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      padding: 6px 10px;
-      border-radius: 6px;
-      margin-left: 10px;
-      transition: background 0.3s ease;
-    }
-    .copy-btn:hover {
-      background: #0099cc;
-    }
-    .codigo-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  </style>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<meta charset="UTF-8" />
+<title>H Invest - Minha Equipe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+body {
+  background: #000;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 500px;
+  margin: auto;
+}
+.card {
+  background: rgba(26, 26, 26, 0.9);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
+  margin-bottom: 20px;
+  border: 1px solid #00bfff;
+}
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 22px;
+  color: #00ffcc;
+  text-align: center;
+}
+.linha {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  background: rgba(43, 43, 43, 0.8);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+  box-shadow: 0 0 8px rgba(0, 255, 200, 0.3);
+}
+button {
+  background: linear-gradient(135deg, #00ff99, #00ccff);
+  color: #000;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 12px rgba(0, 255, 200, 0.6);
+  margin-top: 10px;
+}
+button:hover {
+  background: linear-gradient(135deg, #00e68a, #00bfff);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 255, 200, 0.8);
+}
+#membros-lista {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 12px;
+}
+.membro {
+  padding: 10px;
+  background: rgba(51, 51, 51, 0.7);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 0 10px rgba(0, 255, 200, 0.2);
+  color: #00ffcc;
+}
+.membro strong {
+  color: #00ccff;
+}
+.center {
+  text-align: center;
+  color: #ccc;
+}
+.copy-btn {
+  background: #00bfff;
+  border: none;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-left: 10px;
+  transition: background 0.3s ease;
+}
+.copy-btn:hover {
+  background: #0099cc;
+}
+.codigo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* NOVO ESTILO PARA NÍVEIS */
+.tabela-niveis {
+  background: rgba(43, 43, 43, 0.8);
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  color: #00ffcc;
+  box-shadow: 0 0 10px rgba(0,255,200,0.3);
+  font-size: 16px;
+}
+.tabela-niveis p {
+  margin: 8px 0;
+  font-weight: bold;
+}
+.tabela-niveis .nivel1 { color: #00ff99; }
+.tabela-niveis .nivel2 { color: #00ccff; }
+.tabela-niveis .nivel3 { color: #ffcc00; }
+.tabela-niveis .seta { font-size: 18px; margin: 0 5px; }
+</style>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <h2>🔗 Código de Convite</h2>
-      <div class="linha codigo-container">
-        <span id="codigo-link">Carregando...</span>
-        <button class="copy-btn" onclick="copiarTexto('codigo-link')">Copiar</button>
-      </div>
-      <button onclick="compartilharWhatsApp()">Compartilhar no WhatsApp</button>
+<div class="container">
+  <div class="card">
+    <h2>🔗 Código de Convite</h2>
+    <div class="linha codigo-container">
+      <span id="codigo-link">Carregando...</span>
+      <button class="copy-btn" onclick="copiarTexto('codigo-link')">Copiar</button>
     </div>
+    <button onclick="compartilharWhatsApp()">Compartilhar no WhatsApp</button>
+  </div>
 
-    <div class="card">
-      <h2>👥 Minha Equipe</h2>
-      <div class="linha"><strong>LV 1</strong> <span id="lv1-qtd">0</span></div>
-      <div class="linha"><strong>LV 2</strong> <span id="lv2-qtd">0</span></div>
-      <div class="linha"><strong>LV 3</strong> <span id="lv3-qtd">0</span></div>
-      <div class="linha"><strong>Total de Membros</strong> <span id="total-users">0</span></div>
-      <div class="linha"><strong>Bônus Acumulado</strong> <span id="total-bonus">R$ 0,00</span></div>
-      <button onclick="resgatarBonus()">Resgatar Bônus</button>
-    </div>
+  <div class="card">
+    <h2>👥 Minha Equipe</h2>
+    <div class="linha"><strong>LV 1</strong> <span id="lv1-qtd">0</span></div>
+    <div class="linha"><strong>LV 2</strong> <span id="lv2-qtd">0</span></div>
+    <div class="linha"><strong>LV 3</strong> <span id="lv3-qtd">0</span></div>
+    <div class="linha"><strong>Total de Membros</strong> <span id="total-users">0</span></div>
+    <div class="linha"><strong>Bônus Acumulado</strong> <span id="total-bonus">R$ 0,00</span></div>
+    <button onclick="resgatarBonus()">Resgatar Bônus</button>
+  </div>
 
-    <div class="card">
-      <h2>📄 Membros</h2>
-      <button onclick="mostrarMembros()">Ver Lista de Membros</button>
-      <div id="membros-lista"></div>
+  <div class="card">
+    <h2>📄 Membros</h2>
+    <button onclick="mostrarMembros()">Ver Lista de Membros</button>
+    <div id="membros-lista"></div>
+  </div>
+
+  <!-- CARD DE NÍVEIS -->
+  <div class="card">
+    <h2>💸 Níveis de Comissão</h2>
+    <div class="tabela-niveis">
+      <p class="nivel1">Nível 1 → 10% <span class="seta">➡️</span> indicado direto</p>
+      <p class="nivel2">Nível 2 → 2% <span class="seta">➡️</span> indicado do seu indicado</p>
+      <p class="nivel3">Nível 3 → 1% <span class="seta">➡️</span> indicado do nível 2</p>
     </div>
   </div>
+</div>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
@@ -140,6 +172,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
 const telefoneLogado = localStorage.getItem("telefoneLogado");
 if (!telefoneLogado) window.location.href = "index.html";
 
@@ -218,7 +251,7 @@ async function carregarEquipe() {
     if (u.codigoIndicacao === meuCodigo) {
       lv1++;
       membros.push({ tel: u.telefone, nivel: 1, data: u.dataCadastro });
-      bonusTotal += await verificarInvestimento(tel, 35, updatesBonus, bonusCalculado);
+      bonusTotal += await verificarInvestimento(tel, 10, updatesBonus, bonusCalculado);
 
       for (let tel2 in usuarios) {
         const u2 = usuarios[tel2];
@@ -270,7 +303,7 @@ function mostrarMembros() {
       if (investimentos) {
         for (let k in investimentos) if (investimentos[k].valor) totalInvestido += investimentos[k].valor;
       }
-      let percentual = m.nivel === 1 ? 35 : m.nivel === 2 ? 2 : 1;
+      let percentual = m.nivel === 1 ? 10 : m.nivel === 2 ? 2 : 1;
       let bonusGanho = totalInvestido * (percentual / 100);
       div.innerHTML = `<strong>Telefone:</strong> ${mascararTelefone(m.tel)}<br>
       <strong>Nível:</strong> LV ${m.nivel}<br>
