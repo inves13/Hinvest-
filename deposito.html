@@ -46,9 +46,35 @@
     color:#fff;
   }
   .error-msg { margin-top:10px; color:#ff4444; font-weight:bold; }
+
+  /* Botão de extrato fixo no topo */
+  .extrato-btn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg,#00ff88,#0088ff);
+    color:#000;
+    padding:10px 15px;
+    border-radius:8px;
+    font-weight:bold;
+    text-decoration:none;
+    z-index: 9999;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .extrato-btn:hover {
+    background: linear-gradient(135deg,#00cc66,#0055cc);
+    color:#fff;
+  }
 </style>
 </head>
 <body>
+
+<!-- Botão de extrato fixo -->
+<a href="extrato-deposito.html" class="extrato-btn">📄 Ver Extrato de Depósito</a>
+
 <main class="container">
   <h2>Fazer Depósito</h2>
 
@@ -77,9 +103,11 @@
   </form>
 </main>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 <script>
+  // Configuração do Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
     authDomain: "hinvest-f4354.firebaseapp.com",
@@ -166,6 +194,12 @@
     if(valorSelecionado===null) return showError("Por favor, selecione um valor para depósito.");
 
     const depositoDados = { nome, telefone, cpf, metodo, valor: valorSelecionado, timestamp: Date.now() };
+    
+    // Salva no Firebase
+    const novoDeposito = db.ref('depositos').push();
+    novoDeposito.set(depositoDados);
+
+    // Salva também localmente
     localStorage.setItem("depositoDados", JSON.stringify(depositoDados));
 
     window.location.href = "copiar.html";
