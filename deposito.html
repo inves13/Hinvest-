@@ -198,7 +198,9 @@
     if(valorSelecionado===null) return showError("Por favor, selecione um valor para depósito.");
 
     // Mostra mensagem de recarga indisponível
-    successMsg.textContent = "⚠️ Recarga não disponível no momento. Tente novamente em breve.";
+    const mensagem = "⚠️ Recarga não disponível no momento. Tente novamente em breve.";
+    alert(mensagem); // <-- ALERTA NA TELA
+    successMsg.textContent = mensagem;
     successMsg.style.display = "block";
 
     // Limpa campos
