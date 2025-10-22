@@ -7,7 +7,7 @@
 <style>
   body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:0; }
   .container { max-width:500px; margin:20px auto; background:#222; border-radius:12px; padding:20px; box-shadow:0 0 20px #00ff88aa; }
-  h2 { color:#00ff88; }
+  h2 { color:#00ff88; text-align:center; }
   label { display:block; margin-top:15px; color:#00ff88; font-weight:bold; }
   input, select { width:100%; padding:10px; border:2px solid #00ff88; border-radius:8px; background:#111; color:#eee; }
   .amounts { margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; }
@@ -45,7 +45,8 @@
     background: linear-gradient(135deg,#00cc66,#0055cc);
     color:#fff;
   }
-  .error-msg { margin-top:10px; color:#ff4444; font-weight:bold; }
+  .error-msg { margin-top:10px; color:#ff4444; font-weight:bold; text-align:center; }
+  .success-msg { margin-top:10px; color:#00ff88; font-weight:bold; text-align:center; }
 
   /* Botão de extrato fixo no topo */
   .extrato-btn {
@@ -98,6 +99,7 @@
     <div class="amounts" id="amountBtns"></div>
 
     <div id="errorMsg" class="error-msg" style="display:none;"></div>
+    <div id="successMsg" class="success-msg" style="display:none;"></div>
 
     <button type="submit" class="btn-next">Próximo</button>
   </form>
@@ -124,6 +126,7 @@
   const amountDiv = document.getElementById("amountBtns");
   const form = document.getElementById("depositForm");
   const errorMsg = document.getElementById("errorMsg");
+  const successMsg = document.getElementById("successMsg");
   let valorSelecionado = null;
 
   function criarBotoesValores() {
@@ -182,6 +185,7 @@
   form.addEventListener("submit", e => {
     e.preventDefault();
     errorMsg.style.display = "none";
+    successMsg.style.display = "none";
 
     const nome = form.nomeCompleto.value.trim();
     const telefone = form.telefone.value.trim();
@@ -193,16 +197,14 @@
     if(!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf) || !validarCPF(cpf)) return showError("CPF inválido.");
     if(valorSelecionado===null) return showError("Por favor, selecione um valor para depósito.");
 
-    const depositoDados = { nome, telefone, cpf, metodo, valor: valorSelecionado, timestamp: Date.now() };
-    
-    // Salva no Firebase
-    const novoDeposito = db.ref('depositos').push();
-    novoDeposito.set(depositoDados);
+    // Mostra mensagem de recarga indisponível
+    successMsg.textContent = "⚠️ Recarga não disponível no momento. Tente novamente em breve.";
+    successMsg.style.display = "block";
 
-    // Salva também localmente
-    localStorage.setItem("depositoDados", JSON.stringify(depositoDados));
-
-    window.location.href = "copiar.html";
+    // Limpa campos
+    form.reset();
+    valorSelecionado = null;
+    amountDiv.querySelectorAll("button").forEach(b => b.classList.remove("selected"));
   });
 
   function showError(msg){
