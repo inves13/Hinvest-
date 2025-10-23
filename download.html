@@ -1,77 +1,366 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baixar o App</title>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>H Invest - Cadastro/Login</title>
+
+  <!-- 🧩 CONFIGURAÇÃO PARA INSTALAR NA TELA INICIAL (PWA) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e90ff">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('✅ Service Worker registrado com sucesso.'))
+        .catch(err => console.log('❌ Erro ao registrar Service Worker:', err));
+    }
+  </script>
+
+  <style>
     body {
-        background-color: #000;
-        color: #fff;
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding: 50px 20px;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #111;
+      color: #fff;
     }
-    h1 {
-        color: #1e90ff;
+
+    input, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      transition: 0.3s;
     }
-    #btnDownload {
-        font-size: 18px;
-        padding: 14px 28px;
-        background: #1e90ff;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-top: 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+
+    input {
+      background: linear-gradient(145deg, #00ffcc, #007bff);
+      color: #fff;
+      border: 1px solid #00ffcc;
+      box-shadow: 0 0 8px #00ffcc88;
     }
-    #btnDownload:hover {
-        background: #187bcd;
+
+    input::placeholder {
+      color: #e0e0e0;
     }
-    .aviso {
-        margin-top: 20px;
-        color: #ccc;
-        font-size: 15px;
-        line-height: 1.4;
+
+    button {
+      background: linear-gradient(145deg, #00ffcc, #007bff);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 10px #00ffcc;
     }
-</style>
+
+    button:hover {
+      opacity: 0.9;
+      box-shadow: 0 0 15px #00ffcc;
+    }
+
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .form-box {
+      background: #1c1c1c;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    h2, h3 {
+      text-align: center;
+    }
+
+    #codigo-gerado {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #00ff99;
+      white-space: pre-wrap;
+      cursor: pointer;
+    }
+
+    .link {
+      text-align: center;
+      margin-top: 10px;
+      color: #00ff99;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .msg {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+      color: yellow;
+    }
+
+    #alerta-conectado {
+      position: fixed;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(145deg, #00ffcc, #007bff);
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 50px;
+      box-shadow: 0 0 20px #00ffcc;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.6s ease;
+    }
+
+    #btnAddApp {
+      display: block;
+      width: 100%;
+      background: #00ffcc;
+      color: #000;
+      font-weight: bold;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      margin-top: 15px;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 0 0 12px #00ffcc;
+    }
+
+    #btnAddApp:hover {
+      background: #00e0b5;
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
 
-<h1>Baixe o nosso aplicativo agora!</h1>
-<p>Clique no botão abaixo para iniciar o download do app:</p>
+  <div id="alerta-conectado"><span style="font-size: 22px;">✅</span> Conectado com sucesso!</div>
 
-<button id="btnDownload" onclick="baixarAPK()">📲 Baixar o App</button>
+  <div class="form-box">
+    <img src="1004.png" alt="Imagem H Invest" style="display:block; margin: 0 auto 20px auto; max-width: 100%; border-radius: 12px;" />
+    <h2>H Invest</h2>
 
-<p class="aviso">
-⚠️ Caso apareça um aviso do navegador,<br>
-toque em <b>“Baixar mesmo assim”</b> — o app é seguro!
-</p>
+    <h3>Criar Conta</h3>
+    <form id="cadastro-form">
+      <input type="text" id="cadastro-nome" placeholder="Nome completo" required />
+      <input type="text" id="cadastro-telefone" placeholder="Telefone (somente números)" required />
+      <input type="email" id="cadastro-email" placeholder="E-mail" required />
+      <input type="password" id="cadastro-senha" placeholder="Senha" required />
+      <input type="text" id="cadastro-codigo" placeholder="Código de Indicação (Opcional)" />
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <div id="codigo-gerado" onclick="copiarCodigo(this)"></div>
+
+    <h3>Entrar</h3>
+    <form id="login-form">
+      <input type="text" id="login-telefone" placeholder="Telefone" required />
+      <input type="password" id="login-senha" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+    </form>
+
+    <button id="btnAddApp" onclick="instalarApp()">📲 Adicionar à Tela Inicial</button>
+    <div class="msg" id="msg"></div>
+  </div>
 
 <script>
-function baixarAPK() {
-    // link oficial do app
-    var linkAPK = "https://inves13.github.io/Hinvest-/";
+  // 🔥 FIREBASE
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+    authDomain: "hinvest-f4354.firebaseapp.com",
+    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+    projectId: "hinvest-f4354",
+    storageBucket: "hinvest-f4354.appspot.com",
+    messagingSenderId: "646397677016",
+    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    // Verifica se o dispositivo é Android
-    var isAndroid = /android/i.test(navigator.userAgent);
+  const urlParams = new URLSearchParams(window.location.search);
+  const codigoIndicado = urlParams.get("codigo");
+  if (codigoIndicado) {
+    document.getElementById("cadastro-codigo").value = codigoIndicado;
+  }
 
-    if (isAndroid) {
-        // Cria um link invisível e força o download pelo navegador
-        var a = document.createElement("a");
-        a.href = linkAPK;
-        a.download = "HInvest.apk";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        alert("Seu download foi iniciado! Caso veja um aviso, confirme que deseja baixar o aplicativo.");
-    } else {
-        alert("Este aplicativo está disponível apenas para dispositivos Android.");
+  function gerarCodigoAlfanumerico(tamanho = 8) {
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let codigo = '';
+    for (let i = 0; i < tamanho; i++) {
+      codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
     }
-}
-</script>
+    return codigo;
+  }
 
+  function copiarCodigo(el) {
+    navigator.clipboard.writeText(el.innerText).then(() => {
+      alert("Código copiado!");
+    });
+  }
+
+  const msg = document.getElementById("msg");
+  const alerta = document.getElementById("alerta-conectado");
+
+  // CADASTRO
+  document.getElementById("cadastro-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const botao = this.querySelector("button");
+    botao.disabled = true;
+    botao.innerText = "Cadastrando...";
+
+    const nome = document.getElementById("cadastro-nome").value.trim();
+    const telefone = document.getElementById("cadastro-telefone").value.trim();
+    const email = document.getElementById("cadastro-email").value.trim();
+    const senha = document.getElementById("cadastro-senha").value.trim();
+    const codigoIndicacao = document.getElementById("cadastro-codigo").value.trim() || null;
+
+    if (!/^\d{10,11}$/.test(telefone)) {
+      alert("Telefone inválido. Use DDD + número.");
+      botao.disabled = false;
+      botao.innerText = "Cadastrar";
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("E-mail inválido.");
+      botao.disabled = false;
+      botao.innerText = "Cadastrar";
+      return;
+    }
+
+    if (!/^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{6,}$/.test(senha)) {
+      alert("Senha deve conter letras e números, no mínimo 6 caracteres.");
+      botao.disabled = false;
+      botao.innerText = "Cadastrar";
+      return;
+    }
+
+    db.ref("usuarios/" + telefone).once("value").then(snapshot => {
+      if (snapshot.exists()) {
+        alert("Já existe uma conta com esse telefone.");
+        botao.disabled = false;
+        botao.innerText = "Cadastrar";
+      } else {
+        const meuCodigo = gerarCodigoAlfanumerico();
+
+        db.ref("usuarios/" + telefone).set({
+          nome,
+          telefone,
+          email,
+          senha,
+          saldo: 20,
+          renda: 0,
+          recebimento: 0,
+          ultimoCheckin: "",
+          codigoIndicacao,
+          codigo: meuCodigo,
+          timestamp: Date.now(),
+          bloqueado: false
+        }).then(() => {
+          const link = "https://inves13.github.io/hivest-codigo-1/?codigo=" + meuCodigo;
+          const codigoEl = document.getElementById("codigo-gerado");
+          codigoEl.innerText = `Cadastro realizado!\nCódigo: ${meuCodigo}\nLink: ${link}`;
+
+          localStorage.setItem("telefoneLogado", telefone);
+
+          if (codigoIndicacao) {
+            db.ref("indicacoes/" + codigoIndicacao + "/" + telefone).set({
+              nome, telefone, timestamp: Date.now()
+            });
+          }
+
+          alerta.style.top = "10px";
+          alerta.style.opacity = "1";
+          setTimeout(() => {
+            alerta.style.top = "-60px";
+            alerta.style.opacity = "0";
+          }, 1600);
+
+          msg.innerText = "Redirecionando...";
+          setTimeout(() => {
+            window.location.href = "H.html";
+          }, 3000);
+        });
+      }
+    });
+  });
+
+  // LOGIN
+  document.getElementById("login-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const botao = this.querySelector("button");
+    botao.disabled = true;
+    botao.innerText = "Entrando...";
+
+    const telefone = document.getElementById("login-telefone").value.trim();
+    const senha = document.getElementById("login-senha").value.trim();
+
+    db.ref("usuarios/" + telefone).once("value").then(snapshot => {
+      const user = snapshot.val();
+      
+      if (user) {
+        if (user.bloqueado) {
+          msg.innerText = "Este número está bloqueado.";
+          botao.disabled = false;
+          botao.innerText = "Entrar";
+          return;
+        }
+
+        if (user.senha === senha) {
+          localStorage.setItem("telefoneLogado", telefone);
+
+          alerta.style.top = "10px";
+          alerta.style.opacity = "1";
+          setTimeout(() => {
+            alerta.style.top = "-60px";
+            alerta.style.opacity = "0";
+          }, 1600);
+
+          msg.innerText = "Login bem-sucedido!";
+          setTimeout(() => {
+            window.location.href = "H.html";
+          }, 2000);
+        } else {
+          alert("Telefone ou senha incorretos!");
+          botao.disabled = false;
+          botao.innerText = "Entrar";
+        }
+      } else {
+        alert("Telefone não encontrado!");
+        botao.disabled = false;
+        botao.innerText = "Entrar";
+      }
+    });
+  });
+
+  // 💠 INSTALAR NA TELA INICIAL (PWA)
+  let promptInstalacao;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    promptInstalacao = e;
+  });
+
+  function instalarApp() {
+    if (promptInstalacao) {
+      promptInstalacao.prompt();
+    } else {
+      alert("Para adicionar o app à tela inicial, abra o menu do navegador e toque em 'Adicionar à tela inicial'.");
+    }
+  }
+</script>
 </body>
 </html>
