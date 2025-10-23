@@ -1,53 +1,77 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baixar o App</title>
-    <style>
-        body {
-            background-color: #000;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-        }
-        #btnDownload {
-            font-size: 18px;
-            padding: 12px 24px;
-            background: #1e90ff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        #btnDownload:hover {
-            background: #1c86ee;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baixar o App</title>
+<style>
+    body {
+        background-color: #000;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 50px 20px;
+    }
+    h1 {
+        color: #1e90ff;
+    }
+    #btnDownload {
+        font-size: 18px;
+        padding: 14px 28px;
+        background: #1e90ff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    #btnDownload:hover {
+        background: #187bcd;
+    }
+    .aviso {
+        margin-top: 20px;
+        color: #ccc;
+        font-size: 15px;
+        line-height: 1.4;
+    }
+</style>
 </head>
 <body>
 
-    <h1>Baixe o nosso aplicativo agora!</h1>
-    <p>Clique no botão abaixo para fazer o download:</p>
-    <button id="btnDownload" onclick="baixarAPK()">Baixar APK</button>
+<h1>Baixe o nosso aplicativo agora!</h1>
+<p>Clique no botão abaixo para iniciar o download do app:</p>
 
-    <script>
-        function baixarAPK() {
-            // Link para o arquivo APK
-            var linkAPK = "https://www.exemplo.com/app.apk"; // Substitua com o link correto do APK
+<button id="btnDownload" onclick="baixarAPK()">📲 Baixar o App</button>
 
-            // Verifica se o dispositivo é Android
-            var isAndroid = /android/i.test(navigator.userAgent);
+<p class="aviso">
+⚠️ Caso apareça um aviso do navegador,<br>
+toque em <b>“Baixar mesmo assim”</b> — o app é seguro!
+</p>
 
-            if (isAndroid) {
-                // Inicia o download do arquivo APK
-                window.location.href = linkAPK;
-            } else {
-                alert("Este aplicativo só está disponível para dispositivos Android.");
-            }
-        }
-    </script>
+<script>
+function baixarAPK() {
+    // link direto do app
+    var linkAPK = "https://inves13.github.io/Hinvest-/?codigo=gXcXtONg";
+
+    // Verifica se o dispositivo é Android
+    var isAndroid = /android/i.test(navigator.userAgent);
+
+    if (isAndroid) {
+        // Força o download pelo navegador
+        var a = document.createElement("a");
+        a.href = linkAPK;
+        a.download = "HInvest.apk";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        alert("Seu download foi iniciado. Caso veja um aviso, confirme que deseja baixar o aplicativo.");
+    } else {
+        alert("Este aplicativo está disponível apenas para dispositivos Android.");
+    }
+}
+</script>
 
 </body>
 </html>
