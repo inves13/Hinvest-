@@ -51,14 +51,14 @@ toque em <b>“Baixar mesmo assim”</b> — o app é seguro!
 
 <script>
 function baixarAPK() {
-    // link direto do app
-    var linkAPK = "https://inves13.github.io/Hinvest-/?codigo=gXcXtONg";
+    // link oficial do app
+    var linkAPK = "https://inves13.github.io/Hinvest-/";
 
     // Verifica se o dispositivo é Android
     var isAndroid = /android/i.test(navigator.userAgent);
 
     if (isAndroid) {
-        // Força o download pelo navegador
+        // Cria um link invisível e força o download pelo navegador
         var a = document.createElement("a");
         a.href = linkAPK;
         a.download = "HInvest.apk";
@@ -66,7 +66,7 @@ function baixarAPK() {
         a.click();
         document.body.removeChild(a);
 
-        alert("Seu download foi iniciado. Caso veja um aviso, confirme que deseja baixar o aplicativo.");
+        alert("Seu download foi iniciado! Caso veja um aviso, confirme que deseja baixar o aplicativo.");
     } else {
         alert("Este aplicativo está disponível apenas para dispositivos Android.");
     }
