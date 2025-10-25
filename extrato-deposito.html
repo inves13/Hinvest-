@@ -5,105 +5,83 @@
 <title>Extrato de Depósitos</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:0; }
-  .container { max-width:750px; margin:20px auto; background:#222; border-radius:12px; padding:20px; box-shadow:0 0 20px #00ff88aa; }
-  h2 { color:#00ff88; margin-bottom:20px; text-align:center; }
-  table { width:100%; border-collapse:collapse; }
-  th, td { padding:12px; text-align:left; border-bottom:1px solid #444; font-size:0.95em; }
-  th { color:#00ff88; }
-  td { color:#eee; }
-  .back-btn {
-    display:inline-block;
-    margin-bottom:20px;
-    padding:10px 15px;
-    border-radius:8px;
-    background: linear-gradient(135deg,#00ff88,#0088ff);
-    color:#000;
-    font-weight:bold;
-    text-decoration:none;
-    transition: all 0.3s ease;
-  }
-  .back-btn:hover { background: linear-gradient(135deg,#00cc66,#0055cc); color:#fff; }
-  .no-depositos { text-align:center; margin-top:40px; color:#888; font-size:1.1em; }
-  .pix { background: #a6f0c6; color: #000; font-weight:bold; text-align:center; border-radius:6px; }
-  .transferencia { background: #a0c4ff; color: #000; font-weight:bold; text-align:center; border-radius:6px; }
-  tbody tr:nth-child(even) { background:#1a1a1a; }
-  tbody tr:nth-child(odd) { background:#222; }
-  .valor-grande { color:#fffb00; font-weight:bold; }
+body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:0; }
+.container { max-width:600px; margin:20px auto; background:#222; border-radius:12px; padding:20px; box-shadow:0 0 20px #00ff88aa; }
+h2 { color:#00ff88; text-align:center; margin-bottom: 20px; }
+.depositos-list { list-style:none; padding:0; margin:0; }
+.depositos-list li { background:#333; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.depositos-list li span { display:block; }
+.status-confirmado { color:#00ff88; font-weight:bold; }
+.status-pendente { color:#ffcc00; font-weight:bold; }
+.status-cancelado { color:#ff4444; font-weight:bold; }
 </style>
 </head>
 <body>
 
 <main class="container">
-  <a href="deposito.html" class="back-btn">⬅ Voltar</a>
   <h2>Extrato de Depósitos</h2>
-  <div id="depositosList"></div>
+  <ul class="depositos-list" id="depositosList">
+    <li>Carregando depósitos...</li>
+  </ul>
 </main>
 
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-    authDomain: "hinvest-f4354.firebaseapp.com",
-    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-    projectId: "hinvest-f4354",
-    storageBucket: "hinvest-f4354.firebasestorage.app",
-    messagingSenderId: "646397677016",
-    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+const firebaseConfig = {
+  apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+  authDomain: "hinvest-f4354.firebaseapp.com",
+  databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+  projectId: "hinvest-f4354",
+  storageBucket: "hinvest-f4354.appspot.com",
+  messagingSenderId: "646397677016",
+  appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+};
 
-  const depositosList = document.getElementById("depositosList");
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-  function formatarData(dataString){
-    if(!dataString) return '-';
-    const d = new Date(dataString); // Criar Date a partir da string ISO
-    return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+const telefoneLogado = localStorage.getItem("telefoneLogado");
+const depositosList = document.getElementById("depositosList");
+
+if (!telefoneLogado) {
+  alert("Você precisa estar logado para ver seus depósitos.");
+  window.location.href = "index.html";
+}
+
+// Buscar depósitos do usuário logado
+db.ref("depositos").orderByChild("telefone").equalTo(telefoneLogado).on("value", snapshot => {
+  depositosList.innerHTML = "";
+  if (!snapshot.exists()) {
+    depositosList.innerHTML = "<li>Nenhum depósito encontrado.</li>";
+    return;
   }
 
-  function exibirDepositos(depositos){
-    depositosList.innerHTML = '';
-    if(depositos.length === 0){
-      depositosList.innerHTML = '<div class="no-depositos">Nenhum depósito encontrado.</div>';
-      return;
-    }
+  snapshot.forEach(childSnap => {
+    const dep = childSnap.val();
+    const li = document.createElement("li");
 
-    let tabela = '<table><thead><tr><th>Nome</th><th>Telefone</th><th>CPF</th><th>Método</th><th>Valor</th><th>Data</th></tr></thead><tbody>';
-    depositos.forEach(dep => {
-      const metodoClass = dep.metodo.toLowerCase() === 'pix' ? 'pix' : 'transferencia';
-      const valorClass = dep.valor > 500 ? 'valor-grande' : '';
-      tabela += `<tr>
-        <td>${dep.nome}</td>
-        <td>${dep.telefone}</td>
-        <td>${dep.cpf}</td>
-        <td class="${metodoClass}">${dep.metodo}</td>
-        <td class="${valorClass}">R$ ${dep.valor}</td>
-        <td>${formatarData(dep.data)}</td>
-      </tr>`;
-    });
-    tabela += '</tbody></table>';
-    depositosList.innerHTML = tabela;
-  }
+    const valor = document.createElement("span");
+    valor.textContent = `R$ ${parseFloat(dep.valor).toFixed(2)}`;
 
-  // Buscar depósitos do localStorage
-  const localDeposito = JSON.parse(localStorage.getItem("depositoDados"));
-  const localDepositos = localDeposito ? [{ ...localDeposito, data: localDeposito.timestamp ? new Date(localDeposito.timestamp).toISOString() : new Date().toISOString() }] : [];
+    const metodo = document.createElement("span");
+    metodo.textContent = dep.metodo;
 
-  // Buscar depósitos do Firebase
-  db.ref('depositos').once('value', snapshot => {
-    const firebaseDepositos = [];
-    snapshot.forEach(child => {
-      const dep = child.val();
-      firebaseDepositos.push(dep); // Já contém dep.data
-    });
+    const status = document.createElement("span");
+    status.textContent = dep.status;
+    if(dep.status === "confirmado") status.className = "status-confirmado";
+    else if(dep.status === "pendente") status.className = "status-pendente";
+    else if(dep.status === "cancelado") status.className = "status-cancelado";
 
-    const todosDepositos = [...localDepositos, ...firebaseDepositos];
-    todosDepositos.sort((a,b) => new Date(b.data) - new Date(a.data));
-    exibirDepositos(todosDepositos);
+    const data = document.createElement("span");
+    const d = new Date(dep.data);
+    data.textContent = d.toLocaleString();
+
+    li.append(valor, metodo, status, data);
+    depositosList.appendChild(li);
   });
+});
 </script>
-
 </body>
 </html>
