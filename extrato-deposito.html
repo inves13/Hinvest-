@@ -7,10 +7,9 @@
 <style>
 body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:0; }
 .container { max-width:600px; margin:20px auto; background:#222; border-radius:12px; padding:20px; box-shadow:0 0 20px #00ff88aa; }
-h2 { color:#00ff88; text-align:center; margin-bottom: 20px; }
+h2 { color:#00ff88; text-align:center; margin-bottom:20px; }
 .depositos-list { list-style:none; padding:0; margin:0; }
-.depositos-list li { background:#333; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
-.depositos-list li span { display:block; }
+.depositos-list li { background:#333; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:4px; }
 .status-confirmado { color:#00ff88; font-weight:bold; }
 .status-pendente { color:#ffcc00; font-weight:bold; }
 .status-cancelado { color:#ff4444; font-weight:bold; }
@@ -29,6 +28,7 @@ h2 { color:#00ff88; text-align:center; margin-bottom: 20px; }
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
+// CONFIG DO FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
   authDomain: "hinvest-f4354.firebaseapp.com",
@@ -38,11 +38,11 @@ const firebaseConfig = {
   messagingSenderId: "646397677016",
   appId: "1:646397677016:web:f05ca27a38439568bff6ad"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const telefoneLogado = localStorage.getItem("telefoneLogado");
+// PEGAR TELEFONE LOGADO
+let telefoneLogado = localStorage.getItem("telefoneLogado");
 const depositosList = document.getElementById("depositosList");
 
 if (!telefoneLogado) {
@@ -50,37 +50,51 @@ if (!telefoneLogado) {
   window.location.href = "index.html";
 }
 
-// Buscar depósitos do usuário logado
-db.ref("depositos").orderByChild("telefone").equalTo(telefoneLogado).on("value", snapshot => {
+// Remove espaços e símbolos pra comparação exata
+telefoneLogado = telefoneLogado.replace(/\D/g, "");
+
+// Buscar depósitos
+db.ref("depositos").on("value", snapshot => {
   depositosList.innerHTML = "";
   if (!snapshot.exists()) {
     depositosList.innerHTML = "<li>Nenhum depósito encontrado.</li>";
     return;
   }
 
+  let encontrou = false;
   snapshot.forEach(childSnap => {
     const dep = childSnap.val();
-    const li = document.createElement("li");
+    if (!dep.telefone) return;
 
-    const valor = document.createElement("span");
-    valor.textContent = `R$ ${parseFloat(dep.valor).toFixed(2)}`;
+    const telefoneDep = dep.telefone.replace(/\D/g, "");
+    if (telefoneDep === telefoneLogado) {
+      encontrou = true;
+      const li = document.createElement("li");
 
-    const metodo = document.createElement("span");
-    metodo.textContent = dep.metodo;
+      const valor = document.createElement("span");
+      valor.textContent = `💰 Valor: R$ ${parseFloat(dep.valor).toFixed(2)}`;
 
-    const status = document.createElement("span");
-    status.textContent = dep.status;
-    if(dep.status === "confirmado") status.className = "status-confirmado";
-    else if(dep.status === "pendente") status.className = "status-pendente";
-    else if(dep.status === "cancelado") status.className = "status-cancelado";
+      const metodo = document.createElement("span");
+      metodo.textContent = `Método: ${dep.metodo}`;
 
-    const data = document.createElement("span");
-    const d = new Date(dep.data);
-    data.textContent = d.toLocaleString();
+      const status = document.createElement("span");
+      status.textContent = `Status: ${dep.status}`;
+      if(dep.status === "confirmado") status.className = "status-confirmado";
+      else if(dep.status === "pendente") status.className = "status-pendente";
+      else if(dep.status === "cancelado") status.className = "status-cancelado";
 
-    li.append(valor, metodo, status, data);
-    depositosList.appendChild(li);
+      const data = document.createElement("span");
+      const d = new Date(dep.data);
+      data.textContent = `Data: ${d.toLocaleString("pt-BR")}`;
+
+      li.append(valor, metodo, status, data);
+      depositosList.appendChild(li);
+    }
   });
+
+  if (!encontrou) {
+    depositosList.innerHTML = "<li>Nenhum depósito encontrado.</li>";
+  }
 });
 </script>
 </body>
