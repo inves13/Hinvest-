@@ -5,216 +5,157 @@
 <title>Depósito - Plataforma</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:0; }
-  .container { max-width:500px; margin:20px auto; background:#222; border-radius:12px; padding:20px; box-shadow:0 0 20px #00ff88aa; }
-  h2 { color:#00ff88; text-align:center; }
-  label { display:block; margin-top:15px; color:#00ff88; font-weight:bold; }
-  input, select { width:100%; padding:10px; border:2px solid #00ff88; border-radius:8px; background:#111; color:#eee; }
-  .amounts { margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; }
-  .amount-btn {
-    flex: 1 1 45%;
-    background:#333;
-    border:2px solid #555;
-    border-radius:10px;
-    padding:12px 0;
-    text-align:center;
-    color:#eee;
-    font-weight:bold;
-    cursor:pointer;
-    user-select:none;
-    transition: all 0.2s ease;
-  }
-  .amount-btn.selected {
-    background: linear-gradient(135deg, #00ff88, #0088ff);
-    color:#000;
-    border-color:#00ff88;
-  }
-  .btn-next {
-    margin-top: 25px;
-    background: linear-gradient(135deg,#00ff88,#0088ff);
-    border:none;
-    padding:12px;
-    border-radius:8px;
-    font-weight:bold;
-    color:#000;
-    cursor:pointer;
-    width:100%;
-    transition: background-color 0.3s ease;
-  }
-  .btn-next:hover {
-    background: linear-gradient(135deg,#00cc66,#0055cc);
-    color:#fff;
-  }
-  .error-msg { margin-top:10px; color:#ff4444; font-weight:bold; text-align:center; }
-  .success-msg { margin-top:10px; color:#00ff88; font-weight:bold; text-align:center; }
-
-  /* Botão de extrato fixo no topo */
-  .extrato-btn {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: linear-gradient(135deg,#00ff88,#0088ff);
-    color:#000;
-    padding:10px 15px;
-    border-radius:8px;
-    font-weight:bold;
-    text-decoration:none;
-    z-index: 9999;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .extrato-btn:hover {
-    background: linear-gradient(135deg,#00cc66,#0055cc);
-    color:#fff;
-  }
+body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:0; }
+.container { max-width:500px; margin:20px auto; background:#222; border-radius:12px; padding:20px; box-shadow:0 0 20px #00ff88aa; }
+h2 { color:#00ff88; text-align:center; }
+label { display:block; margin-top:15px; color:#00ff88; font-weight:bold; }
+input, select { width:100%; padding:10px; border:2px solid #00ff88; border-radius:8px; background:#111; color:#eee; }
+.amounts { margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; }
+.amount-btn { flex: 1 1 45%; background:#333; border:2px solid #555; border-radius:10px; padding:12px 0; text-align:center; color:#eee; font-weight:bold; cursor:pointer; user-select:none; transition: all 0.2s ease; }
+.amount-btn.selected { background: linear-gradient(135deg, #00ff88, #0088ff); color:#000; border-color:#00ff88; }
+.btn-next { margin-top: 25px; background: linear-gradient(135deg,#00ff88,#0088ff); border:none; padding:12px; border-radius:8px; font-weight:bold; color:#000; cursor:pointer; width:100%; transition: background-color 0.3s ease; }
+.btn-next:hover { background: linear-gradient(135deg,#00cc66,#0055cc); color:#fff; }
+.error-msg { margin-top:10px; color:#ff4444; font-weight:bold; text-align:center; }
+.success-msg { margin-top:10px; color:#00ff88; font-weight:bold; text-align:center; }
+.extrato-btn { position: fixed; top: 10px; right: 10px; background: linear-gradient(135deg,#00ff88,#0088ff); color:#000; padding:10px 15px; border-radius:8px; font-weight:bold; text-decoration:none; z-index: 9999; display: flex; align-items: center; gap: 6px; }
+.extrato-btn:hover { background: linear-gradient(135deg,#00cc66,#0055cc); color:#fff; }
 </style>
 </head>
 <body>
 
-<!-- Botão de extrato fixo -->
 <a href="extrato-deposito.html" class="extrato-btn">📄 Ver Extrato de Depósito</a>
 
 <main class="container">
-  <h2>Fazer Depósito</h2>
+<h2>Fazer Depósito</h2>
 
-  <form id="depositForm" novalidate>
-    <label for="nomeCompleto">Nome Completo</label>
-    <input type="text" id="nomeCompleto" name="nomeCompleto" required autocomplete="name" />
+<form id="depositForm" novalidate>
+<label for="nomeCompleto">Nome Completo</label>
+<input type="text" id="nomeCompleto" name="nomeCompleto" required autocomplete="name" />
 
-    <label for="telefone">Telefone</label>
-    <input type="tel" id="telefone" name="telefone" required placeholder="(00) 00000-0000" />
+<label for="telefone">Telefone</label>
+<input type="tel" id="telefone" name="telefone" required placeholder="(00) 00000-0000" />
 
-    <label for="cpf">CPF</label>
-    <input type="text" id="cpf" name="cpf" required placeholder="000.000.000-00" maxlength="14" />
+<label for="cpf">CPF</label>
+<input type="text" id="cpf" name="cpf" required placeholder="000.000.000-00" maxlength="14" />
 
-    <label for="pixMetodo">Método de Depósito</label>
-    <select id="pixMetodo" name="pixMetodo">
-      <option value="pix">PIX</option>
-      <option value="transferencia">Transferência Bancária</option>
-    </select>
+<label for="pixMetodo">Método de Depósito</label>
+<select id="pixMetodo" name="pixMetodo">
+<option value="pix">PIX</option>
+<option value="transferencia">Transferência Bancária</option>
+</select>
 
-    <label>Escolha o valor para depósito</label>
-    <div class="amounts" id="amountBtns"></div>
+<label>Escolha o valor para depósito</label>
+<div class="amounts" id="amountBtns"></div>
 
-    <div id="errorMsg" class="error-msg" style="display:none;"></div>
-    <div id="successMsg" class="success-msg" style="display:none;"></div>
+<div id="errorMsg" class="error-msg" style="display:none;"></div>
+<div id="successMsg" class="success-msg" style="display:none;"></div>
 
-    <button type="submit" class="btn-next">Próximo</button>
-  </form>
+<button type="submit" class="btn-next">Próximo</button>
+</form>
 </main>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script>
-  // Configuração do Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-    authDomain: "hinvest-f4354.firebaseapp.com",
-    databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-    projectId: "hinvest-f4354",
-    storageBucket: "hinvest-f4354.firebasestorage.app",
-    messagingSenderId: "646397677016",
-    appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+const firebaseConfig = {
+apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+authDomain: "hinvest-f4354.firebaseapp.com",
+databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+projectId: "hinvest-f4354",
+storageBucket: "hinvest-f4354.appspot.com",
+messagingSenderId: "646397677016",
+appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-  const valores = [60,160,300,450,500,650,700,850,900,1050];
-  const amountDiv = document.getElementById("amountBtns");
-  const form = document.getElementById("depositForm");
-  const errorMsg = document.getElementById("errorMsg");
-  const successMsg = document.getElementById("successMsg");
-  let valorSelecionado = null;
+const valores = [60,160,300,450,500,650,700,850,900,1050];
+const amountDiv = document.getElementById("amountBtns");
+const form = document.getElementById("depositForm");
+const errorMsg = document.getElementById("errorMsg");
+const successMsg = document.getElementById("successMsg");
+let valorSelecionado = null;
 
-  function criarBotoesValores() {
-    valores.forEach((valor) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "amount-btn";
-      btn.textContent = `R$ ${valor}`;
-      btn.addEventListener("click", () => selecionarValor(btn, valor));
-      amountDiv.appendChild(btn);
-    });
-  }
+function criarBotoesValores(){
+valores.forEach(valor=>{
+const btn = document.createElement("button");
+btn.type="button";
+btn.className="amount-btn";
+btn.textContent=`R$ ${valor}`;
+btn.addEventListener("click",()=>selecionarValor(btn,valor));
+amountDiv.appendChild(btn);
+});
+}
+function selecionarValor(btn,valor){
+valorSelecionado=valor;
+errorMsg.style.display="none";
+amountDiv.querySelectorAll("button").forEach(b=>b.classList.remove("selected"));
+btn.classList.add("selected");
+}
+function mascaraTelefone(valor){
+valor=valor.replace(/\D/g,"");
+if(valor.length>11) valor=valor.slice(0,11);
+if(valor.length>10) return valor.replace(/^(\d{2})(\d{5})(\d{4}).*/,"($1) $2-$3");
+if(valor.length>5) return valor.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,"($1) $2-$3");
+if(valor.length>2) return valor.replace(/^(\d{2})(\d{0,5})/,"($1) $2");
+return valor;
+}
+function mascaraCPF(valor){
+valor=valor.replace(/\D/g,"");
+if(valor.length>11) valor=valor.slice(0,11);
+if(valor.length>9) return valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/,"$1.$2.$3-$4");
+if(valor.length>6) return valor.replace(/^(\d{3})(\d{3})(\d{0,3}).*/,"$1.$2.$3");
+if(valor.length>3) return valor.replace(/^(\d{3})(\d{0,3}).*/,"$1.$2");
+return valor;
+}
+function validarCPF(cpf){
+cpf=cpf.replace(/[^\d]+/g,'');
+if(cpf.length!==11 || /^(\d)\1+$/.test(cpf)) return false;
+let soma=0;
+for(let i=0;i<9;i++) soma+=parseInt(cpf.charAt(i))*(10-i);
+let resto=(soma*10)%11; if(resto===10||resto===11) resto=0;
+if(resto!==parseInt(cpf.charAt(9))) return false;
+soma=0;
+for(let i=0;i<10;i++) soma+=parseInt(cpf.charAt(i))*(11-i);
+resto=(soma*10)%11; if(resto===10||resto===11) resto=0;
+if(resto!==parseInt(cpf.charAt(10))) return false;
+return true;
+}
 
-  function selecionarValor(btn, valor) {
-    valorSelecionado = valor;
-    errorMsg.style.display = "none";
-    amountDiv.querySelectorAll("button").forEach(b => b.classList.remove("selected"));
-    btn.classList.add("selected");
-  }
+form.telefone.addEventListener("input",e=>e.target.value=mascaraTelefone(e.target.value));
+form.cpf.addEventListener("input",e=>e.target.value=mascaraCPF(e.target.value));
 
-  function mascaraTelefone(valor) {
-    valor = valor.replace(/\D/g, "");
-    if(valor.length > 11) valor = valor.slice(0,11);
-    if(valor.length > 10) return valor.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
-    if(valor.length > 5) return valor.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
-    if(valor.length > 2) return valor.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
-    return valor;
-  }
+form.addEventListener("submit",e=>{
+e.preventDefault();
+errorMsg.style.display="none";
+successMsg.style.display="none";
 
-  function mascaraCPF(valor) {
-    valor = valor.replace(/\D/g, "");
-    if(valor.length > 11) valor = valor.slice(0,11);
-    if(valor.length > 9) return valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, "$1.$2.$3-$4");
-    if(valor.length > 6) return valor.replace(/^(\d{3})(\d{3})(\d{0,3}).*/, "$1.$2.$3");
-    if(valor.length > 3) return valor.replace(/^(\d{3})(\d{0,3}).*/, "$1.$2");
-    return valor;
-  }
+const nome = form.nomeCompleto.value.trim();
+const telefone = form.telefone.value.trim();
+const cpf = form.cpf.value.trim();
+const metodo = form.pixMetodo.value;
 
-  function validarCPF(cpf) {
-    cpf = cpf.replace(/[^\d]+/g,'');
-    if(cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
-    let soma = 0;
-    for(let i=0; i<9; i++) soma += parseInt(cpf.charAt(i))*(10-i);
-    let resto = (soma*10)%11; if(resto===10||resto===11) resto=0;
-    if(resto!==parseInt(cpf.charAt(9))) return false;
-    soma=0;
-    for(let i=0;i<10;i++) soma+=parseInt(cpf.charAt(i))*(11-i);
-    resto=(soma*10)%11; if(resto===10||resto===11) resto=0;
-    if(resto!==parseInt(cpf.charAt(10))) return false;
-    return true;
-  }
+if(nome.length<3) return showError("Por favor, preencha o nome completo.");
+if(!/^\(\d{2}\) \d{4,5}-\d{4}$/.test(telefone)) return showError("Telefone inválido. Use o formato (00) 00000-0000.");
+if(!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf) || !validarCPF(cpf)) return showError("CPF inválido.");
+if(valorSelecionado===null) return showError("Por favor, selecione um valor para depósito.");
 
-  form.telefone.addEventListener("input", e => e.target.value = mascaraTelefone(e.target.value));
-  form.cpf.addEventListener("input", e => e.target.value = mascaraCPF(e.target.value));
+// Salva dados temporários no localStorage do usuário logado
+localStorage.setItem("depositoDados", JSON.stringify({
+nome, telefone, cpf, metodo, valor: valorSelecionado
+}));
+localStorage.setItem("telefoneLogado", telefone);
 
-  form.addEventListener("submit", e => {
-    e.preventDefault();
-    errorMsg.style.display = "none";
-    successMsg.style.display = "none";
+// Redireciona para copiar PIX
+window.location.href = "copiar.html";
+});
 
-    const nome = form.nomeCompleto.value.trim();
-    const telefone = form.telefone.value.trim();
-    const cpf = form.cpf.value.trim();
-    const metodo = form.pixMetodo.value;
+function showError(msg){
+errorMsg.textContent=msg;
+errorMsg.style.display="block";
+}
 
-    if(nome.length < 3) return showError("Por favor, preencha o nome completo.");
-    if(!/^\(\d{2}\) \d{4,5}-\d{4}$/.test(telefone)) return showError("Telefone inválido. Use o formato (00) 00000-0000.");
-    if(!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf) || !validarCPF(cpf)) return showError("CPF inválido.");
-    if(valorSelecionado===null) return showError("Por favor, selecione um valor para depósito.");
-
-    // Mostra mensagem de recarga indisponível
-    const mensagem = "⚠️ Recarga não disponível no momento. Tente novamente em breve.";
-    alert(mensagem); // <-- ALERTA NA TELA
-    successMsg.textContent = mensagem;
-    successMsg.style.display = "block";
-
-    // Limpa campos
-    form.reset();
-    valorSelecionado = null;
-    amountDiv.querySelectorAll("button").forEach(b => b.classList.remove("selected"));
-  });
-
-  function showError(msg){
-    errorMsg.textContent = msg;
-    errorMsg.style.display = "block";
-  }
-
-  criarBotoesValores();
+criarBotoesValores();
 </script>
 </body>
 </html>
