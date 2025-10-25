@@ -58,16 +58,15 @@ input, select { width:100%; padding:10px; border:2px solid #00ff88; border-radiu
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script>
 const firebaseConfig = {
-apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-authDomain: "hinvest-f4354.firebaseapp.com",
-databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-projectId: "hinvest-f4354",
-storageBucket: "hinvest-f4354.appspot.com",
-messagingSenderId: "646397677016",
-appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+  apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+  authDomain: "hinvest-f4354.firebaseapp.com",
+  databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+  projectId: "hinvest-f4354",
+  storageBucket: "hinvest-f4354.appspot.com",
+  messagingSenderId: "646397677016",
+  appId: "1:646397677016:web:f05ca27a38439568bff6ad"
 };
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
 
 const valores = [60,160,300,450,500,650,700,850,900,1050];
 const amountDiv = document.getElementById("amountBtns");
@@ -77,82 +76,80 @@ const successMsg = document.getElementById("successMsg");
 let valorSelecionado = null;
 
 function criarBotoesValores(){
-valores.forEach(valor=>{
-const btn = document.createElement("button");
-btn.type="button";
-btn.className="amount-btn";
-btn.textContent=`R$ ${valor}`;
-btn.addEventListener("click",()=>selecionarValor(btn,valor));
-amountDiv.appendChild(btn);
-});
+  valores.forEach(valor=>{
+    const btn = document.createElement("button");
+    btn.type="button";
+    btn.className="amount-btn";
+    btn.textContent=`R$ ${valor}`;
+    btn.addEventListener("click",()=>selecionarValor(btn,valor));
+    amountDiv.appendChild(btn);
+  });
 }
+
 function selecionarValor(btn,valor){
-valorSelecionado=valor;
-errorMsg.style.display="none";
-amountDiv.querySelectorAll("button").forEach(b=>b.classList.remove("selected"));
-btn.classList.add("selected");
+  valorSelecionado=valor;
+  errorMsg.style.display="none";
+  amountDiv.querySelectorAll("button").forEach(b=>b.classList.remove("selected"));
+  btn.classList.add("selected");
 }
+
 function mascaraTelefone(valor){
-valor=valor.replace(/\D/g,"");
-if(valor.length>11) valor=valor.slice(0,11);
-if(valor.length>10) return valor.replace(/^(\d{2})(\d{5})(\d{4}).*/,"($1) $2-$3");
-if(valor.length>5) return valor.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,"($1) $2-$3");
-if(valor.length>2) return valor.replace(/^(\d{2})(\d{0,5})/,"($1) $2");
-return valor;
+  valor=valor.replace(/\D/g,"");
+  if(valor.length>11) valor=valor.slice(0,11);
+  if(valor.length>10) return valor.replace(/^(\d{2})(\d{5})(\d{4}).*/,"($1) $2-$3");
+  if(valor.length>5) return valor.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,"($1) $2-$3");
+  if(valor.length>2) return valor.replace(/^(\d{2})(\d{0,5})/,"($1) $2");
+  return valor;
 }
+
 function mascaraCPF(valor){
-valor=valor.replace(/\D/g,"");
-if(valor.length>11) valor=valor.slice(0,11);
-if(valor.length>9) return valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/,"$1.$2.$3-$4");
-if(valor.length>6) return valor.replace(/^(\d{3})(\d{3})(\d{0,3}).*/,"$1.$2.$3");
-if(valor.length>3) return valor.replace(/^(\d{3})(\d{0,3}).*/,"$1.$2");
-return valor;
+  valor=valor.replace(/\D/g,"");
+  if(valor.length>11) valor=valor.slice(0,11);
+  if(valor.length>9) return valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/,"$1.$2.$3-$4");
+  if(valor.length>6) return valor.replace(/^(\d{3})(\d{3})(\d{0,3}).*/,"$1.$2.$3");
+  if(valor.length>3) return valor.replace(/^(\d{3})(\d{0,3}).*/,"$1.$2");
+  return valor;
 }
+
 function validarCPF(cpf){
-cpf=cpf.replace(/[^\d]+/g,'');
-if(cpf.length!==11 || /^(\d)\1+$/.test(cpf)) return false;
-let soma=0;
-for(let i=0;i<9;i++) soma+=parseInt(cpf.charAt(i))*(10-i);
-let resto=(soma*10)%11; if(resto===10||resto===11) resto=0;
-if(resto!==parseInt(cpf.charAt(9))) return false;
-soma=0;
-for(let i=0;i<10;i++) soma+=parseInt(cpf.charAt(i))*(11-i);
-resto=(soma*10)%11; if(resto===10||resto===11) resto=0;
-if(resto!==parseInt(cpf.charAt(10))) return false;
-return true;
+  cpf=cpf.replace(/[^\d]+/g,'');
+  if(cpf.length!==11 || /^(\d)\1+$/.test(cpf)) return false;
+  let soma=0;
+  for(let i=0;i<9;i++) soma+=parseInt(cpf.charAt(i))*(10-i);
+  let resto=(soma*10)%11; if(resto===10||resto===11) resto=0;
+  if(resto!==parseInt(cpf.charAt(9))) return false;
+  soma=0;
+  for(let i=0;i<10;i++) soma+=parseInt(cpf.charAt(i))*(11-i);
+  resto=(soma*10)%11; if(resto===10||resto===11) resto=0;
+  if(resto!==parseInt(cpf.charAt(10))) return false;
+  return true;
 }
 
 form.telefone.addEventListener("input",e=>e.target.value=mascaraTelefone(e.target.value));
 form.cpf.addEventListener("input",e=>e.target.value=mascaraCPF(e.target.value));
 
 form.addEventListener("submit",e=>{
-e.preventDefault();
-errorMsg.style.display="none";
-successMsg.style.display="none";
+  e.preventDefault();
+  errorMsg.style.display="none";
+  successMsg.style.display="none";
 
-const nome = form.nomeCompleto.value.trim();
-const telefone = form.telefone.value.trim();
-const cpf = form.cpf.value.trim();
-const metodo = form.pixMetodo.value;
+  const nome = form.nomeCompleto.value.trim();
+  const telefone = form.telefone.value.trim();
+  const cpf = form.cpf.value.trim();
+  const metodo = form.pixMetodo.value;
 
-if(nome.length<3) return showError("Por favor, preencha o nome completo.");
-if(!/^\(\d{2}\) \d{4,5}-\d{4}$/.test(telefone)) return showError("Telefone inválido. Use o formato (00) 00000-0000.");
-if(!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf) || !validarCPF(cpf)) return showError("CPF inválido.");
-if(valorSelecionado===null) return showError("Por favor, selecione um valor para depósito.");
+  if(nome.length<3) return showError("Por favor, preencha o nome completo.");
+  if(!/^\(\d{2}\) \d{4,5}-\d{4}$/.test(telefone)) return showError("Telefone inválido. Use o formato (00) 00000-0000.");
+  if(!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf) || !validarCPF(cpf)) return showError("CPF inválido.");
+  if(valorSelecionado===null) return showError("Por favor, selecione um valor para depósito.");
 
-// Salva dados temporários no localStorage do usuário logado
-localStorage.setItem("depositoDados", JSON.stringify({
-nome, telefone, cpf, metodo, valor: valorSelecionado
-}));
-localStorage.setItem("telefoneLogado", telefone);
-
-// Redireciona para copiar PIX
-window.location.href = "copiar.html";
+  // 🚫 Mostra mensagem de recarga indisponível (sem redirecionar)
+  showError("⚠️ Recarga indisponível no momento. Tente novamente mais tarde.");
 });
 
 function showError(msg){
-errorMsg.textContent=msg;
-errorMsg.style.display="block";
+  errorMsg.textContent=msg;
+  errorMsg.style.display="block";
 }
 
 criarBotoesValores();
