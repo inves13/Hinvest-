@@ -1,189 +1,129 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Confirmar Depósito</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      background: #111;
-      color: #eee;
-      font-family: sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: #222;
-      padding: 20px 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px #00ff88aa;
-      text-align: center;
-      max-width: 500px;
-    }
-    h2 { color: #00ff88; }
-    p { color: #aaffaa; }
-    #countdown {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #00ff88;
-      margin: 20px 0;
-    }
-    .buttons {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 10px;
-    }
-    button {
-      flex: 1;
-      padding: 15px 10px;
-      font-weight: bold;
-      font-size: 1rem;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    #confirmBtn {
-      background: linear-gradient(135deg, #00ff88, #0088ff);
-      color: #000;
-    }
-    #confirmBtn:disabled {
-      background: #555;
-      color: #aaa;
-      cursor: not-allowed;
-    }
-    #cancelBtn {
-      background: #ff3333;
-      color: #fff;
-    }
-    #cancelBtn:hover { background: #cc0000; }
-    #message {
-      margin-top: 20px;
-      color: #00ff88;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Confirmar Depósito</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+body { background: #111; color: #eee; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+.container { background: #222; padding: 20px 30px; border-radius: 12px; box-shadow: 0 0 20px #00ff88aa; text-align: center; max-width: 500px; }
+h2 { color: #00ff88; }
+p { color: #aaffaa; }
+#countdown { font-size: 2.5rem; font-weight: bold; color: #00ff88; margin: 20px 0; }
+.buttons { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+button { flex: 1; padding: 15px 10px; font-weight: bold; font-size: 1rem; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s; }
+#confirmBtn { background: linear-gradient(135deg, #00ff88, #0088ff); color: #000; }
+#confirmBtn:disabled { background: #555; color: #aaa; cursor: not-allowed; }
+#cancelBtn { background: #ff3333; color: #fff; }
+#cancelBtn:hover { background: #cc0000; }
+#message { margin-top: 20px; color: #00ff88; font-weight: bold; }
+</style>
 </head>
 <body>
-  <main class="container">
-    <h2>Confirmar Depósito</h2>
-    <p>Após o pagamento, clique em confirmar abaixo.</p>
-    <div id="countdown">01:00</div>
 
-    <div class="buttons">
-      <button id="confirmBtn" disabled>Confirmar</button>
-      <button id="cancelBtn">Cancelar</button>
-    </div>
+<main class="container">
+<h2>Confirmar Depósito</h2>
+<p>Após o pagamento, clique em confirmar abaixo.</p>
+<div id="countdown">01:00</div>
 
-    <div id="message"></div>
+<div class="buttons">
+  <button id="confirmBtn" disabled>Confirmar</button>
+  <button id="cancelBtn">Cancelar</button>
+</div>
 
-    <!-- Som de alerta -->
-    <audio id="alertSound">
-      <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
-    </audio>
-  </main>
+<div id="message"></div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<audio id="alertSound">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
-      authDomain: "hinvest-f4354.firebaseapp.com",
-      databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
-      projectId: "hinvest-f4354",
-      storageBucket: "hinvest-f4354.appspot.com",
-      messagingSenderId: "646397677016",
-      appId: "1:646397677016:web:f05ca27a38439568bff6ad"
-    };
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCKSKnVC8dNWmiMrNr1j4rMLfQTlOrqzVM",
+  authDomain: "hinvest-f4354.firebaseapp.com",
+  databaseURL: "https://hinvest-f4354-default-rtdb.firebaseio.com",
+  projectId: "hinvest-f4354",
+  storageBucket: "hinvest-f4354.appspot.com",
+  messagingSenderId: "646397677016",
+  appId: "1:646397677016:web:f05ca27a38439568bff6ad"
+};
 
-    const countdownEl = document.getElementById("countdown");
-    const confirmBtn = document.getElementById("confirmBtn");
-    const cancelBtn = document.getElementById("cancelBtn");
-    const messageEl = document.getElementById("message");
-    const alertSound = document.getElementById("alertSound");
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-    const depositoDados = JSON.parse(localStorage.getItem("depositoDados"));
-    const telefoneLogado = localStorage.getItem("telefoneLogado");
+const countdownEl = document.getElementById("countdown");
+const confirmBtn = document.getElementById("confirmBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+const messageEl = document.getElementById("message");
+const alertSound = document.getElementById("alertSound");
 
-    if (!depositoDados || !telefoneLogado) {
-      alert("Dados de depósito ou telefone não encontrados. Você precisa estar logado e ter feito um depósito.");
-      window.location.href = "index.html";
-    }
+// Obter os dados enviados pelo Copiar.html
+const depositoDados = JSON.parse(localStorage.getItem("confirmarDepositoDados"));
+const telefoneLogado = localStorage.getItem("telefoneLogado");
 
-    // ⏳ Contagem regressiva
-    let tempo = 60;
-    const timer = setInterval(() => {
-      const min = String(Math.floor(tempo / 60)).padStart(2, '0');
-      const seg = String(tempo % 60).padStart(2, '0');
-      countdownEl.textContent = `${min}:${seg}`;
-      tempo--;
+if (!depositoDados || !telefoneLogado || depositoDados.telefone !== telefoneLogado) {
+  alert("Nenhum depósito encontrado para sua conta.");
+  window.location.href = "index.html";
+}
 
-      if (tempo < 0) {
-        clearInterval(timer);
-        confirmBtn.disabled = false;
-        messageEl.textContent = "Você pode confirmar agora.";
-        alertSound.play();
-      }
-    }, 1000);
+// ⏳ Contagem regressiva de 60 segundos
+let tempo = 60;
+const timer = setInterval(() => {
+  const min = String(Math.floor(tempo / 60)).padStart(2,'0');
+  const seg = String(tempo % 60).padStart(2,'0');
+  countdownEl.textContent = `${min}:${seg}`;
+  tempo--;
+  if (tempo < 0) {
+    clearInterval(timer);
+    confirmBtn.disabled = false;
+    messageEl.textContent = "Você pode confirmar agora.";
+    alertSound.play();
+  }
+}, 1000);
 
-    // ✅ Confirmar depósito
-    confirmBtn.addEventListener("click", () => {
-      confirmBtn.disabled = true;
-      messageEl.textContent = "Processando...";
+// ✅ Confirmar depósito
+confirmBtn.addEventListener("click", () => {
+  confirmBtn.disabled = true;
+  messageEl.textContent = "Processando...";
 
-      const userRef = db.ref("usuarios/" + telefoneLogado);
+  const userRef = db.ref("usuarios/" + telefoneLogado);
 
-      userRef.once("value").then(snapshot => {
-        let saldoAtual = parseFloat(snapshot.val()?.saldoCarteira || 0);
-        const novoSaldo = saldoAtual + parseFloat(depositoDados.valor);
+  userRef.once("value").then(snapshot => {
+    let saldoAtual = parseFloat(snapshot.val()?.saldoCarteira || 0);
+    const novoSaldo = saldoAtual + parseFloat(depositoDados.valor);
 
-        userRef.update({ saldoCarteira: novoSaldo }).then(() => {
-          const depositoRef = db.ref("depositos").push();
-          depositoRef.set({
-            nome: depositoDados.nome,
-            telefone: telefoneLogado,
-            cpf: depositoDados.cpf,
-            metodo: depositoDados.metodo,
-            valor: depositoDados.valor,
-            status: "confirmado",
-            data: new Date().toISOString()
-          });
-
-          messageEl.textContent = `✅ Depósito confirmado! Novo saldo: R$ ${novoSaldo.toFixed(2)}`;
-          localStorage.removeItem("depositoDados");
-
-          setTimeout(() => {
-            window.location.href = "H.html";
-          }, 2500);
-        }).catch(() => {
-          messageEl.textContent = "❌ Erro ao atualizar saldo.";
-        });
-      }).catch(() => {
-        messageEl.textContent = "❌ Erro ao acessar o banco de dados.";
+    userRef.update({ saldoCarteira: novoSaldo }).then(() => {
+      const depositoRef = db.ref("depositos").push();
+      depositoRef.set({
+        nome: depositoDados.nome,
+        telefone: telefoneLogado,
+        cpf: depositoDados.cpf,
+        metodo: depositoDados.metodo,
+        valor: depositoDados.valor,
+        status: "confirmado",
+        data: new Date().toISOString()
       });
-    });
 
-    // ❌ Cancelar depósito
-    cancelBtn.addEventListener("click", () => {
-      const confirmar = confirm("Tem certeza que deseja cancelar este depósito?");
-      if (confirmar) {
-        localStorage.removeItem("depositoDados");
-        window.location.href = "H.html"; // ou use history.back() se quiser voltar à página anterior
-      }
-    });
+      messageEl.textContent = `✅ Depósito confirmado! Novo saldo: R$ ${novoSaldo.toFixed(2)}`;
+      localStorage.removeItem("confirmarDepositoDados");
 
-    window.onbeforeunload = function () {
-      return "Se sair agora, a confirmação será perdida.";
-    };
-  </script>
+      setTimeout(()=>window.location.href="H.html",2500);
+    }).catch(()=>{ messageEl.textContent = "❌ Erro ao atualizar saldo."; });
+  }).catch(()=>{ messageEl.textContent = "❌ Erro ao acessar o banco de dados."; });
+});
+
+// ❌ Cancelar depósito
+cancelBtn.addEventListener("click", () => {
+  if (confirm("Tem certeza que deseja cancelar este depósito?")) {
+    localStorage.removeItem("confirmarDepositoDados");
+    window.location.href = "H.html";
+  }
+});
+
+window.onbeforeunload = () => "Se sair agora, a confirmação será perdida.";
+</script>
 </body>
 </html>
